@@ -1,0 +1,3 @@
+#!/bin/sh
+prefix=@prefix@
+guile @datarootdir@/ssim.scm
