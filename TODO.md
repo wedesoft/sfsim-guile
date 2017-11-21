@@ -1,6 +1,7 @@
 # TODO
 
-* 3d wireframe box display
+* quaternion rotation
+* scale cube
 * Runge Kutta
 * 3d rotation
 * 3d collision with ground
