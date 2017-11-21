@@ -8,5 +8,6 @@ GUILE_PKG([2.2 2.0])
 GUILE_MODULE_REQUIRED(gl)
 GUILE_MODULE_REQUIRED(glut)
 AC_OUTPUT(Makefile
+          ssimlib/Makefile
           tests/Makefile
           ssim)

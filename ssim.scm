@@ -7,16 +7,19 @@
 (define glut-wire-cube (pointer->procedure void (dynamic-func "glutWireCube" glut) (list double)))
 
 (define (on-reshape width height)
-  (pk 'reshape! width height)
-  (gl-viewport 0 0 width height)
-  (set-gl-matrix-mode (matrix-mode projection))
-  (gl-load-identity)
-  (gl-ortho -1 1 -1 1 -1 +1))
+  (let [(aspect (/ width height))]
+    (pk 'reshape! width height)
+    (gl-viewport 0 0 width height)
+    (set-gl-matrix-mode (matrix-mode projection))
+    (gl-load-identity)
+    (gl-ortho (- aspect) aspect -1 1 -1 +1)))
 
 (define (on-display)
   (pk 'on-display)
   (gl-clear (clear-buffer-mask color-buffer))
   (gl-color 0 1 0)
+  (set-gl-matrix-mode (matrix-mode modelview))
+;  (gl-rotate 30 1 1 0)
   (glut-wire-cube 0.5)
   (swap-buffers))
 

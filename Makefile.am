@@ -1,6 +1,6 @@
 ACLOCAL_ANFLAGS = -I m4
 
-SUBDIRS = tests
+SUBDIRS = ssimlib tests
 
 bin_SCRIPTS = ssim
 
