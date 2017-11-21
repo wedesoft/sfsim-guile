@@ -25,6 +25,22 @@
     (equal? 0 (make-quaternion 0 0 0 0)))
   (test-assert "Compare quaternion with complex number"
     (equal? 3+5i (make-quaternion 3 5 0 0)))
-  (test-equal "Quaternion multiplication"
-    0 0))
+  (test-equal "Negate quaternion"
+    (make-quaternion -2 -3 -5 -7) (- (make-quaternion 2 3 5 7)))
+  (test-equal "Difference of quaternions"
+    (make-quaternion -1 -2 -2 -4) (- (make-quaternion 2 3 5 7) (make-quaternion 3 5 7 11)))
+  (let [(i2 (make-quaternion 0 2 0 0))
+        (j2 (make-quaternion 0 0 2 0))
+        (k2 (make-quaternion 0 0 0 2))]
+    (for-each (lambda (a results)
+      (for-each (lambda (b expected)
+          (test-assert (format #f "Multiplying ~a with ~a is expected to be ~a" a b expected)
+            (zero? (- (* a b) expected)))
+          (format #t "# ~a~&" expected))
+        (list 2 i j k) results))
+      (list 2 i j k)
+      (list (list 4 i2 j2 k2)
+            (list i2 -1 k (- j))
+            (list j2 (- k) -1 i)
+            (list k2 j (- i) -1)))))
 (test-end "ssim quaternion")
