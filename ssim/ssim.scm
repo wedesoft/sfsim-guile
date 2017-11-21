@@ -1,6 +1,6 @@
 #!/usr/bin/env guile
 !#
-(use-modules (system foreign) (glut) (gl))
+(use-modules (system foreign) (glut) (gl) (ssim quaternion))
 
 
 (define glut (dynamic-link "libglut"))

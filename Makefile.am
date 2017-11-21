@@ -1,7 +1,6 @@
 ACLOCAL_ANFLAGS = -I m4
 
-SUBDIRS = ssimlib tests
+SUBDIRS = ssim tests
 
-bin_SCRIPTS = ssim
-
-data_DATA = ssim.scm
+run:
+	$(GUILE) -L $(top_builddir) $(top_srcdir)/ssim/ssim.scm

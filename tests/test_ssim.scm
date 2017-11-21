@@ -1,6 +1,6 @@
 (use-modules (srfi srfi-64)
              (srfi srfi-26)
-             (ssimlib quaternion))
+             (ssim quaternion))
 
 
 (test-begin "ssim")

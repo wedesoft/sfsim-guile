@@ -1,4 +1,4 @@
-(define-module (ssimlib quaternion)
+(define-module (ssim quaternion)
   #:use-module (oop goops)
   #:use-module (ice-9 format)
   #:use-module (ice-9 optargs)
