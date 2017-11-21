@@ -27,6 +27,8 @@
     (equal? 3+5i (make-quaternion 3 5 0 0)))
   (test-equal "Negate quaternion"
     (make-quaternion -2 -3 -5 -7) (- (make-quaternion 2 3 5 7)))
+  (test-equal "Sum of quaternions"
+    (make-quaternion 5 8 12 18) (+ (make-quaternion 2 3 5 7) (make-quaternion 3 5 7 11)))
   (test-equal "Difference of quaternions"
     (make-quaternion -1 -2 -2 -4) (- (make-quaternion 2 3 5 7) (make-quaternion 3 5 7 11)))
   (let [(i2 (make-quaternion 0 2 0 0))

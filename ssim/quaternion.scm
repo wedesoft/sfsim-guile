@@ -33,6 +33,12 @@
 (define-method (- (a <quaternion>))
   (make-quaternion (- (real-part a)) (- (imag-part a)) (- (jmag-part a)) (- (kmag-part a))))
 
+(define-method (+ (a <quaternion>) (b <quaternion>))
+  (make-quaternion (+ (real-part a) (real-part b))
+                   (+ (imag-part a) (imag-part b))
+                   (+ (jmag-part a) (jmag-part b))
+                   (+ (kmag-part a) (kmag-part b))))
+
 (define-method (- (a <quaternion>) (b <quaternion>))
   (make-quaternion (- (real-part a) (real-part b))
                    (- (imag-part a) (imag-part b))
