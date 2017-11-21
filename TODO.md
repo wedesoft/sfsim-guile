@@ -4,6 +4,8 @@
 * Runge Kutta
 * 3d rotation
 * 3d collision with ground
+* LLVM-based structs
+* contacts with friction
 * 3d collision with object
 * resting contacts
 * suspension
