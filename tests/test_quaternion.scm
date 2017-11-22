@@ -19,7 +19,7 @@
   (make-quaternion 2 3 5 7) (make-quaternion 2 3 5 7))
 (test-end "quaternion objects")
 
-(test-begin "comparisons")
+(test-begin "equality")
 (let [(i (make-quaternion 0 1 0 0))
       (j (make-quaternion 0 0 1 0))
       (k (make-quaternion 0 0 0 1))]
@@ -27,11 +27,25 @@
     (test-assert (format #f "Compare zero with ~a" b)
       (not (equal? (make-quaternion 0 0 0 0) b))))
     (list 1 i j k))
-  (test-assert "Compare zero quaternion with scalar"
-    (equal? 0 (make-quaternion 0 0 0 0)))
-  (test-assert "Compare quaternion with complex number"
-    (equal? 3+5i (make-quaternion 3 5 0 0))))
-(test-end "comparisons")
+  (test-equal "Compare zero quaternion with scalar"
+    0 (make-quaternion 0 0 0 0))
+  (test-equal "Compare quaternion with complex number"
+    3+5i (make-quaternion 3 5 0 0)))
+(test-end "equality")
+
+(test-begin "comparison with =")
+  (test-assert "zero quaternion = 0"
+    (= (make-quaternion 2 3 5 7) (make-quaternion 2 3 5 7)))
+  (let [(i (make-quaternion 0 1 0 0))
+        (j (make-quaternion 0 0 1 0))
+        (k (make-quaternion 0 0 0 1))]
+    (for-each (lambda (b)
+      (test-assert (format #f "zero != ~a" b)
+        (not (= (make-quaternion 0 0 0 0) b))))
+      (list 1 i j k)))
+  (test-assert "use = for comparing components"
+    (= (make-quaternion 2 3 5 7) (make-quaternion 2.0 3.0 5.0 7.0)))
+(test-end "comparison with =")
 
 (test-begin "unary operations")
   (test-equal "Negate quaternion"

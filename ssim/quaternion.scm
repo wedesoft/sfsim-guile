@@ -5,7 +5,7 @@
   #:use-module (srfi srfi-26)
   #:export (<quaternion>
             make-quaternion jmag-part kmag-part quaternion-rotation)
-  #:re-export (real-part imag-part))
+  #:re-export (real-part imag-part =))
 
 
 (define-class <quaternion> ()
@@ -28,18 +28,25 @@
 (define-method (write (self <quaternion>) port)
   (format port "~f~@fi~@fj~@fk" (real-part self) (imag-part self) (jmag-part self) (kmag-part self)))
 
-(define-method (equal? (a <quaternion>) (b <quaternion>))
-  (and (eqv? (real-part a) (real-part b))
-       (eqv? (imag-part a) (imag-part b))
-       (eqv? (jmag-part a) (jmag-part b))
-       (eqv? (kmag-part a) (kmag-part b))))
-
 (define-syntax-rule (quaternion-binary-op op)
   (begin
     (define-method (op (a <real>) (b <quaternion>)) (op (make-quaternion2 a 0 0 0) b))
     (define-method (op (a <quaternion>) (b <real>)) (op a (make-quaternion2 b 0 0 0)))
     (define-method (op (a <complex>) (b <quaternion>)) (op (make-quaternion2 (real-part a) (imag-part a) 0 0) b))
     (define-method (op (a <quaternion>) (b <complex>)) (op a (make-quaternion2 (real-part b) (imag-part b) 0 0)))))
+
+(define-method (equal? (a <quaternion>) (b <quaternion>))
+  (and (equal? (real-part a) (real-part b))
+       (equal? (imag-part a) (imag-part b))
+       (equal? (jmag-part a) (jmag-part b))
+       (equal? (kmag-part a) (kmag-part b))))
+
+(define-method (= (a <quaternion>) (b <quaternion>))
+  (and (= (real-part a) (real-part b))
+       (= (imag-part a) (imag-part b))
+       (= (jmag-part a) (jmag-part b))
+       (= (kmag-part a) (kmag-part b))))
+(quaternion-binary-op =)
 
 (define-method (- (a <quaternion>))
   (make-quaternion (- (real-part a)) (- (imag-part a)) (- (jmag-part a)) (- (kmag-part a))))
