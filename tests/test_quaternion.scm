@@ -103,7 +103,7 @@
     (make-quaternion 0.108 -0.144 -0.24 -0.4) (quaternion-conjugate (make-quaternion 0.432 0.576 0.96 1.6)))
 (test-end "conjugate")
 
-(test-begin "rotation")
+(test-begin "rotations")
   (test-approximate "no rotation"
     1.0 (quaternion-rotation 0 '(0 0 1)) 1e-6)
   (test-approximate "no rotation"
@@ -124,5 +124,9 @@
     '(2.0 4.0 8.0) (rotate-vector (quaternion-rotation 0 '(1 0 0)) '(2.0 4.0 8.0)))
   (test-equal "Rotate vector around x-axis"
     '(2.0 -8.0 4.0) (map round (rotate-vector (quaternion-rotation (/ pi 2) '(1 0 0)) '(2.0 4.0 8.0))))
-(test-end "rotation")
+  (test-equal "Create identity matrix for zero rotation"
+    '((1.0 0 0) (0 1 0) (0 0 1)) (rotation-matrix (quaternion-rotation 0 '(1 0 0))))
+  (test-approximate "Create rotation matrix for rotation around z-axis"
+    -1 (cadar (rotation-matrix (quaternion-rotation (/ pi 2) '(0 0 1)))) 1e-6)
+(test-end "rotations")
 (test-end "ssim quaternion")

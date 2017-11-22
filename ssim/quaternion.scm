@@ -6,7 +6,7 @@
   #:use-module (srfi srfi-26)
   #:export (<quaternion>
             make-quaternion jmag-part kmag-part quaternion-rotation quaternion-norm quaternion-conjugate
-            vector->quaternion quaternion->vector rotate-vector)
+            vector->quaternion quaternion->vector rotate-vector rotation-matrix)
   #:re-export (real-part imag-part))
 
 
@@ -91,10 +91,12 @@
   "Compute norm of quaternion"
   (sqrt (quaternion-norm2 self)))
 
+(define (quaternion-conjugate2 self)
+  (make-quaternion (real-part self) (- (imag-part self)) (- (jmag-part self)) (- (kmag-part self))))
+
 (define (quaternion-conjugate self)
   "Determine multiplicative inverse of quaternion"
-  (* (make-quaternion (real-part self) (- (imag-part self)) (- (jmag-part self)) (- (kmag-part self)))
-     (/ 1 (quaternion-norm2 self))))
+  (* (quaternion-conjugate2 self) (/ 1 (quaternion-norm2 self))))
 
 (define (quaternion-rotation theta axis)
   "Use quaternion to reprsent a rotation"
@@ -114,3 +116,8 @@
 (define (rotate-vector self vec)
   "Perform vector rotation with rotation represented using a quaternion"
   (quaternion->vector (* self (vector->quaternion vec) (quaternion-conjugate self))))
+
+(define (rotation-matrix self)
+  "Convert rotation quaternion to a rotation matrix"
+  (let [(conjugate (quaternion-conjugate2 self))]
+    (map (cut rotate-vector conjugate <>) '((1 0 0) (0 1 0) (0 0 1)))))
