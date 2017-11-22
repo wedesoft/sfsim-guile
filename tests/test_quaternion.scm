@@ -89,18 +89,32 @@
             (list k2 j (- i) -1)))))
 (test-end "binary operations")
 
+(test-begin "norm")
+  (test-equal "Norm of unit quaternion"
+    1.0 (quaternion-norm (make-quaternion 0.216 0.288 0.48 0.8)))
+  (test-equal "Norm of larger quaternion"
+    2.0 (quaternion-norm (make-quaternion 0.432 0.576 0.96 1.6)))
+(test-end "norm")
+
+(test-begin "conjugate")
+  (test-equal "Conjugate of unit quaternion"
+    (make-quaternion 0.216 -0.288 -0.48 -0.8) (quaternion-conjugate (make-quaternion 0.216 0.288 0.48 0.8)))
+  (test-equal "Conjugate of larger quaternion"
+    (make-quaternion 0.108 -0.144 -0.24 -0.4) (quaternion-conjugate (make-quaternion 0.432 0.576 0.96 1.6)))
+(test-end "conjugate")
+
 (test-begin "rotation")
-(test-approximate "no rotation"
-  1.0 (quaternion-rotation 0 '(0 0 1)) 1e-6)
-(test-approximate "no rotation"
-  -1.0 (quaternion-rotation (* 2 pi) '(0 0 1)) 1e-6)
-(let [(q (quaternion-rotation pi '(0.36 0.48 0.8)))]
-  (test-approximate "imaginary part of 180° rotation quaternion"
-    0.36 (imag-part q) 1e-6)
-  (test-approximate "kmaginary part of 180° rotation quaternion"
-    0.8 (kmag-part q) 1e-6))
-(let [(q (quaternion-rotation (/ pi 3) '(0.36 0.48 0.8)))]
-  (test-approximate "imaginary part of 60° rotation quaternion"
-    (* 0.5 0.36) (imag-part q) 1e-6))
+  (test-approximate "no rotation"
+    1.0 (quaternion-rotation 0 '(0 0 1)) 1e-6)
+  (test-approximate "no rotation"
+    -1.0 (quaternion-rotation (* 2 pi) '(0 0 1)) 1e-6)
+  (let [(q (quaternion-rotation pi '(0.36 0.48 0.8)))]
+    (test-approximate "imaginary part of 180° rotation quaternion"
+      0.36 (imag-part q) 1e-6)
+    (test-approximate "kmaginary part of 180° rotation quaternion"
+      0.8 (kmag-part q) 1e-6))
+  (let [(q (quaternion-rotation (/ pi 3) '(0.36 0.48 0.8)))]
+    (test-approximate "imaginary part of 60° rotation quaternion"
+      (* 0.5 0.36) (imag-part q) 1e-6))
 (test-end "rotation")
 (test-end "ssim quaternion")

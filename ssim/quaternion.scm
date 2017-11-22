@@ -2,10 +2,11 @@
   #:use-module (oop goops)
   #:use-module (ice-9 format)
   #:use-module (ice-9 optargs)
+  #:use-module (srfi srfi-1)
   #:use-module (srfi srfi-26)
   #:export (<quaternion>
-            make-quaternion jmag-part kmag-part quaternion-rotation)
-  #:re-export (real-part imag-part =))
+            make-quaternion jmag-part kmag-part quaternion-rotation quaternion-norm quaternion-conjugate)
+  #:re-export (real-part imag-part))
 
 
 (define-class <quaternion> ()
@@ -74,6 +75,16 @@
           (* (jmag-part a) (imag-part b)))
        (* (kmag-part a) (real-part b)))))
 (quaternion-binary-op *)
+
+(define (quaternion-norm2 self)
+  (reduce + 0 (map (lambda (x) (* x x)) (components self))))
+
+(define (quaternion-norm self)
+  (sqrt (quaternion-norm2 self)))
+
+(define (quaternion-conjugate self)
+  (* (make-quaternion (real-part self) (- (imag-part self)) (- (jmag-part self)) (- (kmag-part self)))
+     (/ 1 (quaternion-norm2 self))))
 
 (define (quaternion-rotation theta axis)
   (let* [(theta2     (/ theta 2))
