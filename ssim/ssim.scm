@@ -1,10 +1,19 @@
 #!/usr/bin/env guile
 !#
-(use-modules (system foreign) (glut) (gl) (ssim quaternion))
+(use-modules (system foreign)
+             (rnrs bytevectors)
+             (srfi srfi-1)
+             (srfi srfi-26)
+             (glut) (gl)
+             (ssim quaternion))
 
 
 (define glut (dynamic-link "libglut"))
 (define glut-wire-cube (pointer->procedure void (dynamic-func "glutWireCube" glut) (list double)))
+
+(define main-window #f)
+(define q (quaternion-rotation 0 '(1 0 0)))
+(define qs (quaternion-rotation 0.01 '(0 0.6 0.8)))
 
 (define (on-reshape width height)
   (let [(aspect (/ width height))]
@@ -16,15 +25,24 @@
 
 (define (on-display)
   (pk 'on-display)
-  (gl-clear (clear-buffer-mask color-buffer))
-  (gl-color 0 1 0)
-  (set-gl-matrix-mode (matrix-mode modelview))
-;  (gl-rotate 30 1 1 0)
-  (glut-wire-cube 0.5)
-  (swap-buffers))
+  (let* [(b (make-bytevector (* 4 4 4)))
+         (m (rotation-matrix q))
+         (h (concatenate (append (map (cut append <> '(0)) m) '((0 0 0 1)))))]
+    (for-each (lambda (i) (bytevector-ieee-single-native-set! b (* i 4) (list-ref h i))) (iota (length h)))
+    (gl-clear (clear-buffer-mask color-buffer))
+    (gl-color 0 1 0)
+    (set-gl-matrix-mode (matrix-mode modelview))
+    (gl-load-matrix b)
+    (glut-wire-cube 0.5)
+    (swap-buffers)))
+
+(define (on-idle)
+  (set! q (* q qs))
+  (post-redisplay))
 
 (initialize-glut (program-arguments) #:window-size '(640 . 480) #:display-mode (display-mode rgb double))
-(define main-window (make-window "ssim"))
+(set! main-window (make-window "ssim"))
 (set-display-callback on-display)
 (set-reshape-callback on-reshape)
+(set-idle-callback on-idle)
 (glut-main-loop)
