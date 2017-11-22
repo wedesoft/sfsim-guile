@@ -116,5 +116,13 @@
   (let [(q (quaternion-rotation (/ pi 3) '(0.36 0.48 0.8)))]
     (test-approximate "imaginary part of 60° rotation quaternion"
       (* 0.5 0.36) (imag-part q) 1e-6))
+  (test-equal "Convert vector to quaternion"
+    (make-quaternion 0 2 3 5) (vector->quaternion '(2 3 5)))
+  (test-equal "Convert quaternion to vector"
+    '(2 3 5) (quaternion->vector (make-quaternion 0 2 3 5)))
+  (test-equal "Zero rotation"
+    '(2.0 4.0 8.0) (rotate-vector (quaternion-rotation 0 '(1 0 0)) '(2.0 4.0 8.0)))
+  (test-equal "Rotate vector around x-axis"
+    '(2.0 -8.0 4.0) (map round (rotate-vector (quaternion-rotation (/ pi 2) '(1 0 0)) '(2.0 4.0 8.0))))
 (test-end "rotation")
 (test-end "ssim quaternion")

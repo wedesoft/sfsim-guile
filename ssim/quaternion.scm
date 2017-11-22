@@ -5,7 +5,8 @@
   #:use-module (srfi srfi-1)
   #:use-module (srfi srfi-26)
   #:export (<quaternion>
-            make-quaternion jmag-part kmag-part quaternion-rotation quaternion-norm quaternion-conjugate)
+            make-quaternion jmag-part kmag-part quaternion-rotation quaternion-norm quaternion-conjugate
+            vector->quaternion quaternion->vector rotate-vector)
   #:re-export (real-part imag-part))
 
 
@@ -19,6 +20,7 @@
   (make <quaternion> #:real-part a #:imag-part b #:jmag-part c #:kmag-part d))
 
 (define* (make-quaternion #:optional (a 0) (b 0) (c 0) (d 0))
+  "Construct a quaternion"
   (if (and (zero? c) (zero? d))
     (make-rectangular a b)
     (make-quaternion2 a b c d)))
@@ -40,23 +42,29 @@
     (define-method (op (a <quaternion>) (b <complex>   )) (op a (make-quaternion2 (real-part b) (imag-part b) 0 0)))))
 
 (define-method (equal? (a <quaternion>) (b <quaternion>))
+  "Compare quaternions"
   (and-map (cut apply equal? <>) (map list (components a) (components b))))
 
 (define-method (= (a <quaternion>) (b <quaternion>))
+  "Numerical equality of quaternions"
   (and-map (cut apply = <>) (map list (components a) (components b))))
 (quaternion-binary-op =)
 
 (define-method (- (a <quaternion>))
+  "Unary negation of quaternion"
   (apply make-quaternion (map - (components a) )))
 
 (define-method (+ (a <quaternion>) (b <quaternion>))
+  "Add two quaternions"
   (apply make-quaternion (map + (components a) (components b))))
 (quaternion-binary-op +)
 
 (define-method (- (a <quaternion>) (b <quaternion>))
+  "Subtract a quaternion from another"
   (apply make-quaternion (map - (components a) (components b))))
 
 (define-method (* (a <quaternion>) (b <quaternion>))
+  "Multiply two quaternions"
   (make-quaternion
     (- (* (real-part a) (real-part b))
        (* (imag-part a) (imag-part b))
@@ -80,14 +88,29 @@
   (reduce + 0 (map (lambda (x) (* x x)) (components self))))
 
 (define (quaternion-norm self)
+  "Compute norm of quaternion"
   (sqrt (quaternion-norm2 self)))
 
 (define (quaternion-conjugate self)
+  "Determine multiplicative inverse of quaternion"
   (* (make-quaternion (real-part self) (- (imag-part self)) (- (jmag-part self)) (- (kmag-part self)))
      (/ 1 (quaternion-norm2 self))))
 
 (define (quaternion-rotation theta axis)
+  "Use quaternion to reprsent a rotation"
   (let* [(theta2     (/ theta 2))
          (cos-theta2 (cos theta2))
          (sin-theta2 (sin theta2))]
     (apply make-quaternion cos-theta2 (map (cut * <> sin-theta2) axis))))
+
+(define (vector->quaternion vec)
+  "Convert a vector to a quaternion in order to rotate it"
+  (apply make-quaternion 0 vec))
+
+(define (quaternion->vector self)
+  "Convert a rotation result back to a vector"
+  (cdr (components self)))
+
+(define (rotate-vector self vec)
+  "Perform vector rotation with rotation represented using a quaternion"
+  (quaternion->vector (* self (vector->quaternion vec) (quaternion-conjugate self))))
