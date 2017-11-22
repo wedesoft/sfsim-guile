@@ -2,6 +2,7 @@
   #:use-module (oop goops)
   #:use-module (ice-9 format)
   #:use-module (ice-9 optargs)
+  #:use-module (srfi srfi-26)
   #:export (<quaternion>
             make-quaternion jmag-part kmag-part quaternion-rotation)
   #:re-export (real-part imag-part))
@@ -76,6 +77,9 @@
        (* (kmag-part a) (real-part b)))))
 
 (define (quaternion-rotation theta axis)
-  (cos (/ theta 2)))
+  (let* [(theta2     (/ theta 2))
+         (cos-theta2 (cos theta2))
+         (sin-theta2 (sin theta2))]
+    (apply make-quaternion cos-theta2 (map (cut * <> sin-theta2) axis))))
 
 (quaternion-binary-op *)

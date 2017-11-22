@@ -71,5 +71,13 @@
   1.0 (quaternion-rotation 0 '(0 0 1)) 1e-6)
 (test-approximate "no rotation"
   -1.0 (quaternion-rotation (* 2 pi) '(0 0 1)) 1e-6)
+(let [(q (quaternion-rotation pi '(0.36 0.48 0.8)))]
+  (test-approximate "imaginary part of 180° rotation quaternion"
+    0.36 (imag-part q) 1e-6)
+  (test-approximate "kmaginary part of 180° rotation quaternion"
+    0.8 (kmag-part q) 1e-6))
+(let [(q (quaternion-rotation (/ pi 3) '(0.36 0.48 0.8)))]
+  (test-approximate "imaginary part of 60° rotation quaternion"
+    (* 0.5 0.36) (imag-part q) 1e-6))
 (test-end "rotation")
 (test-end "ssim quaternion")
