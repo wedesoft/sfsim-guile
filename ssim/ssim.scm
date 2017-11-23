@@ -53,9 +53,8 @@
   (let* [(dt       (elapsed time #t))
          (impulse  (rotate-vector (quaternion-conjugate q) impulse))
          (omega    (map / impulse inertia))
-         (norm     (sqrt (reduce + 0 (map sqr omega))))
-         (axis     (rotate-vector q (map (cut / <> norm) omega)))]
-    (set! q (* (quaternion-rotation (* norm dt) axis) q))
+         (dq       (* q (apply make-quaternion 0 (map (cut / <> 2) omega))))]
+    (set! q (+ q (* dq dt)))
     (post-redisplay)))
 
 (initialize-glut (program-arguments) #:window-size '(640 . 480) #:display-mode (display-mode rgb double))
