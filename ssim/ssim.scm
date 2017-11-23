@@ -55,8 +55,8 @@
     (* q (apply make-quaternion 0 (map (cut / <> 2) omega)))))
 
 (define (on-idle)
-  (let [(dt       (elapsed time #t))]
-    (set! q (+ q (* (dq q dt) dt)))
+  (let [(dt (elapsed time #t))]
+    (set! q (runge-kutta q dt dq))
     (post-redisplay)))
 
 (initialize-glut (program-arguments) #:window-size '(640 . 480) #:display-mode (display-mode rgb double))
