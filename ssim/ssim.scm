@@ -37,7 +37,7 @@
     (gl-ortho (- w) w (- h) h -1 +1)))
 
 (define (on-display)
-  (let* [(b (make-bytevector (* 4 4 4)))
+  (let* [(b   (make-bytevector (* 4 4 4)))
          (mat (rotation-matrix q))
          (hom (concatenate (append (map (cut append <> '(0)) mat) '((0 0 0 1)))))]
     (for-each (lambda (i) (bytevector-ieee-single-native-set! b (* i 4) (list-ref hom i))) (iota (length hom)))
@@ -49,12 +49,14 @@
     (glut-wire-cube 0.5)
     (swap-buffers)))
 
+(define (dq q dt)
+  (let* [(rotated-impulse  (rotate-vector (quaternion-conjugate q) impulse))
+         (omega            (map / rotated-impulse inertia))]
+    (* q (apply make-quaternion 0 (map (cut / <> 2) omega)))))
+
 (define (on-idle)
-  (let* [(dt       (elapsed time #t))
-         (impulse  (rotate-vector (quaternion-conjugate q) impulse))
-         (omega    (map / impulse inertia))
-         (dq       (* q (apply make-quaternion 0 (map (cut / <> 2) omega))))]
-    (set! q (+ q (* dq dt)))
+  (let [(dt       (elapsed time #t))]
+    (set! q (+ q (* (dq q dt) dt)))
     (post-redisplay)))
 
 (initialize-glut (program-arguments) #:window-size '(640 . 480) #:display-mode (display-mode rgb double))
