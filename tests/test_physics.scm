@@ -20,19 +20,19 @@
 
 (test-begin "Runge-Kutta method")
   (test-equal "Constant function"
-    42 (runge-kutta 42 1 (lambda (dt y) 0)))
+    42 (runge-kutta 42 1 (lambda (y dt) 0)))
   (test-equal "Linear function"
-    47 (runge-kutta 42 1 (lambda (dt y) 5)))
+    47 (runge-kutta 42 1 (lambda (y dt) 5)))
   (test-equal "Different time step"
-    52 (runge-kutta 42 2 (lambda (dt y) 5)))
+    52 (runge-kutta 42 2 (lambda (y dt) 5)))
   (test-equal "Quadratic function"
-    43 (runge-kutta 42 1 (lambda (dt y) (* 2 dt))))
+    43 (runge-kutta 42 1 (lambda (y dt) (* 2 dt))))
   (test-equal "Quadratic function with different time step"
-    46 (runge-kutta 42 2 (lambda (dt y) (* 2 dt))))
+    46 (runge-kutta 42 2 (lambda (y dt) (* 2 dt))))
   (test-equal "Quadratic function with different time step"
-    43 (runge-kutta 42 1 (lambda (dt y) (* 3 dt dt))))
+    43 (runge-kutta 42 1 (lambda (y dt) (* 3 dt dt))))
   (test-approximate "Approximate exponential growth"
-    (exp 1) (runge-kutta 1 1 (lambda (dt y) y)) 1e-2)
+    (exp 1) (runge-kutta 1 1 (lambda (y dt) y)) 1e-2)
 (test-end "Runge-Kutta method")
 
 (test-begin "inertia of cuboid")

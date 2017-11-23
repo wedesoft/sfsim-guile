@@ -16,10 +16,10 @@
 (define (runge-kutta y0 dt dy)
   "4th order Runge-Kutta method"
   (let* [(dt2 (/ dt 2))
-         (k1  (dy 0 y0))
-         (k2  (dy (/ dt 2) (+ y0 (* k1 dt2))))
-         (k3  (dy (/ dt 2) (+ y0 (* k2 dt2))))
-         (k4  (dy dt       (+ y0 (* k3 dt ))))]
+         (k1  (dy y0                0  ))
+         (k2  (dy (+ y0 (* k1 dt2)) dt2))
+         (k3  (dy (+ y0 (* k2 dt2)) dt2))
+         (k4  (dy (+ y0 (* k3 dt )) dt ))]
     (+ y0 (* (/ dt 6) (+ k1 (* 2 k2) (* 2 k3) k4)))))
 
 (define (sqr x) (* x x))
