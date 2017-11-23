@@ -18,7 +18,7 @@
 (define time #f)
 (define main-window #f)
 
-(define q (quaternion-rotation 0.4 '(0.6 0.0 0.8)))
+(define q (quaternion-rotation 0.3 '(0.6 0.0 0.8)))
 (define impulse '(0 0.3 0))
 
 (define m 1)
@@ -52,10 +52,10 @@
 (define (on-idle)
   (let* [(dt       (elapsed time #t))
          (impulse  (rotate-vector (quaternion-conjugate q) impulse))
-         (rotation (map (cut * <> dt) (map / impulse inertia)))
-         (theta    (sqrt (reduce + 0 (map sqr rotation))))
-         (axis     (rotate-vector q (map (cut / <> theta) rotation)))]
-    (set! q (* (quaternion-rotation theta axis) q))
+         (omega    (map / impulse inertia))
+         (norm     (sqrt (reduce + 0 (map sqr omega))))
+         (axis     (rotate-vector q (map (cut / <> norm) omega)))]
+    (set! q (* (quaternion-rotation (* norm dt) axis) q))
     (post-redisplay)))
 
 (initialize-glut (program-arguments) #:window-size '(640 . 480) #:display-mode (display-mode rgb double))
