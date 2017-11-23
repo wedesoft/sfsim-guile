@@ -11,13 +11,20 @@
 (define glut (dynamic-link "libglut"))
 (define glut-wire-cube (pointer->procedure void (dynamic-func "glutWireCube" glut) (list double)))
 
+(define (sqr x) (* x x))
+
 (define main-window #f)
 (define q (quaternion-rotation 0 '(1 0 0)))
 (define qs (quaternion-rotation 0.01 '(0 0.6 0.8)))
 
+(define m 1)
 (define w 1)
 (define h 0.25)
 (define d 0.5)
+(define Iw (* (/ m 12) (+ (sqr h) (sqr d)))); -> cuboid
+(define Ih (* (/ m 12) (+ (sqr w) (sqr d))))
+(define Id (* (/ m 12) (+ (sqr w) (sqr h))))
+(define I (list Iw Ih Id))
 
 (define (on-reshape width height)
   (let [(aspect (/ width height))]
