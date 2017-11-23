@@ -1,6 +1,17 @@
 (define-module (ssim physics)
-  #:export (cuboid-inertia))
+  #:use-module (srfi srfi-19)
+  #:export (clock elapsed cuboid-inertia))
 
+
+(define (clock)
+  "Get current time with high precision"
+  (current-time))
+
+(define* (elapsed reference #:optional (reset #f))
+  "Return time elapsed and optionally reset the clock"
+  (let [(difference (time-difference (current-time) reference))]
+    (if reset (add-duration! reference difference))
+    (+ (time-second difference) (* 1e-9 (time-nanosecond difference)))))
 
 (define (sqr x) (* x x))
 

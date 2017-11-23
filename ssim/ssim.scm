@@ -3,6 +3,7 @@
 (use-modules (system foreign)
              (rnrs bytevectors)
              (srfi srfi-1)
+             (srfi srfi-19)
              (srfi srfi-26)
              (glut) (gl)
              (ssim physics)
@@ -14,26 +15,28 @@
 
 (define (sqr x) (* x x))
 
+(define time #f)
 (define main-window #f)
-(define q (quaternion-rotation 0 '(1 0 0)))
-(define qs (quaternion-rotation 0.01 '(0 0.6 0.8)))
+
+(define q (quaternion-rotation 0.4 '(0.6 0.0 0.8)))
+(define impulse '(0 0.3 0))
 
 (define m 1)
 (define w 1)
 (define h 0.25)
 (define d 0.5)
-(define I (cuboid-inertia m w h d))
+(define inertia (cuboid-inertia m w h d))
 
 (define (on-reshape width height)
-  (let [(aspect (/ width height))]
-    (pk 'reshape! width height)
+  (let* [(aspect (/ width height))
+         (h      0.4)
+         (w      (* aspect h))]
     (gl-viewport 0 0 width height)
     (set-gl-matrix-mode (matrix-mode projection))
     (gl-load-identity)
-    (gl-ortho (- aspect) aspect -1 1 -1 +1)))
+    (gl-ortho (- w) w (- h) h -1 +1)))
 
 (define (on-display)
-  (pk 'on-display)
   (let* [(b (make-bytevector (* 4 4 4)))
          (mat (rotation-matrix q))
          (hom (concatenate (append (map (cut append <> '(0)) mat) '((0 0 0 1)))))]
@@ -41,18 +44,24 @@
     (gl-clear (clear-buffer-mask color-buffer))
     (gl-color 0 1 0)
     (set-gl-matrix-mode (matrix-mode modelview))
-    (gl-load-matrix b)
+    (gl-load-matrix b #:transpose #t)
     (gl-scale w h d)
     (glut-wire-cube 0.5)
     (swap-buffers)))
 
 (define (on-idle)
-  (set! q (* q qs))
-  (post-redisplay))
+  (let* [(dt       (elapsed time #t))
+         (impulse  (rotate-vector (quaternion-conjugate q) impulse))
+         (rotation (map (cut * <> dt) (map / impulse inertia)))
+         (theta    (sqrt (reduce + 0 (map sqr rotation))))
+         (axis     (rotate-vector q (map (cut / <> theta) rotation)))]
+    (set! q (* (quaternion-rotation theta axis) q))
+    (post-redisplay)))
 
 (initialize-glut (program-arguments) #:window-size '(640 . 480) #:display-mode (display-mode rgb double))
 (set! main-window (make-window "ssim"))
 (set-display-callback on-display)
 (set-reshape-callback on-reshape)
 (set-idle-callback on-idle)
+(set! time (clock))
 (glut-main-loop)

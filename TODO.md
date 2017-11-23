@@ -1,8 +1,7 @@
 # TODO
 
-* scale cube
 * Runge Kutta
-* 3d rotation
+* publish videos: spring, wheel, bouncing block, rotating cube, rotating cuboid
 * 3d collision with ground
 * license
 * install precompiled Scheme files
