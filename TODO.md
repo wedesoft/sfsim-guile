@@ -4,6 +4,8 @@
 * Runge Kutta
 * 3d rotation
 * 3d collision with ground
+* license
+* install precompiled Scheme files
 * LLVM-based structs
 * contacts with friction
 * 3d collision with object (points, lines, surfaces?)

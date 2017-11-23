@@ -6,7 +6,7 @@
 (define pi (* 2 (acos 0)))
 
 (test-begin "ssim quaternion")
-  (test-begin "quaternion objects")
+(test-begin "quaternion objects")
   (test-equal "Create quaternion"
     '(0 0 0 0) (map (cut <> (make-quaternion)) (list real-part imag-part jmag-part kmag-part)))
   (test-equal "Initialise quaternion with values"

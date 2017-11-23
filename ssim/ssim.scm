@@ -5,6 +5,7 @@
              (srfi srfi-1)
              (srfi srfi-26)
              (glut) (gl)
+             (ssim physics)
              (ssim quaternion))
 
 
@@ -21,10 +22,7 @@
 (define w 1)
 (define h 0.25)
 (define d 0.5)
-(define Iw (* (/ m 12) (+ (sqr h) (sqr d)))); -> cuboid
-(define Ih (* (/ m 12) (+ (sqr w) (sqr d))))
-(define Id (* (/ m 12) (+ (sqr w) (sqr h))))
-(define I (list Iw Ih Id))
+(define I (cuboid-inertia m w h d))
 
 (define (on-reshape width height)
   (let [(aspect (/ width height))]

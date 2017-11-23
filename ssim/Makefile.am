@@ -1,3 +1,3 @@
 bin_SCRIPTS = ssim
 
-pkgdata_DATA = ssim.scm quaternion.scm
+pkgdata_DATA = physics.scm quaternion.scm ssim.scm
