@@ -63,21 +63,48 @@ The acceleration is determined by dividing the force by the mass as follows:
 The force of a spring is approximately proportional to the deviation from the resting position (Hooke's law).
 Assuming the resting position is $0$, the force exerted by a spring with strength $k$ is:
 \begin{equation*}
-  F_k(t)=-k\dot x(t)
+  F_k(t)=-k \dot x(t)
 \end{equation*}
 Damping is modelled by a force proportional to the speed:
 \begin{equation*}
-  F_c(t)=-c\dot v(t)
+  F_c(t)=-c \dot v(t)
 \end{equation*}
 Using the sum of forces, the acceleration is
 \begin{equation*}
-  \ddot{x}(t)=-\frac{k}{m} x(t)-\frac{c}{m}\dot{x}(t)
+  \ddot{x}(t) = -\frac{k}{m} x(t) - \frac{c}{m}\dot{x}(t)
 \end{equation*}
-There are closed solutions to this differential equation\footnote{see \url{https://en.wikipedia.org/wiki/Harmonic_oscillator} for more information} but for the purpose of implementing a simulator we are interested in a numerical solution where the conditions can be changed interactively.
+There are closed solutions to this differential equation\footnote{see \url{https://en.wikipedia.org/wiki/Harmonic_oscillator} for more information}, but for the purpose of implementing a simulator we are interested in a numerical solution where the conditions can be changed interactively.
 
-% Euler integration
-% Verlet integration
-% Runge-Kutta integration
+\subsection{Numerical integration}
+\subsubsection{Euler integration}
+Euler integration is a popular method for numeric integration.
+Applied to the motion model above, an Euler integration step for a time interval $\Delta t$ can be performed as follows:
+\begin{align*}
+  \begin{split}
+    v(t + \Delta t) &= v(t) + a(t) \Delta t\\
+    x(t + \Delta t) &= x(t) + v(t) \Delta t + \frac{1}{2} a(t) \Delta t^2
+  \end{split}
+\end{align*}
+
+\subsubsection{Verlet integration}
+Verlet integration is similar to Euler integration. Instead of the speed, the last two positions are used for the integration step:
+\begin{equation*}
+  x(t + \Delta t) = 2 x(t) - x(t - \Delta t) + a(t) \Delta t^2
+\end{equation*}
+
+\subsubsection{Runge-Kutta integration}
+Both Euler and Verlet integration are not sufficiently accurate for integrating functions with large higher-order gradients such as encountered when simulating 3D rotations.
+The Runge Kutta method is a popular numerical integration method for problems requiring higher accuracy\footnote{also see \url{https://en.wikipedia.org/wiki/Runge\%E2\%80\%93Kutta_methods}}.
+Given an initial value $y(t_0)=y_0$ and a derivative $\dot{y}=f(t,y)$, the Runge-Kutta integration is performed as follows:
+\begin{align*}
+  \begin{split}
+    k_1 &= f(t, y(t))\\
+    k_2 &= f(t + \frac{\Delta t}{2}, y(t) + \frac{\Delta t}{2} k_1)\\
+    k_3 &= f(t + \frac{\Delta t}{2}, y(t) + \frac{\Delta t}{2} k_2)\\
+    k_4 &= f(t + \Delta t, y(t) + \Delta t k_3)\\
+    y(t + \Delta t) &= y(t) + \frac{\Delta t}{6} (k_1 + 2 k_2 + 2 k_3 + k_4)
+  \end{split}
+\end{align*}
 
 % 3D motion
 
