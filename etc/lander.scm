@@ -6,7 +6,7 @@
 (use-modules (oop goops) (glut) (gl) (gl low-level) (glu) (srfi srfi-1) (srfi srfi-26) (ice-9 format))
 
 ; use RK4 to get same solution regardless of time step
-(define dt 0.04)
+(define dt 0.01)
 (define reps 5)
 (define scale (/ 1 dt))
 (define pi 3.141592653589793)

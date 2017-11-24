@@ -5,7 +5,9 @@
              (srfi srfi-1)
              (srfi srfi-19)
              (srfi srfi-26)
-             (glut) (gl)
+             (glut)
+             (gl)
+             (gl low-level)
              (ssim physics)
              (ssim quaternion))
 
@@ -27,9 +29,23 @@
 (define d 0.5)
 (define inertia (cuboid-inertia m w h d))
 
+(define w2 (/ w 2))
+(define h2 (/ h 2))
+(define d2 (/ d 2))
+
+(define corners
+  (list (list (- w2) (- h2) (- d2))
+        (list (+ w2) (- h2) (- d2))
+        (list (- w2) (+ h2) (- d2))
+        (list (+ w2) (+ h2) (- d2))
+        (list (- w2) (- h2) (+ d2))
+        (list (+ w2) (- h2) (+ d2))
+        (list (- w2) (+ h2) (+ d2))
+        (list (+ w2) (+ h2) (+ d2))))
+
 (define (on-reshape width height)
   (let* [(aspect (/ width height))
-         (h      0.4)
+         (h      1.0)
          (w      (* aspect h))]
     (gl-viewport 0 0 width height)
     (set-gl-matrix-mode (matrix-mode projection))
@@ -42,11 +58,15 @@
          (hom (concatenate (append (map (cut append <> '(0)) mat) '((0 0 0 1)))))]
     (for-each (lambda (i) (bytevector-ieee-single-native-set! b (* i 4) (list-ref hom i))) (iota (length hom)))
     (gl-clear (clear-buffer-mask color-buffer))
-    (gl-color 0 1 0)
     (set-gl-matrix-mode (matrix-mode modelview))
     (gl-load-matrix b #:transpose #t)
+    (gl-color 1 0 0)
+    (glPointSize 5)
+    (gl-begin (begin-mode points)
+      (for-each (cut apply gl-vertex <>) corners))
     (gl-scale w h d)
-    (glut-wire-cube 0.5)
+    (gl-color 0 1 0)
+    (glut-wire-cube 1.0)
     (swap-buffers)))
 
 (define (dq q dt)
