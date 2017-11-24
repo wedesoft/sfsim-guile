@@ -69,14 +69,6 @@ The speed can be determined by dividing the momentum by the mass as follows:
   v(t)=\frac{p(t)}{m}
 \end{equation*}
 
-\subsubsection{Torque and angular momentum}
-The angular momentum $L$ is determined using the rotational inertial matrix $I$ and the angular speed $\omega$.
-\begin{equation*}
-  L(t) = R(t) I R^\top(t) \omega(t)
-\end{equation*}
-$R(t)$ is the rotation matrix at time $t$.
-\emph{I.e.} the inertial matrix is defined in the object's coordinate system\footnote{also see \url{http://www.cs.unc.edu/~lin/COMP768-F07/LEC/rbd1.pdf}}.
-
 \subsubsection{Mass spring-damper model}
 The force of a spring is approximately proportional to the deviation from the resting position (Hooke's law).
 Assuming the resting position is $0$, the force exerted by a spring with strength $k$ is:
@@ -144,6 +136,26 @@ In the three-dimensional case, position, speed, and motion are three-dimensional
   \vec{a}(t) = \begin{pmatrix} a_1 \\ a_2 \\ a_3 \end{pmatrix}
 \end{equation*}
 
+\subsubsection{Angular momentum and torque}
+The angular momentum $\vec{L}$ is determined using the rotational inertial matrix $\mathcal{I}$ and the angular speed $\vec{\omega}$.
+\begin{equation*}
+  \vec{L}(t) = \mathcal{R}(t) \mathcal{I} \mathcal{R}^\top(t) \vec{\omega}(t)
+\end{equation*}
+$\mathcal{R}(t)$ is the rotation matrix at time $t$.
+\emph{I.e.} the inertial matrix is defined in the object's coordinate system\footnote{also see \url{http://www.cs.unc.edu/~lin/COMP768-F07/LEC/rbd1.pdf}}.
+
+The torque $\tau$ is the derivative of the angular momentum.
+\begin{equation*}
+  \vec{\tau}(t) = \dot{\vec{L}}(t)
+\end{equation*}
+The sum of forces causes a linear acceleration of the object
+\begin{equation*}
+  \vec{F}(t) = \sum \vec{F}_i(t)
+\end{equation*}
+while the torque is the remaining rotational contribution the forces generate.
+\begin{equation*}
+  \vec{\tau}(t) = \sum \vec{r}_i \times \vec{F}_i(t)
+\end{equation*}
 % test on circular motion
 % append Scheme code
 % mass, force, inertia
