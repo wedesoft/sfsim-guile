@@ -69,10 +69,12 @@
     (glut-wire-cube 1.0)
     (swap-buffers)))
 
+(define (omega q)
+  (let [(rotated-impulse  (rotate-vector (quaternion-conjugate q) impulse))]
+    (map / rotated-impulse inertia)))
+
 (define (dq q dt)
-  (let* [(rotated-impulse  (rotate-vector (quaternion-conjugate q) impulse))
-         (omega            (map / rotated-impulse inertia))]
-    (* q (apply make-quaternion 0 (map (cut / <> 2) omega)))))
+  (* q (apply make-quaternion 0 (map (cut / <> 2) (omega q)))))
 
 (define (on-idle)
   (set! q (quaternion-normalize (runge-kutta q (elapsed time #t) dq)))
