@@ -31,6 +31,7 @@ Speed and acceleration are the first and second derivative of the position over 
     a(t) & = \ddot{x}(t) = 0
   \end{split}
 \end{align*}
+Position is measured in meters ($m$), speed is measured in meters per second ($\frac{m}{s}$), and acceleration is measured in meters per second square ($\frac{m}{s^2}$).
 
 \subsubsection{Linear motion}
 A linear motion uses a constant speed and a position which changes linearly.
@@ -52,12 +53,34 @@ If there is a constant acceleration, the speed will change linearly and the posi
   \end{split}
 \end{align*}
 
-% two-dimensional motion
-% Spring damper
+The acceleration is caused by applying a force $F$ to a mass $m$.
+The acceleration is determined by dividing the force by the mass as follows:
+\begin{equation*}
+  a(t)=\frac{F(t)}{m}
+\end{equation*}
+
+\subsubsection{Mass spring-damper model}
+The force of a spring is approximately proportional to the deviation from the resting position (Hooke's law).
+Assuming the resting position is $0$, the force exerted by a spring with strength $k$ is:
+\begin{equation*}
+  F_k(t)=-k\dot x(t)
+\end{equation*}
+Damping is modelled by a force proportional to the speed:
+\begin{equation*}
+  F_c(t)=-c\dot v(t)
+\end{equation*}
+Using the sum of forces, the acceleration is
+\begin{equation*}
+  \ddot{x}(t)=-\frac{k}{m} x(t)-\frac{c}{m}\dot{x}(t)
+\end{equation*}
+There are closed solutions to this differential equation\footnote{see \url{https://en.wikipedia.org/wiki/Harmonic_oscillator} for more information} but for the purpose of implementing a simulator we are interested in a numerical solution where the conditions can be changed interactively.
 
 % Euler integration
 % Verlet integration
 % Runge-Kutta integration
+
+% 3D motion
+
 % test on circular motion
 % append Scheme code
 % mass, force, inertia
