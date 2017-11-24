@@ -21,7 +21,7 @@
 (define main-window #f)
 
 (define q (quaternion-rotation 0.3 '(0.6 0.0 0.8)))
-(define impulse '(0 0.3 0))
+(define impulse '(0 0.1 0))
 
 (define m 1)
 (define w 1)
@@ -42,6 +42,18 @@
         (list (+ w2) (- h2) (+ d2))
         (list (- w2) (+ h2) (+ d2))
         (list (+ w2) (+ h2) (+ d2))))
+
+(define (omega q)
+  (let [(rotated-impulse  (rotate-vector (quaternion-conjugate q) impulse))]
+    (map / rotated-impulse inertia)))
+
+(define (dq q dt)
+  (* q (apply make-quaternion 0 (map (cut / <> 2) (omega q)))))
+
+(define (cross a b)
+  (list (- (* (cadr  a) (caddr b)) (* (caddr a) (cadr  b)))
+        (- (* (caddr a) (car   b)) (* (car   a) (caddr b)))
+        (- (* (car   a) (cadr  b)) (* (cadr  a) (car   b)))))
 
 (define (on-reshape width height)
   (let* [(aspect (/ width height))
@@ -67,14 +79,14 @@
     (gl-scale w h d)
     (gl-color 0 1 0)
     (glut-wire-cube 1.0)
+    (gl-load-identity)
+    (gl-color 0 0 1)
+    (gl-begin (begin-mode lines)
+      (for-each (lambda (p)
+        (apply gl-vertex (rotate-vector q p))
+        (apply gl-vertex (map + (rotate-vector q p) (map (cut * 0.5 <>) (cross (rotate-vector q (omega q)) (rotate-vector q p))))))
+        corners))
     (swap-buffers)))
-
-(define (omega q)
-  (let [(rotated-impulse  (rotate-vector (quaternion-conjugate q) impulse))]
-    (map / rotated-impulse inertia)))
-
-(define (dq q dt)
-  (* q (apply make-quaternion 0 (map (cut / <> 2) (omega q)))))
 
 (define (on-idle)
   (set! q (quaternion-normalize (runge-kutta q (elapsed time #t) dq)))
