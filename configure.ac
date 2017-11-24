@@ -10,9 +10,9 @@ GUILE_PKG([2.2 2.0])
 GUILE_MODULE_REQUIRED(gl)
 GUILE_MODULE_REQUIRED(glut)
 
-AC_CHECK_PROG(XELATEX,xelatex,xelatex,no)
-if test "x$XELATEX" = xno; then
-  AC_MSG_ERROR([Could not find 'xelatex' in path.])
+AC_CHECK_PROG(PDFLATEX,pdflatex,pdflatex,no)
+if test "x$PDFLATEX" = xno; then
+  AC_MSG_ERROR([Could not find 'pdflatex' in path.])
 fi
 
 AC_OUTPUT(Makefile

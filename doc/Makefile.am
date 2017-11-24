@@ -5,6 +5,6 @@ doc_DATA = physics.pdf
 EXTRA_DIST = physics.tex
 
 .tex.pdf:
-	$(XELATEX) $<
+	$(PDFLATEX) $<
 
 CLEANFILES = *.pdf *.aux *.log

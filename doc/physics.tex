@@ -1,9 +1,11 @@
-\documentclass[10pt,a4paper,twoside]{article}
+\documentclass[12pt,a4paper,twoside]{article}
 \usepackage[left=2.45cm,top=2.52cm,right=1.85cm,bottom=2.95cm]{geometry}
 
 \usepackage{hyperref}
 
 \usepackage{amsmath}
+
+\usepackage{txfonts}
 
 \title{3D Game Physics}
 \author{Jan Wedekind}
@@ -53,11 +55,27 @@ If there is a constant acceleration, the speed will change linearly and the posi
   \end{split}
 \end{align*}
 
+\subsubsection{Force and momentum}
 The acceleration is caused by applying a force $F$ to a mass $m$.
 The acceleration is determined by dividing the force by the mass as follows:
 \begin{equation*}
   a(t)=\frac{F(t)}{m}
 \end{equation*}
+\emph{I.e.} the heavier the object, the more force is required to accelerate it.
+
+The momentum $p$ of an object is defined as the product of speed $v$ and mass $m$.
+The speed can be determined by dividing the momentum by the mass as follows:
+\begin{equation*}
+  v(t)=\frac{p(t)}{m}
+\end{equation*}
+
+\subsubsection{Torque and angular momentum}
+The angular momentum $L$ is determined using the rotational inertial matrix $I$ and the angular speed $\omega$.
+\begin{equation*}
+  L(t) = R(t) I R^\top(t) \omega(t)
+\end{equation*}
+$R(t)$ is the rotation matrix at time $t$.
+\emph{I.e.} the inertial matrix is defined in the object's coordinate system\footnote{also see \url{http://www.cs.unc.edu/~lin/COMP768-F07/LEC/rbd1.pdf}}.
 
 \subsubsection{Mass spring-damper model}
 The force of a spring is approximately proportional to the deviation from the resting position (Hooke's law).
@@ -106,7 +124,25 @@ Given an initial value $y(t_0)=y_0$ and a derivative $\dot{y}=f(t,y)$, the Runge
   \end{split}
 \end{align*}
 
-% 3D motion
+In order to perform numerical integration for both position and speed, one can set  $y(t) = (y_x(t), y_v(t))$ with $y_x(t)= x(t)$ and $y_v(t) = v(t)$.
+\emph{I.e.} the state vector $y$ is composed of position and speed.
+The initial state is set to
+\begin{equation*}
+  y(t_0) = (y_x(t_0), y_v(t_0))
+\end{equation*}
+The derivative of the state vector is
+\begin{equation*}
+  \dot{y}(t, y) = (y_v, a(t))
+\end{equation*}
+
+\section{Three-dimensional motion}
+\subsection{Vectors}
+In the three-dimensional case, position, speed, and motion are three-dimensional vectors.
+\begin{equation*}
+  \vec{x}(t) = \begin{pmatrix} x_1 \\ x_2 \\ x_3 \end{pmatrix}\mathrm{,\ }
+  \vec{v}(t) = \begin{pmatrix} v_1 \\ v_2 \\ v_3 \end{pmatrix}\mathrm{,\ and\ }
+  \vec{a}(t) = \begin{pmatrix} a_1 \\ a_2 \\ a_3 \end{pmatrix}
+\end{equation*}
 
 % test on circular motion
 % append Scheme code
