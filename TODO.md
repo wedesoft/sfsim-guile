@@ -1,7 +1,6 @@
 # TODO
 
 * use exponential of quaternion to simplify code
-* normalize quaternion
 * publish videos: spring, wheel, bouncing block, rotating cube, rotating cuboid
 * 3d collision with ground
 * license
