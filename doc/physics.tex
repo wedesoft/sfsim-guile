@@ -1,4 +1,9 @@
-\documentclass[12pt,a4paper,oneside]{article}
+\documentclass[10pt,a4paper,twoside]{article}
+\usepackage[left=2.45cm,top=2.52cm,right=1.85cm,bottom=2.95cm]{geometry}
+
+\usepackage{hyperref}
+
+\usepackage{amsmath}
 
 \title{3D Game Physics}
 \author{Jan Wedekind}
@@ -6,4 +11,59 @@
 
 \begin{document}
 \maketitle
+
+\section{Introduction}
+This technical report is about developing a small simulator with rigid bodies and soft body physics.
+
+\section{Motion}
+\subsection{One-dimensional motion}
+\subsubsection{Constant position}
+The position of each object in Euclidean space is a function of time $x(t)$.
+The most basic case is a stationary object which is at a fixed position $x_0$ in the frame of reference.
+\begin{equation*}
+  x(t) = x_0
+\end{equation*}
+In this case the speed $v(t)$ and acceleration $a(t)$ are zero.
+Speed and acceleration are the first and second derivative of the position over time (here denoted by one or two dots above the letter $x$).
+\begin{align*}
+  \begin{split}
+    v(t) & = \dot{x}(t)  = 0\\
+    a(t) & = \ddot{x}(t) = 0
+  \end{split}
+\end{align*}
+
+\subsubsection{Linear motion}
+A linear motion uses a constant speed and a position which changes linearly.
+\begin{align*}
+  \begin{split}
+    x(t) & = x_0 + v_0 \cdot t\\
+    v(t) & = v_0\\
+    a(t) & = 0
+  \end{split}
+\end{align*}
+
+\subsubsection{Constant acceleration}
+If there is a constant acceleration, the speed will change linearly and the position is a quadratic function of time.
+\begin{align*}
+  \begin{split}
+    x(t) & = x_0 + v_0 \cdot t + \frac{1}{2} \cdot a_0 \cdot t^2\\
+    v(t) & = v_0 + a_0 \cdot t\\
+    a(t) & = a_0
+  \end{split}
+\end{align*}
+
+% two-dimensional motion
+% Spring damper
+
+% Euler integration
+% Verlet integration
+% Runge-Kutta integration
+% test on circular motion
+% append Scheme code
+% mass, force, inertia
+% rigid body rotation
+% 3d rotation
+
+% gravitation
+
 \end{document}

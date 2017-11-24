@@ -5,7 +5,8 @@
   #:use-module (srfi srfi-1)
   #:use-module (srfi srfi-26)
   #:export (<quaternion>
-            make-quaternion jmag-part kmag-part quaternion-rotation quaternion-norm quaternion-conjugate
+            make-quaternion jmag-part kmag-part quaternion-rotation quaternion-norm
+            quaternion-normalize quaternion-conjugate
             vector->quaternion quaternion->vector rotate-vector rotation-matrix)
   #:re-export (real-part imag-part))
 
@@ -90,6 +91,10 @@
 (define (quaternion-norm self)
   "Compute norm of quaternion"
   (sqrt (quaternion-norm2 self)))
+
+(define (quaternion-normalize self)
+  "Normalize the quaternion"
+  (* (/ 1 (quaternion-norm self)) self))
 
 (define (quaternion-conjugate2 self)
   (make-quaternion (real-part self) (- (imag-part self)) (- (jmag-part self)) (- (kmag-part self))))

@@ -55,10 +55,8 @@
     (* q (apply make-quaternion 0 (map (cut / <> 2) omega)))))
 
 (define (on-idle)
-  (let [(dt (elapsed time #t))]
-    (set! q (runge-kutta q dt dq))
-    (set! q (* (/ 1 (quaternion-norm q)) q))
-    (post-redisplay)))
+  (set! q (quaternion-normalize (runge-kutta q (elapsed time #t) dq)))
+  (post-redisplay))
 
 (initialize-glut (program-arguments) #:window-size '(640 . 480) #:display-mode (display-mode rgb double))
 (set! main-window (make-window "ssim"))

@@ -96,6 +96,14 @@
     2.0 (quaternion-norm (make-quaternion 0.432 0.576 0.96 1.6)))
 (test-end "norm")
 
+(test-begin "normalize")
+  (let [(q (make-quaternion 0.216 0.288 0.48 0.8))]
+    (test-equal "Quaternion already normalized"
+      q (quaternion-normalize q))
+    (test-equal "Divide quaternion by its norm"
+      q (quaternion-normalize (* 2 q))))
+(test-end "normalize")
+
 (test-begin "conjugate")
   (test-equal "Conjugate of unit quaternion"
     (make-quaternion 0.216 -0.288 -0.48 -0.8) (quaternion-conjugate (make-quaternion 0.216 0.288 0.48 0.8)))
