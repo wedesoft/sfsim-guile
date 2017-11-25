@@ -7,6 +7,8 @@
 (test-begin "vector operations")
   (test-equal "add two vectors"
     '(7 10) (+ '(2 3) '(5 7)))
+  (test-equal "subtract a vector from another"
+    '(2 3) (- '(7 10) '(5 7)))
   (test-equal "multiply vector with scalar"
     '(10 15) (* '(2 3) 5))
   (test-equal "multiply scalar with vector"

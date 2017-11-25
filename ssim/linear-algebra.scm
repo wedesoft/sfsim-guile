@@ -2,11 +2,14 @@
   #:use-module (oop goops)
   #:use-module (srfi srfi-26)
   #:export (cross-product)
-  #:re-export (+ *))
+  #:re-export (+ - *))
 
 
 (define-method (+ (a <list>) (b <list>))
   (map + a b))
+
+(define-method (- (a <list>) (b <list>))
+  (map - a b))
 
 (define-method (* (a <list>) (b <number>))
   (map (cut * <> b) a))
