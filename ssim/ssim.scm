@@ -22,13 +22,15 @@
 (define main-window #f)
 
 (define q (quaternion-rotation 0.0 '(1.0 0.0 0.0)))
-(define impulse '(0.01 0.1 0))
+(define angular-momentum '(0.01 0.1 0))
 
 (define m 1)
 (define w 1)
 (define h 0.5)
 (define d 0.15)
 (define inertia (cuboid-inertia m w h d))
+
+(define speed-scale 0.3)
 
 (define w2 (/ w 2))
 (define h2 (/ h 2))
@@ -45,8 +47,8 @@
         (list (+ w2) (+ h2) (+ d2))))
 
 (define (omega q)
-  (let [(rotated-impulse  (rotate-vector (quaternion-conjugate q) impulse))]
-    (map / rotated-impulse inertia)))
+  (let [(rotated-momentum  (rotate-vector (quaternion-conjugate q) angular-momentum))]
+    (map / rotated-momentum inertia)))
 
 (define (dq q dt)
   (* q (apply make-quaternion 0 (map (cut / <> 2) (omega q)))))
@@ -79,9 +81,9 @@
     (gl-color 0 0 1)
     (gl-begin (begin-mode lines)
       (for-each (lambda (p)
-        (apply gl-vertex (rotate-vector q p))
-        (apply gl-vertex (map + (rotate-vector q p) (map (cut * 0.5 <>) (cross-product (rotate-vector q (omega q)) (rotate-vector q p))))))
-        corners))
+        (apply gl-vertex p)
+        (apply gl-vertex (map + p (map (cut * speed-scale <>) (cross-product (rotate-vector q (omega q)) p)))))
+        (map (cut rotate-vector q <>) corners)))
     (swap-buffers)))
 
 (define (on-idle)
