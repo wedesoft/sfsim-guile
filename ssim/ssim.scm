@@ -48,10 +48,10 @@
 
 (define (omega q)
   (let [(rotated-momentum  (rotate-vector (quaternion-conjugate q) angular-momentum))]
-    (map / rotated-momentum inertia)))
+    (rotate-vector q (map / rotated-momentum inertia))))
 
 (define (dq q dt)
-  (* q (apply make-quaternion 0 (map (cut / <> 2) (omega q)))))
+  (* (apply make-quaternion 0 (map (cut / <> 2) (omega q))) q))
 
 (define (on-reshape width height)
   (let* [(aspect (/ width height))
@@ -82,7 +82,7 @@
     (gl-begin (begin-mode lines)
       (for-each (lambda (p)
         (apply gl-vertex p)
-        (apply gl-vertex (map + p (map (cut * speed-scale <>) (cross-product (rotate-vector q (omega q)) p)))))
+        (apply gl-vertex (map + p (map (cut * speed-scale <>) (cross-product (omega q) p)))))
         (map (cut rotate-vector q <>) corners)))
     (swap-buffers)))
 
