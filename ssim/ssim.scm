@@ -34,6 +34,8 @@
 (define d 0.15)
 (define inertia (cuboid-inertia m w h d))
 
+(define ground -1.0)
+
 (define speed-scale 0.3)
 
 (define w2 (/ w 2))
@@ -49,6 +51,13 @@
         (list (+ w2) (- h2) (+ d2))
         (list (- w2) (+ h2) (+ d2))
         (list (+ w2) (+ h2) (+ d2))))
+
+(define (argop op fun lst)
+  (let* [(vals  (map fun lst))
+         (opval (apply op vals))]
+    (list-ref (reverse lst) (1- (length (member opval vals))))))
+(define (argmin fun lst) (argop min fun lst))
+(define (argmax fun lst) (argop max fun lst))
 
 (define (omega q)
   (let [(rotated-momentum  (rotate-vector (quaternion-conjugate q) angular-momentum))]
@@ -97,6 +106,10 @@
   (let [(dt (elapsed time #t))]
     (set! state (runge-kutta state dt dstate))
     (set! q (quaternion-normalize (runge-kutta q dt dq)))
+    (let* [(outer     (map (lambda (corner) (+ (rotate-vector q corner) (position state))) corners))
+           (collision (argmin cadr outer))]
+      (if (<= (cadr collision) ground)
+        (set! state '(0 0 0 0 0 0))))
     (post-redisplay)))
 
 (initialize-glut (program-arguments) #:window-size '(640 . 480) #:display-mode (display-mode rgb double))
