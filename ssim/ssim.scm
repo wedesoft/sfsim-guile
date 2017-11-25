@@ -8,6 +8,7 @@
              (glut)
              (gl)
              (gl low-level)
+             (ssim linear-algebra)
              (ssim physics)
              (ssim quaternion))
 
@@ -20,13 +21,13 @@
 (define time #f)
 (define main-window #f)
 
-(define q (quaternion-rotation 0.3 '(0.6 0.0 0.8)))
-(define impulse '(0 0.1 0))
+(define q (quaternion-rotation 0.0 '(1.0 0.0 0.0)))
+(define impulse '(0.01 0.1 0))
 
 (define m 1)
 (define w 1)
-(define h 0.25)
-(define d 0.5)
+(define h 0.5)
+(define d 0.15)
 (define inertia (cuboid-inertia m w h d))
 
 (define w2 (/ w 2))
@@ -49,11 +50,6 @@
 
 (define (dq q dt)
   (* q (apply make-quaternion 0 (map (cut / <> 2) (omega q)))))
-
-(define (cross a b)
-  (list (- (* (cadr  a) (caddr b)) (* (caddr a) (cadr  b)))
-        (- (* (caddr a) (car   b)) (* (car   a) (caddr b)))
-        (- (* (car   a) (cadr  b)) (* (cadr  a) (car   b)))))
 
 (define (on-reshape width height)
   (let* [(aspect (/ width height))
@@ -84,7 +80,7 @@
     (gl-begin (begin-mode lines)
       (for-each (lambda (p)
         (apply gl-vertex (rotate-vector q p))
-        (apply gl-vertex (map + (rotate-vector q p) (map (cut * 0.5 <>) (cross (rotate-vector q (omega q)) (rotate-vector q p))))))
+        (apply gl-vertex (map + (rotate-vector q p) (map (cut * 0.5 <>) (cross-product (rotate-vector q (omega q)) (rotate-vector q p))))))
         corners))
     (swap-buffers)))
 
