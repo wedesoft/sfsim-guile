@@ -3,6 +3,16 @@
 
 
 (test-begin "ssim linear-algebra")
+
+(test-begin "vector operations")
+  (test-equal "add two vectors"
+    '(7 10) (+ '(2 3) '(5 7)))
+  (test-equal "multiply vector with scalar"
+    '(10 15) (* '(2 3) 5))
+  (test-equal "multiply scalar with vector"
+    '(10 15) (* 5 '(2 3)))
+(test-begin "vector operations")
+
 (test-begin "cross product")
   (test-equal "cross product of zero vectors"
     '(0 0 0) (cross-product '(1 0 0) '(0 0 0)))

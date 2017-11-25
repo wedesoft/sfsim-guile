@@ -21,6 +21,10 @@
 (define time #f)
 (define main-window #f)
 
+(define state '(0 0 0 0 0 0))
+(define (position state) (take state 3))
+(define (speed state) (drop state 3))
+(define g '(0 -0.1 0))
 (define q (quaternion-rotation 0.0 '(1.0 0.0 0.0)))
 (define angular-momentum '(0.01 0.1 0))
 
@@ -50,8 +54,11 @@
   (let [(rotated-momentum  (rotate-vector (quaternion-conjugate q) angular-momentum))]
     (rotate-vector q (map / rotated-momentum inertia))))
 
+(define (dstate state dt)
+  (append (speed state) g))
+
 (define (dq q dt)
-  (* (apply make-quaternion 0 (map (cut / <> 2) (omega q))) q))
+  (* (apply make-quaternion 0 (* 0.5 (omega q))) q))
 
 (define (on-reshape width height)
   (let* [(aspect (/ width height))
@@ -65,7 +72,7 @@
 (define (on-display)
   (let* [(b   (make-bytevector (* 4 4 4)))
          (mat (rotation-matrix q))
-         (hom (concatenate (append (map (cut append <> '(0)) mat) '((0 0 0 1)))))]
+         (hom (concatenate (append (map append mat (map list (position state))) '((0 0 0 1)))))]
     (for-each (lambda (i) (bytevector-ieee-single-native-set! b (* i 4) (list-ref hom i))) (iota (length hom)))
     (gl-clear (clear-buffer-mask color-buffer))
     (set-gl-matrix-mode (matrix-mode modelview))
@@ -82,13 +89,15 @@
     (gl-begin (begin-mode lines)
       (for-each (lambda (p)
         (apply gl-vertex p)
-        (apply gl-vertex (map + p (map (cut * speed-scale <>) (cross-product (omega q) p)))))
-        (map (cut rotate-vector q <>) corners)))
+        (apply gl-vertex (+ p (* speed-scale (+ (cross-product (omega q) p) (speed state))))))
+        (map (lambda (corner) (+ (rotate-vector q corner) (position state))) corners)))
     (swap-buffers)))
 
 (define (on-idle)
-  (set! q (quaternion-normalize (runge-kutta q (elapsed time #t) dq)))
-  (post-redisplay))
+  (let [(dt (elapsed time #t))]
+    (set! state (runge-kutta state dt dstate))
+    (set! q (quaternion-normalize (runge-kutta q dt dq)))
+    (post-redisplay)))
 
 (initialize-glut (program-arguments) #:window-size '(640 . 480) #:display-mode (display-mode rgb double))
 (set! main-window (make-window "ssim"))
