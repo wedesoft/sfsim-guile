@@ -21,21 +21,20 @@
 (define time #f)
 (define main-window #f)
 
-(define state '(0 0 0 0 0 0))
+(define state '(0 0.7 0 0 0 0))
 (define (position state) (take state 3))
 (define (speed state) (drop state 3))
-(define g '(0 -0.1 0))
+(define g '(0 -0.3 0))
 (define q (quaternion-rotation 0.0 '(1.0 0.0 0.0)))
-(define angular-momentum '(0.01 0.1 0))
+(define angular-momentum '(0.01 0.1 0.0))
 
 (define m 1)
-;(define w 1)
-;(define h 0.5)
-;(define d 0.15)
 (define w 1)
-(define h 1)
-(define d 1)
+(define h 0.5)
+(define d 0.15)
 (define inertia (cuboid-inertia m w h d))
+
+(define loss 0.2)
 
 (define ground -1.0)
 
@@ -113,18 +112,20 @@
            (collision (argmin cadr outer))]
       (if (<= (cadr collision) ground)
         (let* [(r    (- collision (position state)))
-               (n    '(0 -1 0))
+               (n    '(0 1 0))
                (v    (+ (cross-product (omega q) r) (speed state)))
                (vrel (inner-product n v))
-               (j    (/ (* -2 vrel) (+ (/ 1 m) (inner-product n (cross-product (map / (cross-product r n) inertia) r)))))
+               (j    (/ (* (- loss 2) vrel) (+ (/ 1 m) (inner-product n (cross-product (rotate-vector q (map / (rotate-vector (quaternion-conjugate q) (cross-product r n)) inertia)) r)))))
                (J    (* j n))]
-          (if (> vrel 0)
+          (if (< vrel 0)
             (begin
-              (format #t "vrel :  ~a~&" vrel)
+              (format #t "vrel : ~a~&" vrel)
               (set! state (append (position state) (+ (speed state) (* (/ 1 m) J))))
               (set! angular-momentum (+ angular-momentum (cross-product r J)))
-              (format #t "vrel': ~a~&" (inner-product n (+ (cross-product (omega q) r) (speed state)))))))))
+              (format #t "vrel':  ~a~&" (inner-product n (+ (cross-product (omega q) r) (speed state)))))))))
     (post-redisplay)))
+
+; rotated inertia
 
 (initialize-glut (program-arguments) #:window-size '(640 . 480) #:display-mode (display-mode rgb double))
 (set! main-window (make-window "ssim"))
