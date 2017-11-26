@@ -109,7 +109,11 @@
     (let* [(outer     (map (lambda (corner) (+ (rotate-vector q corner) (position state))) corners))
            (collision (argmin cadr outer))]
       (if (<= (cadr collision) ground)
-        (set! state '(0 0 0 0 0 0))))
+        (let* [(r    (- collision (position state)))
+               (v    (+ (cross-product (omega q) r) (speed state)))
+               (vrel (list 0 (cadr v) 0))]
+          (format #t "~a~&" (cadr v))
+          (set! state '(0 0 0 0 0 0)))))
     (post-redisplay)))
 
 (initialize-glut (program-arguments) #:window-size '(640 . 480) #:display-mode (display-mode rgb double))
