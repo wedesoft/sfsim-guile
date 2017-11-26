@@ -120,7 +120,7 @@
                (J    (* j n))]
           (if (> vrel 0)
             (begin
-              (format #t "vrel: ~a~&" vrel)
+              (format #t "vrel :  ~a~&" vrel)
               (set! state (append (position state) (+ (speed state) (* (/ 1 m) J))))
               (set! angular-momentum (+ angular-momentum (cross-product r J)))
               (format #t "vrel': ~a~&" (inner-product n (+ (cross-product (omega q) r) (speed state)))))))))
