@@ -15,6 +15,13 @@
     '(10 15) (* 5 '(2 3)))
 (test-begin "vector operations")
 
+(test-begin "inner product")
+  (test-equal "inner product of one-dimensional vectors"
+    6 (inner-product '(2) '(3)))
+  (test-equal "inner product of two-dimensional vectors"
+    31 (inner-product '(2 3) '(5 7)))
+(test-end "inner product")
+
 (test-begin "cross product")
   (test-equal "cross product of zero vectors"
     '(0 0 0) (cross-product '(1 0 0) '(0 0 0)))

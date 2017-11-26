@@ -1,7 +1,8 @@
 (define-module (ssim linear-algebra)
   #:use-module (oop goops)
+  #:use-module (srfi srfi-1)
   #:use-module (srfi srfi-26)
-  #:export (cross-product)
+  #:export (cross-product inner-product)
   #:re-export (+ - *))
 
 
@@ -16,6 +17,9 @@
 
 (define-method (* (a <number>) (b <list>))
   (map (cut * <> a) b))
+
+(define (inner-product a b)
+  (reduce + 0 (map * a b)))
 
 (define (cross-product a b)
   (list (- (* (cadr  a) (caddr b)) (* (caddr a) (cadr  b)))
