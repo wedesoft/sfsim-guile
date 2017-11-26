@@ -29,9 +29,12 @@
 (define angular-momentum '(0.01 0.1 0))
 
 (define m 1)
+;(define w 1)
+;(define h 0.5)
+;(define d 0.15)
 (define w 1)
-(define h 0.5)
-(define d 0.15)
+(define h 1)
+(define d 1)
 (define inertia (cuboid-inertia m w h d))
 
 (define ground -1.0)
@@ -110,10 +113,17 @@
            (collision (argmin cadr outer))]
       (if (<= (cadr collision) ground)
         (let* [(r    (- collision (position state)))
+               (n    '(0 -1 0))
                (v    (+ (cross-product (omega q) r) (speed state)))
-               (vrel (list 0 (cadr v) 0))]
-          (format #t "~a~&" (cadr v))
-          (set! state '(0 0 0 0 0 0)))))
+               (vrel (inner-product n v))
+               (j    (/ (* -2 vrel) (+ (/ 1 m) (inner-product n (cross-product (map / (cross-product r n) inertia) r)))))
+               (J    (* j n))]
+          (if (> vrel 0)
+            (begin
+              (format #t "vrel: ~a~&" vrel)
+              (set! state (append (position state) (+ (speed state) (* (/ 1 m) J))))
+              (set! angular-momentum (+ angular-momentum (cross-product r J)))
+              (format #t "vrel': ~a~&" (inner-product n (+ (cross-product (omega q) r) (speed state)))))))))
     (post-redisplay)))
 
 (initialize-glut (program-arguments) #:window-size '(640 . 480) #:display-mode (display-mode rgb double))

@@ -96,13 +96,12 @@
                (dw   (* (car r) (/ j t)))]
           (if (>= vrel 0)
             (begin
-              ;(format #t "vrel: ~a, dangle: ~a, j: ~a, dv: ~a, dw: ~a~&" vrel (- angle angle_) j dv dw)
+              (format #t "vrel: ~a, dangle: ~a, j: ~a, dv: ~a, dw: ~a~&" vrel (- angle angle_) j dv dw)
               (set! position_ (- position_ (list 0 dv)))
               (set! position (- position (list 0 eps)))
               (set! position_ (- position_ (list 0 eps)))
               (set! angle_ (- angle_ dw))
-              ;(format #t "vrel': ~a~&" (cadr (+ (- position position_) (spin (- collision position) (- angle angle_)))))
-              )))))))
+              (format #t "vrel': ~a~&" (cadr (+ (- position position_) (spin (- collision position) (- angle angle_))))))))))))
   (iota reps))
   (post-redisplay))
 
