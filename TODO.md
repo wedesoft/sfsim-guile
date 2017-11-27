@@ -1,14 +1,12 @@
 # TODO
 
 * use exponential of quaternion to simplify code
-* publish videos: spring, wheel, bouncing block, rotating cube, rotating cuboid
-* 3d collision with ground
+* contacts with friction
+* resting contacts
 * license
 * install precompiled Scheme files
 * LLVM-based structs
-* contacts with friction
 * 3d collision with object (points, lines, surfaces?)
-* resting contacts
 * suspension
 * body with gears
 * blog post: quaternions, rotational inertia, ground collision, springs, resting contacts
