@@ -1,3 +1,3 @@
 #!/bin/sh
 prefix=@prefix@
-guile -L @datarootdir@ @datarootdir@/ssim/ssim.scm
+guile --no-auto-compile -L @datarootdir@ @datarootdir@/ssim/ssim.scm
