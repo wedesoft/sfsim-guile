@@ -20,12 +20,15 @@
 (define time #f)
 (define main-window #f)
 
-(define state '(0 0.7 0 0 0 0 0.01 0.1 0))
+(define state `(0 0.7 0
+                0 0 0
+                ,(quaternion-rotation 0 '(1 0 0))
+                0.01 0.1 0))
 (define (position state) (take state 3))
 (define (speed state) (take (drop state 3) 3))
-(define (angular-momentum state) (take (drop state 6) 3))
+(define (orientation state) (car (drop state 6)))
+(define (angular-momentum state) (take (drop state 7) 3))
 (define g '(0 -0.2 0))
-(define q (quaternion-rotation 0.0 '(1.0 0.0 0.0)))
 
 (define m 1)
 (define w 1)
@@ -53,18 +56,18 @@
         (list (- w2) (+ h2) (+ d2))
         (list (+ w2) (+ h2) (+ d2))))
 
-(define (omega q)
-  (let [(rotated-momentum  (rotate-vector (quaternion-conjugate q) (angular-momentum state)))]
-    (rotate-vector q (dot (inverse inertia) rotated-momentum))))
+(define (omega state)
+  (let [(rotated-momentum  (rotate-vector (quaternion-conjugate (orientation state)) (angular-momentum state)))]
+    (rotate-vector (orientation state) (dot (inverse inertia) rotated-momentum))))
 
-(define (circular q r)
-  (cross-product (omega q) r))
+(define (circular state r)
+  (cross-product (omega state) r))
 
 (define (dstate state dt)
-  (append (speed state) g '(0 0 0)))
-
-(define (dq q dt)
-  (* (vector->quaternion (* 0.5 (omega q))) q))
+  (append (speed state)
+          g
+          (list (* (vector->quaternion (* 0.5 (omega state))) (orientation state)))
+          '(0 0 0)))
 
 (define (on-reshape width height)
   (let* [(aspect (/ width height))
@@ -77,7 +80,7 @@
 
 (define (on-display)
   (let* [(b   (make-bytevector (* 4 4 4)))
-         (mat (rotation-matrix q))
+         (mat (rotation-matrix (orientation state)))
          (hom (concatenate (append (map append mat (map list (position state))) '((0 0 0 1)))))]
     (for-each (lambda (i) (bytevector-ieee-single-native-set! b (* i 4) (list-ref hom i))) (iota (length hom)))
     (gl-clear (clear-buffer-mask color-buffer))
@@ -95,30 +98,30 @@
     (gl-begin (begin-mode lines)
       (for-each (lambda (r)
         (apply gl-vertex (+ r (position state)))
-        (apply gl-vertex (+ r (position state) (* speed-scale (+ (circular q r) (speed state))))))
-        (map (cut rotate-vector q <>) corners)))
+        (apply gl-vertex (+ r (position state) (* speed-scale (+ (circular state r) (speed state))))))
+        (map (cut rotate-vector (orientation state) <>) corners)))
     (swap-buffers)))
 
 (define (on-idle)
   (let [(dt (elapsed time #t))]
     (set! state (runge-kutta state dt dstate))
-    (set! q (quaternion-normalize (runge-kutta q dt dq)))
-    (let* [(outer     (map (lambda (corner) (+ (rotate-vector q corner) (position state))) corners))
+    (let* [(outer     (map (lambda (corner) (+ (rotate-vector (orientation state) corner) (position state))) corners))
            (collision (argmin cadr outer))]
       (if (<= (cadr collision) ground)
         (let* [(r    (- collision (position state)))
                (n    '(0 1 0))
-               (v    (+ (circular q r) (speed state)))
+               (v    (+ (circular state r) (speed state)))
                (vrel (inner-product n v))
-               (j    (/ (* (- loss 2) vrel) (+ (/ 1 m) (inner-product n (cross-product (rotate-vector q (dot (inverse inertia) (rotate-vector (quaternion-conjugate q) (cross-product r n)))) r)))))
+               (j    (/ (* (- loss 2) vrel) (+ (/ 1 m) (inner-product n (cross-product (rotate-vector (orientation state) (dot (inverse inertia) (rotate-vector (quaternion-conjugate (orientation state)) (cross-product r n)))) r)))))
                (J    (* j n))]
           (if (< vrel 0)
             (begin
               (format #t "vrel : ~a~&" vrel)
               (set! state (append (position state)
                                   (+ (speed state) (* (/ 1 m) J))
+                                  (list (quaternion-normalize (orientation state)))
                                   (+ (angular-momentum state) (cross-product r J))))
-              (format #t "vrel':  ~a~&" (inner-product n (+ (circular q r) (speed state)))))))))
+              (format #t "vrel':  ~a~&" (inner-product n (+ (circular state r) (speed state)))))))))
     (post-redisplay)))
 
 (initialize-glut (program-arguments) #:window-size '(640 . 480) #:display-mode (display-mode rgb double))
