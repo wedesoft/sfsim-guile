@@ -13,7 +13,7 @@
     '(10 15) (* '(2 3) 5))
   (test-equal "multiply scalar with vector"
     '(10 15) (* 5 '(2 3)))
-(test-begin "vector operations")
+(test-end "vector operations")
 
 (test-begin "inner product")
   (test-equal "inner product of one-dimensional vectors"

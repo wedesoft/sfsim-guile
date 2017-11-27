@@ -10,7 +10,8 @@
              (gl low-level)
              (ssim linear-algebra)
              (ssim physics)
-             (ssim quaternion))
+             (ssim quaternion)
+             (ssim util))
 
 
 (define glut (dynamic-link "libglut"))
@@ -24,7 +25,7 @@
 (define state '(0 0.7 0 0 0 0))
 (define (position state) (take state 3))
 (define (speed state) (drop state 3))
-(define g '(0 -0.3 0))
+(define g '(0 -0.2 0))
 (define q (quaternion-rotation 0.0 '(1.0 0.0 0.0)))
 (define angular-momentum '(0.01 0.1 0.0))
 
@@ -53,13 +54,6 @@
         (list (+ w2) (- h2) (+ d2))
         (list (- w2) (+ h2) (+ d2))
         (list (+ w2) (+ h2) (+ d2))))
-
-(define (argop op fun lst)
-  (let* [(vals  (map fun lst))
-         (opval (apply op vals))]
-    (list-ref (reverse lst) (1- (length (member opval vals))))))
-(define (argmin fun lst) (argop min fun lst))
-(define (argmax fun lst) (argop max fun lst))
 
 (define (omega q)
   (let [(rotated-momentum  (rotate-vector (quaternion-conjugate q) angular-momentum))]
