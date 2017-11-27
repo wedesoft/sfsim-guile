@@ -133,7 +133,7 @@
   (test-equal "Rotate vector around x-axis"
     '(2.0 -8.0 4.0) (map round (rotate-vector (quaternion-rotation (/ pi 2) '(1 0 0)) '(2.0 4.0 8.0))))
   (test-equal "Create identity matrix for zero rotation"
-    '((1.0 0 0) (0 1 0) (0 0 1)) (rotation-matrix (quaternion-rotation 0 '(1 0 0))))
+    '((1.0 0 0) (0.0 1.0 0.0) (0.0 0.0 1.0)) (rotation-matrix (quaternion-rotation 0 '(1 0 0))))
   (test-approximate "Create rotation matrix for rotation around z-axis"
     -1 (cadar (rotation-matrix (quaternion-rotation (/ pi 2) '(0 0 1)))) 1e-6)
 (test-end "rotations")

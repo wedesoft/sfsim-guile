@@ -105,13 +105,6 @@
   "Determine multiplicative inverse of quaternion"
   (* (quaternion-conjugate2 self) (/ 1 (quaternion-norm2 self))))
 
-(define (quaternion-rotation theta axis)
-  "Use quaternion to reprsent a rotation"
-  (let* [(theta2     (/ theta 2))
-         (cos-theta2 (cos theta2))
-         (sin-theta2 (sin theta2))]
-    (apply make-quaternion cos-theta2 (map (cut * <> sin-theta2) axis))))
-
 (define (vector->quaternion vec)
   "Convert a vector to a quaternion in order to rotate it"
   (apply make-quaternion 0 vec))
@@ -140,3 +133,7 @@
          (cos-rotation  (cos rotation))
          (sinc-rotation (sinc rotation))]
     (apply make-quaternion (* scale cos-rotation) (* scale sinc-rotation axis))))
+
+(define (quaternion-rotation theta axis)
+  "Use quaternion to reprsent a rotation"
+  (exp (apply make-quaternion 0 (* (/ theta 2) axis))))
