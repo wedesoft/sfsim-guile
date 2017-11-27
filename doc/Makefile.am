@@ -6,5 +6,6 @@ EXTRA_DIST = physics.tex
 
 .tex.pdf:
 	$(PDFLATEX) $<
+	$(PDFLATEX) $<
 
-CLEANFILES = *.pdf *.aux *.log
+CLEANFILES = *.pdf *.aux *.log *.out
