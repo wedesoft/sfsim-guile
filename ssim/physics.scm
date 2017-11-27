@@ -22,10 +22,8 @@
          (k4  (dy (+ y0 (* k3 dt )) dt ))]
     (+ y0 (* (/ dt 6) (+ k1 (* 2 k2) (* 2 k3) k4)))))
 
-(define (sqr x) (* x x))
-
 (define (cuboid-inertia mass width height depth)
   "Determine diagonal elements of a cuboid's inertial matrix"
-  (list (* (/ mass 12) (+ (sqr height) (sqr depth )))
-        (* (/ mass 12) (+ (sqr width ) (sqr depth )))
-        (* (/ mass 12) (+ (sqr width ) (sqr height)))))
+  (list (* (/ mass 12) (+ (expt height 2) (expt depth  2)))
+        (* (/ mass 12) (+ (expt width  2) (expt depth  2)))
+        (* (/ mass 12) (+ (expt width  2) (expt height 2)))))

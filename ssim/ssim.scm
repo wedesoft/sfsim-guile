@@ -17,8 +17,6 @@
 (define glut (dynamic-link "libglut"))
 (define glut-wire-cube (pointer->procedure void (dynamic-func "glutWireCube" glut) (list double)))
 
-(define (sqr x) (* x x))
-
 (define time #f)
 (define main-window #f)
 
