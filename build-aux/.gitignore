@@ -1,3 +1,6 @@
+compile
+config.guess
 config.rpath
+config.sub
 install-sh
 missing

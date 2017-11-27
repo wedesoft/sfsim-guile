@@ -6,9 +6,13 @@ AC_CONFIG_MACRO_DIR([m4])
 AC_REQUIRE_AUX_FILE([test-driver.scm])
 
 GUILE_PKG([2.2 2.0])
+GUILE_PROGS
+GUILE_CACHE_DIR
 
 GUILE_MODULE_REQUIRED(gl)
 GUILE_MODULE_REQUIRED(glut)
+
+AC_CHECK_PROG(TOUCH,touch,touch,touch)
 
 AC_CHECK_PROG(PDFLATEX,pdflatex,pdflatex,no)
 if test "x$PDFLATEX" = xno; then

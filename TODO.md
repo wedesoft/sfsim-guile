@@ -2,8 +2,6 @@
 
 * contacts with friction
 * resting contacts
-* license
-* install precompiled Scheme files
 * LLVM-based structs
 * 3d collision with object (points, lines, surfaces?)
 * suspension
