@@ -38,4 +38,11 @@
   (test-equal "cross product of first and third basis vector"
     '(0 -1 0) (cross-product '(1 0 0) '(0 0 1)))
 (test-end "cross product")
+
+(test-begin "norm")
+  (test-equal "Norm of 1D vector"
+    3 (norm '(3)))
+  (test-equal "Norm of 2D vector"
+    5 (norm '(3 4)))
+(test-end "norm")
 (test-end "ssim linear-algebra")

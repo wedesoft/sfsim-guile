@@ -4,11 +4,12 @@
   #:use-module (ice-9 optargs)
   #:use-module (srfi srfi-1)
   #:use-module (srfi srfi-26)
+  #:use-module (ssim linear-algebra)
   #:export (<quaternion>
             make-quaternion jmag-part kmag-part quaternion-rotation quaternion-norm
             quaternion-normalize quaternion-conjugate vector->quaternion quaternion->vector
             rotate-vector rotation-matrix sinc)
-  #:re-export (real-part imag-part))
+  #:re-export (real-part imag-part exp))
 
 
 (define-class <quaternion> ()
@@ -86,11 +87,12 @@
 (quaternion-binary-op *)
 
 (define (quaternion-norm2 self)
-  (reduce + 0 (map (lambda (x) (* x x)) (components self))))
+  (let [(v (components self))]
+    (inner-product v v)))
 
 (define (quaternion-norm self)
   "Compute norm of quaternion"
-  (sqrt (quaternion-norm2 self)))
+  (norm (components self)))
 
 (define (quaternion-normalize self)
   "Normalize the quaternion"
@@ -130,3 +132,11 @@
 (define (sinc x)
   "Compute sin(x) divided by x"
   (if (zero? x) 1 (/ (sin x) x)))
+
+(define-method (exp (self <quaternion>))
+  (let* [(scale         (exp (real-part self)))
+         (axis          (cdr (components self)))
+         (rotation      (norm axis))
+         (cos-rotation  (cos rotation))
+         (sinc-rotation (sinc rotation))]
+    (apply make-quaternion (* scale cos-rotation) (* scale sinc-rotation axis))))

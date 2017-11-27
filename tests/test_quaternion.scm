@@ -147,4 +147,27 @@
     1 (sinc 0))
 (test-end "sinc")
 
+(test-begin "quaternion exponentiation")
+  (test-approximate "real part of exp(pi * j) should be minus one"
+    -1.0 (real-part (exp (make-quaternion 0 0 pi 0))) 1e-6)
+  (test-approximate "jmaginary part of exp(pi * j) should be zero"
+    0.0 (jmag-part (exp (make-quaternion 0 0 pi 0))) 1e-6)
+  (test-approximate "real part of exp(pi * j / 2) should be zero"
+    0.0 (real-part (exp (make-quaternion 0 0 (/ pi 2) 0))) 1e-6)
+  (test-approximate "jmaginary part of exp(pi * j / 2) should be one"
+    1.0 (jmag-part (exp (make-quaternion 0 0 (/ pi 2) 0))) 1e-6)
+  (test-approximate "real part of 1 + exp(pi * j) should be minus e"
+    (- (exp 1)) (real-part (exp (make-quaternion 1 0 pi 0))) 1e-6)
+  (test-approximate "jmaginary part of 1 + exp(pi * j / 2) should be e"
+    (exp 1) (jmag-part (exp (make-quaternion 1 0 (/ pi 2) 0))) 1e-6)
+  (test-approximate "kmaginary part of exp(pi * k) should be zero"
+    0.0 (kmag-part (exp (make-quaternion 0 0 0 pi))) 1e-6)
+  (test-approximate "kmaginary part of exp(pi * k / 2) should be one"
+    1.0 (kmag-part (exp (make-quaternion 0 0 0 (/ pi 2)))) 1e-6)
+  (test-approximate "imaginary part of exp(pi / 2 * (0.8 * i + 0.6 * j)) should be 0.8"
+    0.8 (imag-part (exp (make-quaternion 0 (* 0.4 pi) (* 0.3 pi) 0))) 1e-6)
+  (test-approximate "jmaginary part of exp(pi / 2 * (0.8 * i + 0.6 * j)) should be 0.6"
+    0.6 (jmag-part (exp (make-quaternion 0 (* 0.4 pi) (* 0.3 pi) 0))) 1e-6)
+(test-end "quaternion exponentiation")
+
 (test-end "ssim quaternion")

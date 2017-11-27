@@ -2,7 +2,7 @@
   #:use-module (oop goops)
   #:use-module (srfi srfi-1)
   #:use-module (srfi srfi-26)
-  #:export (cross-product inner-product)
+  #:export (cross-product inner-product norm)
   #:re-export (+ - *))
 
 
@@ -25,3 +25,6 @@
   (list (- (* (cadr  a) (caddr b)) (* (caddr a) (cadr  b)))
         (- (* (caddr a) (car   b)) (* (car   a) (caddr b)))
         (- (* (car   a) (cadr  b)) (* (cadr  a) (car   b)))))
+
+(define (norm v)
+  (sqrt (inner-product v v)))
