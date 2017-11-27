@@ -20,12 +20,12 @@
 (define time #f)
 (define main-window #f)
 
-(define state '(0 0.7 0 0 0 0))
+(define state '(0 0.7 0 0 0 0 0.01 0.1 0))
 (define (position state) (take state 3))
-(define (speed state) (drop state 3))
+(define (speed state) (take (drop state 3) 3))
+(define (angular-momentum state) (take (drop state 6) 3))
 (define g '(0 -0.2 0))
 (define q (quaternion-rotation 0.0 '(1.0 0.0 0.0)))
-(define angular-momentum '(0.01 0.1 0.0))
 
 (define m 1)
 (define w 1)
@@ -54,14 +54,14 @@
         (list (+ w2) (+ h2) (+ d2))))
 
 (define (omega q)
-  (let [(rotated-momentum  (rotate-vector (quaternion-conjugate q) angular-momentum))]
+  (let [(rotated-momentum  (rotate-vector (quaternion-conjugate q) (angular-momentum state)))]
     (rotate-vector q (dot (inverse inertia) rotated-momentum))))
 
 (define (dstate state dt)
-  (append (speed state) g))
+  (append (speed state) g '(0 0 0)))
 
 (define (dq q dt)
-  (* (apply make-quaternion 0 (* 0.5 (omega q))) q))
+  (* (vector->quaternion (* 0.5 (omega q))) q))
 
 (define (on-reshape width height)
   (let* [(aspect (/ width height))
@@ -112,8 +112,9 @@
           (if (< vrel 0)
             (begin
               (format #t "vrel : ~a~&" vrel)
-              (set! state (append (position state) (+ (speed state) (* (/ 1 m) J))))
-              (set! angular-momentum (+ angular-momentum (cross-product r J)))
+              (set! state (append (position state)
+                                  (+ (speed state) (* (/ 1 m) J))
+                                  (+ (angular-momentum state) (cross-product r J))))
               (format #t "vrel':  ~a~&" (inner-product n (+ (cross-product (omega q) r) (speed state)))))))))
     (post-redisplay)))
 

@@ -1,5 +1,8 @@
 # TODO
 
+* state vector
+* time of collision
+* compiled ssim.scm not being found
 * contacts with friction
 * resting contacts
 * LLVM-based structs
