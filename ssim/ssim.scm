@@ -20,14 +20,14 @@
 (define time #f)
 (define main-window #f)
 
-(define state `(0 0.7 0
-                0 0 0
-                ,(quaternion-rotation 0 '(1 0 0))
-                0.01 0.1 0))
-(define (position state) (take state 3))
-(define (speed state) (take (drop state 3) 3))
-(define (orientation state) (car (drop state 6)))
-(define (angular-momentum state) (take (drop state 7) 3))
+(define state (list '(0 0.7 0)
+                    '(0 0 0)
+                    (quaternion-rotation 0 '(1 0 0))
+                    '(0.01 0.1 0)))
+(define (position         state) (car    state))
+(define (speed            state) (cadr   state))
+(define (orientation      state) (caddr  state))
+(define (angular-momentum state) (cadddr state))
 (define g '(0 -0.2 0))
 
 (define m 1)
@@ -64,10 +64,10 @@
   (cross-product (omega state) r))
 
 (define (dstate state dt)
-  (append (speed state)
-          g
-          (list (* (vector->quaternion (* 0.5 (omega state))) (orientation state)))
-          '(0 0 0)))
+  (list (speed state)
+        g
+        (* (vector->quaternion (* 0.5 (omega state))) (orientation state))
+        '(0 0 0)))
 
 (define (on-reshape width height)
   (let* [(aspect (/ width height))
@@ -117,10 +117,10 @@
           (if (< vrel 0)
             (begin
               (format #t "vrel : ~a~&" vrel)
-              (set! state (append (position state)
-                                  (+ (speed state) (* (/ 1 m) J))
-                                  (list (quaternion-normalize (orientation state)))
-                                  (+ (angular-momentum state) (cross-product r J))))
+              (set! state (list (position state)
+                                (+ (speed state) (* (/ 1 m) J))
+                                (quaternion-normalize (orientation state))
+                                (+ (angular-momentum state) (cross-product r J))))
               (format #t "vrel':  ~a~&" (inner-product n (+ (circular state r) (speed state)))))))))
     (post-redisplay)))
 
