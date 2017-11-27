@@ -57,6 +57,9 @@
   (let [(rotated-momentum  (rotate-vector (quaternion-conjugate q) (angular-momentum state)))]
     (rotate-vector q (dot (inverse inertia) rotated-momentum))))
 
+(define (circular q r)
+  (cross-product (omega q) r))
+
 (define (dstate state dt)
   (append (speed state) g '(0 0 0)))
 
@@ -92,7 +95,7 @@
     (gl-begin (begin-mode lines)
       (for-each (lambda (r)
         (apply gl-vertex (+ r (position state)))
-        (apply gl-vertex (+ r (position state) (* speed-scale (+ (cross-product (omega q) r) (speed state))))))
+        (apply gl-vertex (+ r (position state) (* speed-scale (+ (circular q r) (speed state))))))
         (map (cut rotate-vector q <>) corners)))
     (swap-buffers)))
 
@@ -105,7 +108,7 @@
       (if (<= (cadr collision) ground)
         (let* [(r    (- collision (position state)))
                (n    '(0 1 0))
-               (v    (+ (cross-product (omega q) r) (speed state)))
+               (v    (+ (circular q r) (speed state)))
                (vrel (inner-product n v))
                (j    (/ (* (- loss 2) vrel) (+ (/ 1 m) (inner-product n (cross-product (rotate-vector q (dot (inverse inertia) (rotate-vector (quaternion-conjugate q) (cross-product r n)))) r)))))
                (J    (* j n))]
@@ -115,7 +118,7 @@
               (set! state (append (position state)
                                   (+ (speed state) (* (/ 1 m) J))
                                   (+ (angular-momentum state) (cross-product r J))))
-              (format #t "vrel':  ~a~&" (inner-product n (+ (cross-product (omega q) r) (speed state)))))))))
+              (format #t "vrel':  ~a~&" (inner-product n (+ (circular q r) (speed state)))))))))
     (post-redisplay)))
 
 (initialize-glut (program-arguments) #:window-size '(640 . 480) #:display-mode (display-mode rgb double))
