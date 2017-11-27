@@ -128,7 +128,7 @@
 
 (define-method (exp (self <quaternion>))
   (let* [(scale         (exp (real-part self)))
-         (axis          (cdr (components self)))
+         (axis          (quaternion->vector self))
          (rotation      (norm axis))
          (cos-rotation  (cos rotation))
          (sinc-rotation (sinc rotation))]
@@ -136,4 +136,4 @@
 
 (define (quaternion-rotation theta axis)
   "Use quaternion to reprsent a rotation"
-  (exp (apply make-quaternion 0 (* (/ theta 2) axis))))
+  (exp (vector->quaternion (* (/ theta 2) axis))))

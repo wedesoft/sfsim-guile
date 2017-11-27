@@ -1,6 +1,5 @@
 # TODO
 
-* use exponential of quaternion to simplify code
 * contacts with friction
 * resting contacts
 * license
