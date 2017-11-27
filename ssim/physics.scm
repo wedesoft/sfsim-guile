@@ -1,5 +1,6 @@
 (define-module (ssim physics)
   #:use-module (srfi srfi-19)
+  #:use-module (ssim linear-algebra)
   #:export (clock elapsed cuboid-inertia runge-kutta))
 
 
@@ -24,6 +25,6 @@
 
 (define (cuboid-inertia mass width height depth)
   "Determine diagonal elements of a cuboid's inertial matrix"
-  (list (* (/ mass 12) (+ (expt height 2) (expt depth  2)))
-        (* (/ mass 12) (+ (expt width  2) (expt depth  2)))
-        (* (/ mass 12) (+ (expt width  2) (expt height 2)))))
+  (diagonal (list (* (/ mass 12) (+ (expt height 2) (expt depth  2)))
+                  (* (/ mass 12) (+ (expt width  2) (expt depth  2)))
+                  (* (/ mass 12) (+ (expt width  2) (expt height 2))))))

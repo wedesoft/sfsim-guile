@@ -15,6 +15,9 @@
     '(10 15) (* 5 '(2 3)))
 (test-end "vector operations")
 
+(test-equal "create diagonal matrix"
+  '((2 0 0) (0 3 0) (0 0 5)) (diagonal '(2 3 5)))
+
 (test-begin "inner product")
   (test-equal "inner product of one-dimensional vectors"
     6 (inner-product '(2) '(3)))
@@ -45,4 +48,15 @@
   (test-equal "Norm of 2D vector"
     5 (norm '(3 4)))
 (test-end "norm")
+
+(test-begin "inverse")
+  (test-equal "Invert diagonal matrix"
+    '((1/2 0 0) (0 1/4 0) (0 0 1/8)) (inverse '((2 0 0) (0 4 0) (0 0 8))))
+(test-end "inverse")
+
+(test-begin "dot")
+  (test-equal "Matrix-vector product"
+    '(6 15 35) (dot (diagonal '(2 3 5)) '(3 5 7)))
+(test-end "dot")
+
 (test-end "ssim linear-algebra")

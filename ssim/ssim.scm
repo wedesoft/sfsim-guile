@@ -55,7 +55,7 @@
 
 (define (omega q)
   (let [(rotated-momentum  (rotate-vector (quaternion-conjugate q) angular-momentum))]
-    (rotate-vector q (map / rotated-momentum inertia))))
+    (rotate-vector q (dot (inverse inertia) rotated-momentum))))
 
 (define (dstate state dt)
   (append (speed state) g))
@@ -107,7 +107,7 @@
                (n    '(0 1 0))
                (v    (+ (cross-product (omega q) r) (speed state)))
                (vrel (inner-product n v))
-               (j    (/ (* (- loss 2) vrel) (+ (/ 1 m) (inner-product n (cross-product (rotate-vector q (map / (rotate-vector (quaternion-conjugate q) (cross-product r n)) inertia)) r)))))
+               (j    (/ (* (- loss 2) vrel) (+ (/ 1 m) (inner-product n (cross-product (rotate-vector q (dot (inverse inertia) (rotate-vector (quaternion-conjugate q) (cross-product r n)))) r)))))
                (J    (* j n))]
           (if (< vrel 0)
             (begin
@@ -116,8 +116,6 @@
               (set! angular-momentum (+ angular-momentum (cross-product r J)))
               (format #t "vrel':  ~a~&" (inner-product n (+ (cross-product (omega q) r) (speed state)))))))))
     (post-redisplay)))
-
-; rotated inertia
 
 (initialize-glut (program-arguments) #:window-size '(640 . 480) #:display-mode (display-mode rgb double))
 (set! main-window (make-window "ssim"))
