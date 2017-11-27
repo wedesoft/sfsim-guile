@@ -6,8 +6,8 @@
   #:use-module (srfi srfi-26)
   #:export (<quaternion>
             make-quaternion jmag-part kmag-part quaternion-rotation quaternion-norm
-            quaternion-normalize quaternion-conjugate
-            vector->quaternion quaternion->vector rotate-vector rotation-matrix)
+            quaternion-normalize quaternion-conjugate vector->quaternion quaternion->vector
+            rotate-vector rotation-matrix sinc)
   #:re-export (real-part imag-part))
 
 
@@ -126,3 +126,7 @@
   "Convert rotation quaternion to a rotation matrix"
   (let [(conjugate (quaternion-conjugate2 self))]
     (map (cut rotate-vector conjugate <>) '((1 0 0) (0 1 0) (0 0 1)))))
+
+(define (sinc x)
+  "Compute sin(x) divided by x"
+  (if (zero? x) 1 (/ (sin x) x)))

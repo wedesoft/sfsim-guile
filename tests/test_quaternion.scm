@@ -137,4 +137,14 @@
   (test-approximate "Create rotation matrix for rotation around z-axis"
     -1 (cadar (rotation-matrix (quaternion-rotation (/ pi 2) '(0 0 1)))) 1e-6)
 (test-end "rotations")
+
+(test-begin "sinc")
+  (test-approximate "sin(pi)/pi should be zero"
+    0 (sinc pi) 1e-6)
+  (test-approximate "sin(pi/2) / (pi/2) should be 2/pi"
+    (/ 2 pi) (sinc (/ pi 2)) 1e-6)
+  (test-equal "sinc(0) should be 1"
+    1 (sinc 0))
+(test-end "sinc")
+
 (test-end "ssim quaternion")
