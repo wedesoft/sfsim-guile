@@ -94,4 +94,11 @@
     '((3 0) (0 2)) (dot '((1 0) (0 2)) '((3 0) (0 1))))
 (test-end "dot")
 
+(test-begin "transpose")
+  (test-equal "One element matrix transpose"
+    '((42)) (transpose '((42))))
+  (test-equal "Transpose 2x3 matrix"
+    '((1 4) (2 5) (3 6)) (transpose '((1 2 3) (4 5 6))))
+(test-end "transpose")
+
 (test-end "ssim linear-algebra")

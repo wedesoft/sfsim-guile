@@ -130,29 +130,33 @@
     '(2 3 5) (quaternion->vector (make-quaternion 0 2 3 5)))
 (test-end "rotations")
 
+(define (round-vector v) (map (compose inexact->exact round) v))
+
 (test-begin "rotate vector")
   (test-equal "Zero rotation"
     '(2.0 4.0 8.0) (rotate-vector (quaternion-rotation 0 '(1 0 0)) '(2.0 4.0 8.0)))
   (test-equal "Rotate vector around x-axis"
-    '(2.0 -8.0 4.0) (map round (rotate-vector (quaternion-rotation (/ pi 2) '(1 0 0)) '(2.0 4.0 8.0))))
+    '(2 -8 4) (round-vector (rotate-vector (quaternion-rotation (/ pi 2) '(1 0 0)) '(2.0 4.0 8.0))))
 (test-end "rotate vector")
 
+(define (round-matrix m) (map round-vector m))
+
 (test-begin "rotate matrix")
-  (test-equal "Zero rotation for identity matrix"
-    '((1.0 0 0) (0.0 1.0 0.0) (0.0 0.0 1.0)) (rotate-matrix (quaternion-rotation 0 '(1 0 0)) '((1 0 0) (0 1 0) (0 0 1))))
+  (test-equal "Zero rotation for matrix"
+    '((1.0 2.0 3.0) (4.0 5.0 6.0) (7.0 8.0 9.0)) (rotate-matrix (quaternion-rotation 0 '(1 0 0)) '((1 2 3) (4 5 6) (7 8 9))))
   (test-equal "Rotate matrix 180 degrees around z-axis"
-    -1.0 (caar (rotate-matrix (quaternion-rotation pi '(0 0 1)) '((1 0 0) (0 1 0) (0 0 1)))))
-  (test-equal "Zero rotation for rotated matrix"
-    '((-1.0 0 0) (0.0 -1.0 0.0) (0.0 0.0 1.0)) (rotate-matrix (quaternion-rotation 0 '(1 0 0)) '((-1 0 0) (0 -1 0) (0 0 1))))
-  (test-approximate "Rotatie identity matrix 90 degrees around z-axis"
-    -1 (cadar (rotate-matrix (quaternion-rotation (/ pi 2) '(0 0 1)) '((1 0 0) (0 1 0) (0 0 1)))) 1e-6)
+    '((1 2 -3) (4 5 -6) (-7 -8 9))
+    (round-matrix (rotate-matrix (quaternion-rotation pi '(0 0 1)) '((1 2 3) (4 5 6) (7 8 9)))))
+  (test-equal "Rotate matrix 90 degrees around z-axis"
+    '((5 -4 -6) (-2 1 3) (-8 7 9))
+    (round-matrix (rotate-matrix (quaternion-rotation (/ pi 2) '(0 0 1)) '((1 2 3) (4 5 6) (7 8 9)))))
 (test-end "rotate matrix")
 
 (test-begin "rotation matrix")
   (test-equal "Create identity matrix for zero rotation"
     '((1.0 0 0) (0.0 1.0 0.0) (0.0 0.0 1.0)) (rotation-matrix (quaternion-rotation 0 '(1 0 0))))
-  (test-approximate "Create rotation matrix for 90 degree rotation around z-axis"
-    -1 (cadar (rotation-matrix (quaternion-rotation (/ pi 2) '(0 0 1)))) 1e-6)
+  (test-equal "Create rotation matrix for 90 degree rotation around z-axis"
+    '((0 -1 0) (1 0 0) (0 0 1)) (round-matrix (rotation-matrix (quaternion-rotation (/ pi 2) '(0 0 1)))))
 (test-end "rotation matrix")
 
 (test-begin "sinc")

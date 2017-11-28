@@ -2,7 +2,7 @@
   #:use-module (oop goops)
   #:use-module (srfi srfi-1)
   #:use-module (srfi srfi-26)
-  #:export (cross-product inner-product norm diagonal dot permutations determinant submatrix inverse)
+  #:export (cross-product inner-product norm diagonal dot permutations determinant submatrix inverse transpose)
   #:re-export (+ - *))
 
 
@@ -78,6 +78,10 @@
         (sgn     (lambda (v j i) (if (eq? (even? j) (even? i)) v (- v))))]
     (map (lambda (j) (map (lambda (i) (sgn (/ (determinant (submatrix mat i j)) det) j i)) indices)) indices)))
 
-(define (dot matrix vec)
+(define (dot mat vec)
   "Multiply a matrix with another matrix or a vector"
-  (map (cut inner-product <> vec) matrix))
+  (map (cut inner-product <> vec) mat))
+
+(define (transpose mat)
+  "Transpose a matrix"
+  (map (lambda (i) (map (cut list-ref <> i) mat)) (iota (length (car mat)))))

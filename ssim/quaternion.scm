@@ -120,11 +120,11 @@
 (define (rotate-matrix self mat)
   "Rotate a matrix using quaternion rotation"
   (let [(conjugate (quaternion-conjugate2 self))]
-    (map (cut rotate-vector conjugate <>) mat)))
+    (transpose (map (lambda (v) (rotate-vector self (dot mat (rotate-vector conjugate v)))) '((1 0 0) (0 1 0) (0 0 1))))))
 
 (define (rotation-matrix self)
   "Convert rotation quaternion to a rotation matrix"
-  (rotate-matrix self '((1 0 0) (0 1 0) (0 0 1))))
+  (map (cut rotate-vector (quaternion-conjugate2 self) <>) '((1 0 0) (0 1 0) (0 0 1))))
 
 (define (sinc x)
   "Compute sin(x) divided by x"
