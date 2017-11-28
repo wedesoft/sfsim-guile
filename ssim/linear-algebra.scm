@@ -2,7 +2,7 @@
   #:use-module (oop goops)
   #:use-module (srfi srfi-1)
   #:use-module (srfi srfi-26)
-  #:export (cross-product inner-product norm diagonal inverse dot)
+  #:export (cross-product inner-product norm diagonal inverse dot permutations determinant)
   #:re-export (+ - *))
 
 
@@ -28,6 +28,22 @@
 
 (define (norm v)
   (sqrt (inner-product v v)))
+
+(define (permutations lst)
+  (if (zero? (length lst))
+    '(())
+    (concatenate (map (lambda (item) (map (cut cons item <>) (permutations (delete item lst)))) lst))))
+
+(define (determinant mat)
+  (let* [(n       (length mat))
+         (indices (iota n))
+         (perms   (permutations indices))]
+    (reduce + 0
+      (map
+        (lambda (perm k)
+          (* (reduce * 1 (map (lambda (j i) (list-ref (list-ref mat j) i)) indices perm)) (if (even? k) 1 -1)))
+         perms
+         (iota (length perms))))))
 
 (define (diagonal v)
   (list (list (car v) 0 0) (list 0 (cadr v) 0) (list 0 0 (caddr v))))

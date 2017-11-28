@@ -49,6 +49,22 @@
     5 (norm '(3 4)))
 (test-end "norm")
 
+(test-begin "permutations")
+  (test-equal "permutations of single element array"
+    '((0)) (permutations '(0)))
+  (test-equal "permutations of array with two elements"
+    '((0 1) (1 0)) (permutations '(0 1)))
+  (test-equal "permutations of array with three elements"
+    '((0 1 2) (0 2 1) (1 0 2) (1 2 0) (2 0 1) (2 1 0)) (permutations '(0 1 2)))
+(test-end "permutations")
+
+(test-begin "determinant")
+  (test-equal "Determinant of 2D diagonal matrix"
+    6 (determinant '((2 0) (0 3))))
+  (test-equal "Determinant of 2D matrix"
+    -1 (determinant '((2 3) (5 7))))
+(test-end "determinant")
+
 (test-begin "inverse")
   (test-equal "Invert diagonal matrix"
     '((1/2 0 0) (0 1/4 0) (0 0 1/8)) (inverse '((2 0 0) (0 4 0) (0 0 8))))
