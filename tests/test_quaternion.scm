@@ -128,15 +128,32 @@
     (make-quaternion 0 2 3 5) (vector->quaternion '(2 3 5)))
   (test-equal "Convert quaternion to vector"
     '(2 3 5) (quaternion->vector (make-quaternion 0 2 3 5)))
+(test-end "rotations")
+
+(test-begin "rotate vector")
   (test-equal "Zero rotation"
     '(2.0 4.0 8.0) (rotate-vector (quaternion-rotation 0 '(1 0 0)) '(2.0 4.0 8.0)))
   (test-equal "Rotate vector around x-axis"
     '(2.0 -8.0 4.0) (map round (rotate-vector (quaternion-rotation (/ pi 2) '(1 0 0)) '(2.0 4.0 8.0))))
+(test-end "rotate vector")
+
+(test-begin "rotate matrix")
+  (test-equal "Zero rotation for identity matrix"
+    '((1.0 0 0) (0.0 1.0 0.0) (0.0 0.0 1.0)) (rotate-matrix (quaternion-rotation 0 '(1 0 0)) '((1 0 0) (0 1 0) (0 0 1))))
+  (test-equal "Rotate matrix 180 degrees around z-axis"
+    -1.0 (caar (rotate-matrix (quaternion-rotation pi '(0 0 1)) '((1 0 0) (0 1 0) (0 0 1)))))
+  (test-equal "Zero rotation for rotated matrix"
+    '((-1.0 0 0) (0.0 -1.0 0.0) (0.0 0.0 1.0)) (rotate-matrix (quaternion-rotation 0 '(1 0 0)) '((-1 0 0) (0 -1 0) (0 0 1))))
+  (test-approximate "Rotatie identity matrix 90 degrees around z-axis"
+    -1 (cadar (rotate-matrix (quaternion-rotation (/ pi 2) '(0 0 1)) '((1 0 0) (0 1 0) (0 0 1)))) 1e-6)
+(test-end "rotate matrix")
+
+(test-begin "rotation matrix")
   (test-equal "Create identity matrix for zero rotation"
     '((1.0 0 0) (0.0 1.0 0.0) (0.0 0.0 1.0)) (rotation-matrix (quaternion-rotation 0 '(1 0 0))))
-  (test-approximate "Create rotation matrix for rotation around z-axis"
+  (test-approximate "Create rotation matrix for 90 degree rotation around z-axis"
     -1 (cadar (rotation-matrix (quaternion-rotation (/ pi 2) '(0 0 1)))) 1e-6)
-(test-end "rotations")
+(test-end "rotation matrix")
 
 (test-begin "sinc")
   (test-approximate "sin(pi)/pi should be zero"

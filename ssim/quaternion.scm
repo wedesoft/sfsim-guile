@@ -8,7 +8,7 @@
   #:export (<quaternion>
             make-quaternion jmag-part kmag-part quaternion-rotation quaternion-norm
             quaternion-normalize quaternion-conjugate vector->quaternion quaternion->vector
-            rotate-vector rotation-matrix sinc)
+            rotate-vector rotate-matrix rotation-matrix sinc)
   #:re-export (real-part imag-part exp))
 
 
@@ -117,10 +117,14 @@
   "Perform vector rotation with rotation represented using a quaternion"
   (quaternion->vector (* self (vector->quaternion vec) (quaternion-conjugate self))))
 
+(define (rotate-matrix self mat)
+  "Rotate a matrix using quaternion rotation"
+  (let [(conjugate (quaternion-conjugate2 self))]
+    (map (cut rotate-vector conjugate <>) mat)))
+
 (define (rotation-matrix self)
   "Convert rotation quaternion to a rotation matrix"
-  (let [(conjugate (quaternion-conjugate2 self))]
-    (map (cut rotate-vector conjugate <>) '((1 0 0) (0 1 0) (0 0 1)))))
+  (rotate-matrix self '((1 0 0) (0 1 0) (0 0 1))))
 
 (define (sinc x)
   "Compute sin(x) divided by x"
