@@ -1,6 +1,6 @@
 # TODO
 
-* state vector
+* use rotated inertia matrix
 * time of collision
 * compiled ssim.scm not being found
 * contacts with friction
