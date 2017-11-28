@@ -1,5 +1,6 @@
 # TODO
 
+* matrix inversion
 * use rotated inertia matrix
 * time of collision
 * compiled ssim.scm not being found
