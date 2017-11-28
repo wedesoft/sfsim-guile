@@ -55,7 +55,7 @@
   (test-equal "permutations of array with two elements"
     '((0 1) (1 0)) (permutations '(0 1)))
   (test-equal "permutations of array with three elements"
-    '((0 1 2) (0 2 1) (1 0 2) (1 2 0) (2 0 1) (2 1 0)) (permutations '(0 1 2)))
+    '((0 1 2) (0 2 1) (1 2 0) (1 0 2) (2 0 1) (2 1 0)) (permutations '(0 1 2)))
 (test-end "permutations")
 
 (test-begin "determinant")
@@ -63,6 +63,8 @@
     6 (determinant '((2 0) (0 3))))
   (test-equal "Determinant of 2D matrix"
     -1 (determinant '((2 3) (5 7))))
+  (test-equal "Determinant of 3D matrix"
+    3 (determinant '((0 1 2) (3 2 1) (1 1 0))))
 (test-end "determinant")
 
 (test-begin "inverse")

@@ -32,7 +32,14 @@
 (define (permutations lst)
   (if (zero? (length lst))
     '(())
-    (concatenate (map (lambda (item) (map (cut cons item <>) (permutations (delete item lst)))) lst))))
+    (concatenate
+      (map
+        (lambda (item index)
+          (let [(remaining (delete item lst))
+                (order     (if (even? index) identity reverse))]
+            (map (cut cons item <>) (permutations (order remaining)))))
+        lst
+        (iota (length lst))))))
 
 (define (determinant mat)
   (let* [(n       (length mat))
