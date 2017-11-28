@@ -15,8 +15,12 @@
     '(10 15) (* 5 '(2 3)))
 (test-end "vector operations")
 
-(test-equal "create diagonal matrix"
-  '((2 0 0) (0 3 0) (0 0 5)) (diagonal '(2 3 5)))
+(test-begin "diagonal matrix")
+  (test-equal "create 2D diagonal matrix"
+    '((2 0) (0 3)) (diagonal '(2 3)))
+  (test-equal "create 3D diagonal matrix"
+    '((2 0 0) (0 3 0) (0 0 5)) (diagonal '(2 3 5)))
+(test-end "diagonal matrix")
 
 (test-begin "inner product")
   (test-equal "inner product of one-dimensional vectors"
@@ -67,14 +71,27 @@
     3 (determinant '((0 1 2) (3 2 1) (1 1 0))))
 (test-end "determinant")
 
+(test-begin "submatrix")
+  (test-equal "Empty submatrix"
+     '() (submatrix '((42)) 0 0))
+  (test-equal "First submatrix of 2D matrix"
+     '((1 2)) (submatrix '((1 2 3) (4 5 6)) 1 2))
+  (test-equal "Last submatrix of 2D matrix"
+     '((5 6)) (submatrix '((1 2 3) (4 5 6)) 0 0))
+(test-end "submatrix")
+
 (test-begin "inverse")
   (test-equal "Invert diagonal matrix"
     '((1/2 0 0) (0 1/4 0) (0 0 1/8)) (inverse '((2 0 0) (0 4 0) (0 0 8))))
+  (test-equal "Invert 2D matrix"
+    '((-7 3) (5 -2)) (inverse '((2 3) (5 7))))
 (test-end "inverse")
 
 (test-begin "dot")
   (test-equal "Matrix-vector product"
     '(6 15 35) (dot (diagonal '(2 3 5)) '(3 5 7)))
+  (test-equal "Matrix-matrix product"
+    '((3 0) (0 2)) (dot '((1 0) (0 2)) '((3 0) (0 1))))
 (test-end "dot")
 
 (test-end "ssim linear-algebra")

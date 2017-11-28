@@ -2,34 +2,42 @@
   #:use-module (oop goops)
   #:use-module (srfi srfi-1)
   #:use-module (srfi srfi-26)
-  #:export (cross-product inner-product norm diagonal inverse dot permutations determinant)
+  #:export (cross-product inner-product norm diagonal dot permutations determinant submatrix inverse)
   #:re-export (+ - *))
 
 
 (define-method (+ (a <list>) (b <list>))
+  "Add two vectors."
   (map + a b))
 
 (define-method (- (a <list>) (b <list>))
+  "Subtract a vector from another."
   (map - a b))
 
 (define-method (* (a <list>) (b <number>))
+  "Multiply a vector with a scalar."
   (map (cut * <> b) a))
 
 (define-method (* (a <number>) (b <list>))
+  "Multiply a scalar with a vector."
   (map (cut * <> a) b))
 
 (define (inner-product a b)
+  "Compute inner product of two vectors."
   (reduce + 0 (map * a b)))
 
 (define (cross-product a b)
+  "Determine cross-product of two 3D vectors."
   (list (- (* (cadr  a) (caddr b)) (* (caddr a) (cadr  b)))
         (- (* (caddr a) (car   b)) (* (car   a) (caddr b)))
         (- (* (car   a) (cadr  b)) (* (cadr  a) (car   b)))))
 
 (define (norm v)
+  "Return norm of a vector."
   (sqrt (inner-product v v)))
 
 (define (permutations lst)
+  "Return all permutations of list LST. The permutations are ordered so that every alternate permutation is even."
   (if (zero? (length lst))
     '(())
     (concatenate
@@ -42,6 +50,7 @@
         (iota (length lst))))))
 
 (define (determinant mat)
+  "Compute determinant of a matrix"
   (let* [(n       (length mat))
          (indices (iota n))
          (perms   (permutations indices))]
@@ -52,11 +61,23 @@
          perms
          (iota (length perms))))))
 
-(define (diagonal v)
-  (list (list (car v) 0 0) (list 0 (cadr v) 0) (list 0 0 (caddr v))))
+(define (diagonal lst)
+  "Create diagonal matrix"
+  (map (lambda (item i) (append (make-list i 0) (list item) (make-list (- (length lst) i 1) 0))) lst (iota (length lst))))
 
-(define (inverse matrix)
-  (diagonal (map (lambda (i) (/ 1 (list-ref (list-ref matrix i) i))) (iota 3))))
+(define (submatrix mat row column)
+  "Return submatrix with specified ROW and COLUMN removed."
+  (let [(rows    (delete row    (iota (length mat))))
+        (columns (delete column (iota (length (car mat)))))]
+    (map (lambda (j) (map (lambda (i) (list-ref (list-ref mat j) i)) columns)) rows)))
+
+(define (inverse mat)
+  "Compute inverse of matrix"
+  (let [(det     (determinant mat))
+        (indices (iota (length mat)))
+        (sgn     (lambda (v j i) (if (eq? (even? j) (even? i)) v (- v))))]
+    (map (lambda (j) (map (lambda (i) (sgn (/ (determinant (submatrix mat i j)) det) j i)) indices)) indices)))
 
 (define (dot matrix vec)
+  "Multiply a matrix with another matrix or a vector"
   (map (cut inner-product <> vec) matrix))
