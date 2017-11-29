@@ -1,7 +1,9 @@
 (define-module (sfsim physics)
+  #:use-module (ice-9 curried-definitions)
   #:use-module (srfi srfi-19)
   #:use-module (sfsim linear-algebra)
-  #:export (clock elapsed cuboid-inertia runge-kutta))
+  #:use-module (sfsim quaternion)
+  #:export (clock elapsed cuboid-inertia runge-kutta inertia-body))
 
 
 (define (clock)
@@ -28,3 +30,7 @@
   (diagonal (list (* (/ mass 12) (+ (expt height 2) (expt depth  2)))
                   (* (/ mass 12) (+ (expt width  2) (expt depth  2)))
                   (* (/ mass 12) (+ (expt width  2) (expt height 2))))))
+
+(define ((inertia-body mat) rotation)
+  "Rotate inertia matrix MAT into world frame"
+  (rotate-matrix rotation mat))

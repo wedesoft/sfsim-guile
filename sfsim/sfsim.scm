@@ -34,7 +34,7 @@
 (define w 1)
 (define h 0.5)
 (define d 0.15)
-(define inertia-body (cuboid-inertia m w h d))
+(define inertia (inertia-body (cuboid-inertia m w h d)))
 
 (define loss 0.2)
 
@@ -57,11 +57,8 @@
         (list (- w2) (+ h2) (+ d2))
         (list (+ w2) (+ h2) (+ d2))))
 
-(define (inertia state)
-  (rotate-matrix (orientation state) inertia-body))
-
 (define (omega state)
-  (dot (inverse (inertia state)) (angular-momentum state)))
+  (dot (inverse (inertia (orientation state))) (angular-momentum state)))
 
 (define (circular-motion state r)
   (cross-product (omega state) r))
@@ -118,7 +115,7 @@
          (v    (corner-speed state r))
          (vrel (inner-product n v))
          (j    (/ (* (- loss 2) vrel)
-                  (+ (/ 1 m) (inner-product n (cross-product (dot (inverse (inertia state)) (cross-product r n)) r)))))
+                  (+ (/ 1 m) (inner-product n (cross-product (dot (inverse (inertia (orientation state))) (cross-product r n)) r)))))
          (J    (* j n))]
     (if (< vrel 0)
       (list (position state)

@@ -1,12 +1,12 @@
 # TODO
 
-* Baraff -> Zotero
 * extract more tested methods
 * minimal time step
 * do not split remaining interval unless required (add clock to state)
 * resting contacts
 * suspension
 * compiled sfsim.scm not being found
+* 3D model: Dream Chaser, Soyuz, PTK NP
 * contacts with friction
 * LLVM-based structs
 * 3d collision with object (points, lines, surfaces?)

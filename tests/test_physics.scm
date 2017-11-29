@@ -1,5 +1,9 @@
 (use-modules (srfi srfi-64)
-             (sfsim physics))
+             (sfsim physics)
+             (sfsim quaternion))
+
+
+(define pi (* 2 (acos 0)))
 
 
 (test-begin "sfsim physics")
@@ -43,4 +47,15 @@
   (test-equal "Inertia of cuboid"
     '((34 0 0) (0 29 0) (0 0 13)) (cuboid-inertia 12 2 3 5))
 (test-end "inertia of cuboid")
+
+(define (round-vector v) (map (compose inexact->exact round) v))
+(define (round-matrix m) (map round-vector m))
+
+(test-begin "inertia")
+  (let [(inertia (inertia-body '((3 2 1) (2 4 2) (1 2 5))))]
+    (test-equal "use specified inertia matrix"
+      '((3 2 1) (2 4 2) (1 2 5)) (round-matrix (inertia (quaternion-rotation 0 '(1 0 0)))))
+    (test-equal "use specified inertia matrix"
+      '((3 -1 2) (-1 5 -2) (2 -2 4)) (round-matrix (inertia (quaternion-rotation (/ pi 2) '(1 0 0))))))
+(test-end "inertia")
 (test-end "sfsim physics")
