@@ -57,7 +57,7 @@
         (list (- w2) (+ h2) (+ d2))
         (list (+ w2) (+ h2) (+ d2))))
 
-(define (corner-speed state r)
+(define (particle-speed state r)
   (let [(omega (angular-velocity inertia (orientation state) (angular-momentum state)))]
     (+ (cross-product omega r) (speed state))))
 
@@ -99,18 +99,18 @@
     (gl-begin (begin-mode lines)
       (for-each (lambda (r)
         (apply gl-vertex (+ r (position state)))
-        (apply gl-vertex (+ r (position state) (* speed-scale (corner-speed state r)))))
+        (apply gl-vertex (+ r (position state) (* speed-scale (particle-speed state r)))))
         (map (cut rotate-vector (orientation state) <>) corners)))
     (swap-buffers)))
 
 
 ;(format #t "vrel : ~a~&" vrel)
-;(format #t "vrel':  ~a~&" (inner-product n (corner-speed state r)))
+;(format #t "vrel':  ~a~&" (inner-product n (particle-speed state r)))
 
 (define (collision state contact)
   (let* [(r    (- contact (position state)))
          (n    '(0 1 0))
-         (v    (corner-speed state r))
+         (v    (particle-speed state r))
          (vrel (inner-product n v))
          (j    (/ (* (- loss 2) vrel)
                   (+ (/ 1 m) (inner-product n (cross-product (dot (inverse (inertia (orientation state))) (cross-product r n)) r)))))

@@ -2,7 +2,6 @@
 
 * extract more tested methods
 * minimal time step
-* do not split remaining interval unless required (add clock to state)
 * resting contacts
 * suspension
 * compiled sfsim.scm not being found
