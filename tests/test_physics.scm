@@ -53,9 +53,19 @@
 
 (test-begin "inertia")
   (let [(inertia (inertia-body '((3 2 1) (2 4 2) (1 2 5))))]
-    (test-equal "use specified inertia matrix"
+    (test-equal "Use specified inertia matrix"
       '((3 2 1) (2 4 2) (1 2 5)) (round-matrix (inertia (quaternion-rotation 0 '(1 0 0)))))
-    (test-equal "use specified inertia matrix"
+    (test-equal "Apply specified rotation to inertia matrix"
       '((3 -1 2) (-1 5 -2) (2 -2 4)) (round-matrix (inertia (quaternion-rotation (/ pi 2) '(1 0 0))))))
 (test-end "inertia")
+
+(test-begin "angular speed")
+  (let [(inertia (inertia-body '((1 0 0) (0 2 0) (0 0 4))))]
+    (test-equal "Angular speed should be zero if angular momentum is zero"
+      '(0.0 0.0 0.0) (angular-velocity inertia (quaternion-rotation 0 '(1 0 0)) '(0 0 0)))
+    (test-equal "Scale angular momentum using inverse inertia matrix"
+      '(2.0 2.0 1.5) (angular-velocity inertia (quaternion-rotation 0 '(1 0 0)) '(2 4 6)))
+    (test-equal "Scale angular momentum using inverse of rotated inertia matrix"
+      '(2 1 3) (round-vector (angular-velocity inertia (quaternion-rotation (/ pi 2) '(1 0 0)) '(2 3 6)))))
+(test-end "angular speed")
 (test-end "sfsim physics")

@@ -3,7 +3,7 @@
   #:use-module (srfi srfi-19)
   #:use-module (sfsim linear-algebra)
   #:use-module (sfsim quaternion)
-  #:export (clock elapsed cuboid-inertia runge-kutta inertia-body))
+  #:export (clock elapsed cuboid-inertia runge-kutta inertia-body angular-velocity))
 
 
 (define (clock)
@@ -31,6 +31,9 @@
                   (* (/ mass 12) (+ (expt width  2) (expt depth  2)))
                   (* (/ mass 12) (+ (expt width  2) (expt height 2))))))
 
-(define ((inertia-body mat) rotation)
+(define ((inertia-body mat) orientation)
   "Rotate inertia matrix MAT into world frame"
-  (rotate-matrix rotation mat))
+  (rotate-matrix orientation mat))
+
+(define (angular-velocity inertia orientation angular-momentum)
+  (dot (inverse (inertia orientation)) angular-momentum))

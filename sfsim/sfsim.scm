@@ -57,20 +57,20 @@
         (list (- w2) (+ h2) (+ d2))
         (list (+ w2) (+ h2) (+ d2))))
 
-(define (omega state)
-  (dot (inverse (inertia (orientation state))) (angular-momentum state)))
-
 (define (circular-motion state r)
-  (cross-product (omega state) r))
+  (cross-product (angular-velocity inertia (orientation state) (angular-momentum state)) r))
 
 (define (corner-speed state r)
   (+ (circular-motion state r) (speed state)))
 
 (define (dstate state dt)
-  (list (speed state)
-        g
-        (* (vector->quaternion (* 0.5 (omega state))) (orientation state))
-        '(0 0 0)))
+  (let [(v (speed state))
+        (q (orientation state))
+        (l (angular-momentum state))]
+    (list v
+          g
+          (* (vector->quaternion (* 0.5 (angular-velocity inertia q l))) q)
+          '(0 0 0))))
 
 (define (on-reshape width height)
   (let* [(aspect (/ width height))
