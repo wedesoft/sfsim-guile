@@ -57,11 +57,9 @@
         (list (- w2) (+ h2) (+ d2))
         (list (+ w2) (+ h2) (+ d2))))
 
-(define (circular-motion state r)
-  (cross-product (angular-velocity inertia (orientation state) (angular-momentum state)) r))
-
 (define (corner-speed state r)
-  (+ (circular-motion state r) (speed state)))
+  (let [(omega (angular-velocity inertia (orientation state) (angular-momentum state)))]
+    (+ (cross-product omega r) (speed state))))
 
 (define (dstate state dt)
   (let [(v (speed state))
