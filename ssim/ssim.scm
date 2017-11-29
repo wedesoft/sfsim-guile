@@ -107,27 +107,32 @@
         (map (cut rotate-vector (orientation state) <>) corners)))
     (swap-buffers)))
 
+
+;(format #t "vrel : ~a~&" vrel)
+;(format #t "vrel':  ~a~&" (inner-product n (corner-speed state r)))
+
+(define (collision contact)
+  (let* [(r    (- contact (position state)))
+         (n    '(0 1 0))
+         (v    (corner-speed state r))
+         (vrel (inner-product n v))
+         (j    (/ (* (- loss 2) vrel)
+                  (+ (/ 1 m) (inner-product n (cross-product (dot (inverse (inertia state)) (cross-product r n)) r)))))
+         (J    (* j n))]
+    (if (< vrel 0)
+      (list (position state)
+            (+ (speed state) (* (/ 1 m) J))
+            (quaternion-normalize (orientation state))
+            (+ (angular-momentum state) (cross-product r J)))
+      state)))
+
 (define (on-idle)
   (let [(dt (elapsed time #t))]
     (set! state (runge-kutta state dt dstate))
-    (let* [(outer     (map (lambda (corner) (+ (rotate-vector (orientation state) corner) (position state))) corners))
-           (collision (argmin cadr outer))]
-      (if (<= (cadr collision) ground)
-        (let* [(r    (- collision (position state)))
-               (n    '(0 1 0))
-               (v    (corner-speed state r))
-               (vrel (inner-product n v))
-               (j    (/ (* (- loss 2) vrel)
-                        (+ (/ 1 m) (inner-product n (cross-product (dot (inverse (inertia state)) (cross-product r n)) r)))))
-               (J    (* j n))]
-          (if (< vrel 0)
-            (begin
-              (format #t "vrel : ~a~&" vrel)
-              (set! state (list (position state)
-                                (+ (speed state) (* (/ 1 m) J))
-                                (quaternion-normalize (orientation state))
-                                (+ (angular-momentum state) (cross-product r J))))
-              (format #t "vrel':  ~a~&" (inner-product n (corner-speed state r))))))))
+    (let* [(outer   (map (lambda (corner) (+ (rotate-vector (orientation state) corner) (position state))) corners))
+           (contact (argmin cadr outer))]
+      (if (<= (cadr contact) ground)
+        (set! state (collision contact))))
     (post-redisplay)))
 
 (initialize-glut (program-arguments) #:window-size '(640 . 480) #:display-mode (display-mode rgb double))

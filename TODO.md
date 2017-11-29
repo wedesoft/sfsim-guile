@@ -1,8 +1,6 @@
 # TODO
 
-* matrix inversion
-* use rotated inertia matrix
-* time of collision
+* time of collision is approximately current time minus vrel/depth
 * compiled ssim.scm not being found
 * contacts with friction
 * resting contacts
