@@ -39,6 +39,7 @@
 (define loss 0.2)
 
 (define ground -1.0)
+(define epsilon 0.01)
 
 (define speed-scale 0.3)
 
@@ -130,12 +131,19 @@
   (let [(outer (map (lambda (corner) (+ (rotate-vector (orientation state) corner) (position state))) corners))]
     (argmin cadr outer)))
 
+(define (timestep state dt)
+  (let [(update (runge-kutta state dt dstate))]
+    (let* [(contact (candidate update))
+           (depth   (- ground (cadr contact)))]
+      (if (>= depth 0)
+        (if (<= depth epsilon)
+          (collision update contact)
+          (timestep (timestep state (/ dt 2)) (/ dt 2)))
+        update))))
+
 (define (on-idle)
   (let [(dt (elapsed time #t))]
-    (set! state (runge-kutta state dt dstate))
-    (let [(contact (candidate state))]
-      (if (<= (cadr contact) ground)
-        (set! state (collision state contact))))
+    (set! state (timestep state dt))
     (post-redisplay)))
 
 (initialize-glut (program-arguments) #:window-size '(640 . 480) #:display-mode (display-mode rgb double))
