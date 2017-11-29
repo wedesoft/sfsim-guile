@@ -1,6 +1,6 @@
-(define-module (ssim physics)
+(define-module (sfsim physics)
   #:use-module (srfi srfi-19)
-  #:use-module (ssim linear-algebra)
+  #:use-module (sfsim linear-algebra)
   #:export (clock elapsed cuboid-inertia runge-kutta))
 
 

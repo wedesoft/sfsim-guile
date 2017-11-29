@@ -8,10 +8,10 @@
              (glut)
              (gl)
              (gl low-level)
-             (ssim linear-algebra)
-             (ssim physics)
-             (ssim quaternion)
-             (ssim util))
+             (sfsim linear-algebra)
+             (sfsim physics)
+             (sfsim quaternion)
+             (sfsim util))
 
 
 (define glut (dynamic-link "libglut"))
@@ -147,7 +147,7 @@
     (post-redisplay)))
 
 (initialize-glut (program-arguments) #:window-size '(640 . 480) #:display-mode (display-mode rgb double))
-(set! main-window (make-window "ssim"))
+(set! main-window (make-window "sfsim"))
 (set-display-callback on-display)
 (set-reshape-callback on-reshape)
 (set-idle-callback on-idle)

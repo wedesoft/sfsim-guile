@@ -1,0 +1,3 @@
+#!/bin/sh
+prefix=@prefix@
+guile --no-auto-compile -L @datarootdir@ @datarootdir@/sfsim/sfsim.scm

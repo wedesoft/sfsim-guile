@@ -1,8 +1,8 @@
 (use-modules (srfi srfi-64)
-             (ssim physics))
+             (sfsim physics))
 
 
-(test-begin "ssim physics")
+(test-begin "sfsim physics")
 (test-begin "clock")
   (test-assert "Clock starts with zero"
     (let [(t (clock))] (>= (elapsed t) 0)))
@@ -43,4 +43,4 @@
   (test-equal "Inertia of cuboid"
     '((34 0 0) (0 29 0) (0 0 13)) (cuboid-inertia 12 2 3 5))
 (test-end "inertia of cuboid")
-(test-end "ssim physics")
+(test-end "sfsim physics")

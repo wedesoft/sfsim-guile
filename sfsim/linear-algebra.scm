@@ -1,4 +1,4 @@
-(define-module (ssim linear-algebra)
+(define-module (sfsim linear-algebra)
   #:use-module (oop goops)
   #:use-module (srfi srfi-1)
   #:use-module (srfi srfi-26)

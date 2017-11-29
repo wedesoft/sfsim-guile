@@ -1,5 +1,5 @@
 AC_PREREQ([2.69])
-AC_INIT([ssim], [0.1.1], [jan@wedesoft.de])
+AC_INIT([sfsim], [0.1.1], [jan@wedesoft.de])
 AC_CONFIG_AUX_DIR([build-aux])
 AM_INIT_AUTOMAKE([--warnings=no-portability foreign])
 AC_CONFIG_MACRO_DIR([m4])
@@ -20,7 +20,7 @@ if test "x$PDFLATEX" = xno; then
 fi
 
 AC_OUTPUT(Makefile
-          ssim/Makefile
-          ssim/ssim
+          sfsim/Makefile
+          sfsim/sfsim
           tests/Makefile
           doc/Makefile)

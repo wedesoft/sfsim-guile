@@ -1,12 +1,12 @@
 SUFFIXES = .scm
 
-bin_SCRIPTS = ssim
+bin_SCRIPTS = sfsim
 
-EXTRA_DIST =  linear-algebra.scm physics.scm quaternion.scm ssim.scm util.scm
+EXTRA_DIST =  linear-algebra.scm physics.scm quaternion.scm sfsim.scm util.scm
 
-pkgdata_DATA = linear-algebra.scm physics.scm quaternion.scm ssim.scm util.scm
+pkgdata_DATA = linear-algebra.scm physics.scm quaternion.scm sfsim.scm util.scm
 
-cachedir = $(GUILE_CACHE)/ssim
+cachedir = $(GUILE_CACHE)/sfsim
 
 cache_DATA = $(pkgdata_DATA:.scm=.go)
 

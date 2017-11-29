@@ -1,8 +1,8 @@
 (use-modules (srfi srfi-64)
-             (ssim linear-algebra))
+             (sfsim linear-algebra))
 
 
-(test-begin "ssim linear-algebra")
+(test-begin "sfsim linear-algebra")
 
 (test-begin "vector operations")
   (test-equal "add two vectors"
@@ -101,4 +101,4 @@
     '((1 4) (2 5) (3 6)) (transpose '((1 2 3) (4 5 6))))
 (test-end "transpose")
 
-(test-end "ssim linear-algebra")
+(test-end "sfsim linear-algebra")

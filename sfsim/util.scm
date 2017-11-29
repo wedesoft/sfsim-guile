@@ -1,4 +1,4 @@
-(define-module (ssim util)
+(define-module (sfsim util)
   #:export (argmin argmax))
 
 

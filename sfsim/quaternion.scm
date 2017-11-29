@@ -1,10 +1,10 @@
-(define-module (ssim quaternion)
+(define-module (sfsim quaternion)
   #:use-module (oop goops)
   #:use-module (ice-9 format)
   #:use-module (ice-9 optargs)
   #:use-module (srfi srfi-1)
   #:use-module (srfi srfi-26)
-  #:use-module (ssim linear-algebra)
+  #:use-module (sfsim linear-algebra)
   #:export (<quaternion>
             make-quaternion jmag-part kmag-part quaternion-rotation quaternion-norm
             quaternion-normalize quaternion-conjugate vector->quaternion quaternion->vector

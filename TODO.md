@@ -1,12 +1,15 @@
 # TODO
 
-* time of collision is approximately current time minus vrel/depth
-* compiled ssim.scm not being found
-* contacts with friction
+* Baraff -> Zotero
+* extract more tested methods
+* minimal time step
+* do not split remaining interval unless required (add clock to state)
 * resting contacts
+* suspension
+* compiled sfsim.scm not being found
+* contacts with friction
 * LLVM-based structs
 * 3d collision with object (points, lines, surfaces?)
-* suspension
 * body with gears
 * blog post: quaternions, rotational inertia, ground collision, springs, resting contacts
 * softbody wheels

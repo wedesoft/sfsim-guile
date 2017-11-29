@@ -1,11 +1,11 @@
 (use-modules (srfi srfi-64)
              (srfi srfi-26)
-             (ssim quaternion))
+             (sfsim quaternion))
 
 
 (define pi (* 2 (acos 0)))
 
-(test-begin "ssim quaternion")
+(test-begin "sfsim quaternion")
 (test-begin "quaternion objects")
   (test-equal "Create quaternion"
     '(0 0 0 0) (map (cut <> (make-quaternion)) (list real-part imag-part jmag-part kmag-part)))
@@ -191,4 +191,4 @@
     0.6 (jmag-part (exp (make-quaternion 0 (* 0.4 pi) (* 0.3 pi) 0))) 1e-6)
 (test-end "quaternion exponentiation")
 
-(test-end "ssim quaternion")
+(test-end "sfsim quaternion")
