@@ -111,7 +111,7 @@
 ;(format #t "vrel : ~a~&" vrel)
 ;(format #t "vrel':  ~a~&" (inner-product n (corner-speed state r)))
 
-(define (collision contact)
+(define (collision state contact)
   (let* [(r    (- contact (position state)))
          (n    '(0 1 0))
          (v    (corner-speed state r))
@@ -126,13 +126,16 @@
             (+ (angular-momentum state) (cross-product r J)))
       state)))
 
+(define (candidate state)
+  (let [(outer (map (lambda (corner) (+ (rotate-vector (orientation state) corner) (position state))) corners))]
+    (argmin cadr outer)))
+
 (define (on-idle)
   (let [(dt (elapsed time #t))]
     (set! state (runge-kutta state dt dstate))
-    (let* [(outer   (map (lambda (corner) (+ (rotate-vector (orientation state) corner) (position state))) corners))
-           (contact (argmin cadr outer))]
+    (let [(contact (candidate state))]
       (if (<= (cadr contact) ground)
-        (set! state (collision contact))))
+        (set! state (collision state contact))))
     (post-redisplay)))
 
 (initialize-glut (program-arguments) #:window-size '(640 . 480) #:display-mode (display-mode rgb double))
