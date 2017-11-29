@@ -39,7 +39,7 @@
 (define loss 0.2)
 
 (define ground -1.0)
-(define epsilon 0.01)
+(define epsilon 0.005)
 
 (define speed-scale 0.3)
 
@@ -135,7 +135,7 @@
   (let [(update (runge-kutta state dt dstate))]
     (let* [(contact (candidate update))
            (depth   (- ground (cadr contact)))]
-      (if (>= depth 0)
+      (if (>= depth (- epsilon))
         (if (<= depth epsilon)
           (collision update contact)
           (timestep (timestep state (/ dt 2)) (/ dt 2)))
