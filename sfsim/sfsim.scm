@@ -24,7 +24,7 @@
 (define state (list '(0 0.7 0)
                     '(0 0 0)
                     (quaternion-rotation 0 '(1 0 0))
-                    '(0.01 0.1 0)))
+                    '(0.02 0.1 0.03)))
 (define (position         state) (car    state))
 (define (speed            state) (cadr   state))
 (define (orientation      state) (caddr  state))
@@ -37,11 +37,11 @@
 (define d 0.15)
 (define inertia (inertia-body (cuboid-inertia m w h d)))
 
-(define loss 0.6)
+(define loss 0.7)
 
 (define ground -1.0)
 (define epsilon 0.01)
-(define max-depth 3)
+(define max-depth 2)
 
 (define speed-scale 0.3)
 
