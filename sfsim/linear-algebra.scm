@@ -1,8 +1,10 @@
 (define-module (sfsim linear-algebra)
   #:use-module (oop goops)
+  #:use-module (ice-9 optargs)
   #:use-module (srfi srfi-1)
   #:use-module (srfi srfi-26)
-  #:export (cross-product inner-product norm diagonal dot permutations determinant submatrix inverse transpose)
+  #:export (cross-product inner-product norm diagonal dot permutations determinant submatrix inverse transpose
+            homogeneous-matrix)
   #:re-export (+ - *))
 
 
@@ -85,3 +87,7 @@
 (define (transpose mat)
   "Transpose a matrix"
   (map (lambda (i) (map (cut list-ref <> i) mat)) (iota (length (car mat)))))
+
+(define* (homogeneous-matrix rotation #:optional (translation '(0 0 0)))
+  "Convert rotation and optional translation to a homogeneous matrix"
+  (append (map append rotation (map list translation)) '((0 0 0 1))))

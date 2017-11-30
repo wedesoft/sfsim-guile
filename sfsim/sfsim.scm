@@ -58,6 +58,7 @@
         (list (+ w2) (+ h2) (+ d2))))
 
 (define (particle-pos state corner) (particle-position (position state) (orientation state) corner))
+
 (define (particle-vel state corner) (particle-speed inertia (orientation state) (speed state) (angular-momentum state) corner))
 
 (define (dstate state dt)
@@ -81,8 +82,8 @@
 (define (on-display)
   (let* [(b   (make-bytevector (* 4 4 4)))
          (mat (rotation-matrix (orientation state)))
-         (hom (concatenate (append (map append mat (map list (position state))) '((0 0 0 1)))))]
-    (for-each (lambda (i) (bytevector-ieee-single-native-set! b (* i 4) (list-ref hom i))) (iota (length hom)))
+         (hom (concatenate (homogeneous-matrix mat (position state))))]
+    (for-each (lambda (i v) (bytevector-ieee-single-native-set! b (* i 4) v)) (iota (length hom)) hom)
     (gl-clear (clear-buffer-mask color-buffer))
     (set-gl-matrix-mode (matrix-mode modelview))
     (gl-load-matrix b #:transpose #t)

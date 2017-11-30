@@ -101,4 +101,11 @@
     '((1 4) (2 5) (3 6)) (transpose '((1 2 3) (4 5 6))))
 (test-end "transpose")
 
+(test-begin "homogeneous-matrix")
+  (test-equal "Create homogeneous matrix from 3x3 matrix"
+    '((1 2 3 0) (4 5 6 0) (7 8 9 0) (0 0 0 1)) (homogeneous-matrix '((1 2 3) (4 5 6) (7 8 9))))
+  (test-equal "Create homogeneous matrix from 3x3 matrix and translation vector"
+    '((1 2 3 -1) (4 5 6 -2) (7 8 9 -3) (0 0 0 1)) (homogeneous-matrix '((1 2 3) (4 5 6) (7 8 9)) '(-1 -2 -3)))
+(test-end "homogeneous-matrix")
+
 (test-end "sfsim linear-algebra")
