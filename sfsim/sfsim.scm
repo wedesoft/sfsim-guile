@@ -2,6 +2,7 @@
 !#
 (use-modules (system foreign)
              (rnrs bytevectors)
+             (ice-9 optargs)
              (srfi srfi-1)
              (srfi srfi-19)
              (srfi srfi-26)
@@ -39,7 +40,8 @@
 (define loss 0.6)
 
 (define ground -1.0)
-(define epsilon 0.005)
+(define epsilon 0.01)
+(define max-depth 3)
 
 (define speed-scale 0.3)
 
@@ -126,14 +128,14 @@
 (define (candidate state)
   (argmin (cut height state <>) corners))
 
-(define (timestep state dt)
+(define* (timestep state dt #:optional (recursion 1))
   (let [(update (runge-kutta state dt dstate))]
     (let* [(contact (candidate update))
            (depth   (- ground (height update contact)))]
       (if (>= depth (- epsilon))
-        (if (<= depth epsilon)
+        (if (or (<= depth epsilon) (>= recursion max-depth))
           (collision update contact)
-          (timestep (timestep state (/ dt 2)) (/ dt 2)))
+          (timestep (timestep state (/ dt 2) (1+ recursion)) (/ dt 2) (1+ recursion)))
         update))))
 
 (define (on-idle)
