@@ -36,7 +36,7 @@
 (define d 0.15)
 (define inertia (inertia-body (cuboid-inertia m w h d)))
 
-(define loss 0.2)
+(define loss 0.6)
 
 (define ground -1.0)
 (define epsilon 0.005)
@@ -57,9 +57,8 @@
         (list (- w2) (+ h2) (+ d2))
         (list (+ w2) (+ h2) (+ d2))))
 
-(define (particle-speed2 state r)
-  (let [(omega (angular-velocity inertia (orientation state) (angular-momentum state)))]
-    (+ (cross-product omega r) (speed state))))
+(define (particle-pos state corner) (particle-position (position state) (orientation state) corner))
+(define (particle-vel state corner) (particle-speed inertia (orientation state) (speed state) (angular-momentum state) corner))
 
 (define (dstate state dt)
   (let [(v (speed state))
@@ -98,21 +97,17 @@
     (gl-color 0 0 1)
     (gl-begin (begin-mode lines)
       (for-each (lambda (corner r)
-        (let [(pos (particle-position (position state) (orientation state) corner))
-              (vel (particle-speed inertia (orientation state) (speed state) (angular-momentum state) corner))]
+        (let [(pos (particle-pos state corner))
+              (vel (particle-vel state corner))]
           (apply gl-vertex pos)
           (apply gl-vertex (+ pos (* speed-scale vel)))))
         corners (map (cut rotate-vector (orientation state) <>) corners)))
     (swap-buffers)))
 
-
-;(format #t "vrel : ~a~&" vrel)
-;(format #t "vrel':  ~a~&" (inner-product n (particle-speed state r)))
-
 (define (collision state contact)
-  (let* [(r    (- contact (position state)))
+  (let* [(r    (- (particle-pos state contact) (position state)))
          (n    '(0 1 0))
-         (v    (particle-speed2 state r))
+         (v    (particle-vel state contact))
          (vrel (inner-product n v))
          (j    (/ (* (- loss 2) vrel)
                   (+ (/ 1 m) (inner-product n (cross-product (dot (inverse (inertia (orientation state))) (cross-product r n)) r)))))
@@ -124,14 +119,16 @@
             (+ (angular-momentum state) (cross-product r J)))
       state)))
 
+(define (height state corner)
+  (cadr (particle-position (position state) (orientation state) corner)))
+
 (define (candidate state)
-  (let [(outer (map (cut particle-position (position state) (orientation state) <>) corners))]
-    (argmin cadr outer)))
+  (argmin (cut height state <>) corners))
 
 (define (timestep state dt)
   (let [(update (runge-kutta state dt dstate))]
     (let* [(contact (candidate update))
-           (depth   (- ground (cadr contact)))]
+           (depth   (- ground (height update contact)))]
       (if (>= depth (- epsilon))
         (if (<= depth epsilon)
           (collision update contact)
