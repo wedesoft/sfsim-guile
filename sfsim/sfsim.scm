@@ -97,12 +97,12 @@
     (gl-load-identity)
     (gl-color 0 0 1)
     (gl-begin (begin-mode lines)
-      (for-each (lambda (corner r)
+      (for-each (lambda (corner)
         (let [(pos (particle-pos state corner))
               (vel (particle-vel state corner))]
           (apply gl-vertex pos)
           (apply gl-vertex (+ pos (* speed-scale vel)))))
-        corners (map (cut rotate-vector (orientation state) <>) corners)))
+        corners))
     (swap-buffers)))
 
 (define (collision state contact)
