@@ -123,7 +123,7 @@
       state)))
 
 (define (candidate state)
-  (let [(outer (map (lambda (corner) (+ (rotate-vector (orientation state) corner) (position state))) corners))]
+  (let [(outer (map (cut particle-position (position state) (orientation state) <>) corners))]
     (argmin cadr outer)))
 
 (define (timestep state dt)

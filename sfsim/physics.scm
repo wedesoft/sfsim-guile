@@ -3,7 +3,7 @@
   #:use-module (srfi srfi-19)
   #:use-module (sfsim linear-algebra)
   #:use-module (sfsim quaternion)
-  #:export (clock elapsed cuboid-inertia runge-kutta inertia-body angular-velocity))
+  #:export (clock elapsed cuboid-inertia runge-kutta inertia-body angular-velocity particle-position))
 
 
 (define (clock)
@@ -36,4 +36,9 @@
   (rotate-matrix orientation mat))
 
 (define (angular-velocity inertia orientation angular-momentum)
+  "Angular velocity determined using the angular momentum and the (rotated) inertia tensor"
   (dot (inverse (inertia orientation)) angular-momentum))
+
+(define (particle-position center-of-gravity orientation radius-vector)
+  "Determine position of a rigid body's particle"
+  (+ center-of-gravity (rotate-vector orientation radius-vector)))

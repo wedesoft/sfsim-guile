@@ -68,4 +68,13 @@
     (test-equal "Scale angular momentum using inverse of rotated inertia matrix"
       '(2 1 3) (round-vector (angular-velocity inertia (quaternion-rotation (/ pi 2) '(1 0 0)) '(2 3 6)))))
 (test-end "angular speed")
+
+(test-begin "position of a particle")
+  (test-equal "Position of center particle equals body's center of gravity"
+    '(2 3 5) (particle-position '(2 3 5) (quaternion-rotation 0 '(1 0 0)) '(0 0 0)))
+  (test-equal "Position of particle of an object which is aligned with the world coordinate system"
+    '(3.0 5.0 8.0) (particle-position '(2 3 5) (quaternion-rotation 0 '(1 0 0)) '(1 2 3)))
+  (test-equal "Position of particle of a rotated object"
+    '(3.0 1.0 2.0) (particle-position '(2 3 5) (quaternion-rotation pi '(1 0 0)) '(1 2 3)))
+(test-end "position of a particle")
 (test-end "sfsim physics")
