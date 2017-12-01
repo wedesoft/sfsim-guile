@@ -1,8 +1,9 @@
 # TODO
 
-* extract more tested methods
-* minimal time step
 * resting contacts
+* mass matrix
+* friction
+* better (faster) time of impact computation
 * suspension
 * compiled sfsim.scm not being found
 * 3D model: Dream Chaser, Soyuz, PTK NP

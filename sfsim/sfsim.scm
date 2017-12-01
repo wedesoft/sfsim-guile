@@ -24,12 +24,12 @@
 (define state (list '(0 0.7 0)
                     '(0 0 0)
                     (quaternion-rotation 0 '(1 0 0))
-                    '(0.02 0.1 0.03)))
+                    '(0.0 0.0 0.03)))
 (define (position         state) (car    state))
 (define (speed            state) (cadr   state))
 (define (orientation      state) (caddr  state))
 (define (angular-momentum state) (cadddr state))
-(define g '(0 -0.2 0))
+(define g '(0 -0.19 0))
 
 (define m 1)
 (define w 1)
@@ -37,11 +37,12 @@
 (define d 0.15)
 (define inertia (inertia-body (cuboid-inertia m w h d)))
 
-(define loss 0.7)
+(define loss 0.6)
 
 (define ground -1.0)
-(define epsilon 0.01)
-(define max-depth 2)
+(define epsilon 0.02)
+(define ve (sqrt (* 2 (- (cadr g)) epsilon)))
+(define max-depth 3)
 
 (define speed-scale 0.3)
 
@@ -110,9 +111,11 @@
 (define (collision state contact)
   (let* [(r    (- (particle-pos state contact) (position state)))
          (n    '(0 1 0))
+         (d    (- ground (height state contact)))
          (v    (particle-vel state contact))
          (vrel (inner-product n v))
-         (j    (/ (* (- loss 2) vrel)
+         (vtgt (if (>= vrel (- ve)) (* -2 vrel) (* (- loss 2) vrel)))
+         (j    (/ vtgt
                   (+ (/ 1 m) (inner-product n (cross-product (dot (inverse (inertia (orientation state))) (cross-product r n)) r)))))
          (J    (* j n))]
     (if (< vrel 0)
