@@ -24,12 +24,12 @@
 (define state (list '(0 0.7 0)
                     '(0 0 0)
                     (quaternion-rotation 0 '(1 0 0))
-                    '(0.0 0.0 0.03)))
+                    '(0.01 0.0 0.04)))
 (define (position         state) (car    state))
 (define (speed            state) (cadr   state))
 (define (orientation      state) (caddr  state))
 (define (angular-momentum state) (cadddr state))
-(define g '(0 -0.19 0))
+(define g '(0 -0.8 0))
 
 (define m 1)
 (define w 1)
@@ -37,12 +37,13 @@
 (define d 0.15)
 (define inertia (inertia-body (cuboid-inertia m w h d)))
 
-(define loss 0.6)
+(define loss 0.4)
 
-(define ground -1.0)
-(define epsilon 0.02)
+(define ground -0.95)
+(define dtmax 0.1)
+(define epsilon (* 0.5 (abs (cadr g)) (* dtmax dtmax)))
 (define ve (sqrt (* 2 (- (cadr g)) epsilon)))
-(define max-depth 3)
+(define max-depth 4)
 
 (define speed-scale 0.3)
 
@@ -108,7 +109,7 @@
         corners))
     (swap-buffers)))
 
-(define (collision state contact)
+(define (collision contact state)
   (let* [(r    (- (particle-pos state contact) (position state)))
          (n    '(0 1 0))
          (d    (- ground (height state contact)))
@@ -128,21 +129,28 @@
 (define (height state corner)
   (cadr (particle-position (position state) (orientation state) corner)))
 
+(define (depth state corner)
+  (- ground (height state corner)))
+
 (define (candidate state)
-  (argmin (cut height state <>) corners))
+  (argmax (cut depth state <>) corners))
+
+(define (collisions state)
+  (let [(contacts (filter (lambda (corner) (>= (depth state corner) (- epsilon))) corners))]
+    (fold collision state contacts)))
 
 (define* (timestep state dt #:optional (recursion 1))
   (let [(update (runge-kutta state dt dstate))]
     (let* [(contact (candidate update))
-           (depth   (- ground (height update contact)))]
-      (if (>= depth (- epsilon))
-        (if (or (<= depth epsilon) (>= recursion max-depth))
-          (collision update contact)
+           (d       (depth update contact))]
+      (if (>= d (- epsilon))
+        (if (or (<= d epsilon) (>= recursion max-depth))
+          (collisions update)
           (timestep (timestep state (/ dt 2) (1+ recursion)) (/ dt 2) (1+ recursion)))
         update))))
 
 (define (on-idle)
-  (let [(dt (elapsed time #t))]
+  (let [(dt (min dtmax (elapsed time #t)))]
     (set! state (timestep state dt))
     (post-redisplay)))
 
