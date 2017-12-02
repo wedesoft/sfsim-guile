@@ -1,7 +1,5 @@
 # TODO
 
-* multiple contacts
-* multiple resting contacts
 * suspension
 * mass matrix
 * friction
