@@ -29,7 +29,7 @@
 (define (speed            state) (cadr   state))
 (define (orientation      state) (caddr  state))
 (define (angular-momentum state) (cadddr state))
-(define g '(0 -0.8 0))
+(define g '(0 -0.4 0))
 
 (define m 1)
 (define w 1)
