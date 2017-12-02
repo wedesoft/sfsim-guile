@@ -39,7 +39,7 @@
 
 (define loss 0.4)
 
-(define ground -0.95)
+(define ground -0.99)
 (define dtmax 0.1)
 (define epsilon (* 0.5 (abs (cadr g)) (* dtmax dtmax)))
 (define ve (sqrt (* 2 (- (cadr g)) epsilon)))
