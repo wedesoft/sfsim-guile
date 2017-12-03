@@ -21,6 +21,7 @@
 * 3D cockpit
 * on board displays, cameras
 * model with multiple moving parts (e.g. gear)
+* https://github.com/HappyEnte/DreamChaser
 * bump maps
 * add license
 * load two objects
