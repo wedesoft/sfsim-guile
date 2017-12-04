@@ -1,16 +1,18 @@
 # TODO
 
-* decribe and render object using configuration
+* LLVM integration
+* render wireframe and contact points with configuration
+* multiple rigid body collisions
 * suspension using spring damper elements
 * amend collision impulses for dynamics of linked bodies
 * propagation of impulses during collision
 * mass matrix
-* friction
+* contacts with friction
 * check`friction creep
 * better (faster) time of impact computation
 * compiled sfsim.scm not being found
+* decribe and render object using configuration
 * 3D model: Dream Chaser, Soyuz, PTK NP
-* contacts with friction
 * LLVM-based structs
 * 3d collision with object (points, lines, surfaces?)
 * body with gears
