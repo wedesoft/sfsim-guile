@@ -1,7 +1,8 @@
 # TODO
 
-* LLVM integration
-* render wireframe and contact points with configuration
+* LLVM integration with floating point
+* OpenGL bindings for rendering vertex array objects
+* render articulated objects with configuration
 * multiple rigid body collisions
 * suspension using spring damper elements
 * amend collision impulses for dynamics of linked bodies
