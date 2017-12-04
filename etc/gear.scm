@@ -4,7 +4,7 @@
 (use-modules (glut) (gl) (gl low-level) (glu) (srfi srfi-1) (srfi srfi-26) (ice-9 format))
 
 (define mb 10000)
-(define mw 200)
+(define mw 500)
 (define b 20)
 (define w 220)
 
@@ -22,7 +22,7 @@
 
 (define fl 440)
 
-(define dt 0.1)
+(define dt 0.05)
 
 (define main-window #f)
 
