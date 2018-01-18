@@ -1,6 +1,5 @@
 # TODO
 
-* LLVM integration with floating point
 * OpenGL bindings for rendering vertex array objects
 * render articulated objects with configuration
 * multiple rigid body collisions
@@ -26,7 +25,8 @@
 * Guile array implementation of simulator
 * 3D moon rendering
 * 3D cockpit
-* on board displays, cameras
+* on board displays, cameras, MFDs
+* no need to adjust MFDs during critical parts of the mission
 * model with multiple moving parts (e.g. gear)
 * https://github.com/HappyEnte/DreamChaser
 * bump maps
