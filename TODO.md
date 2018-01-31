@@ -12,7 +12,7 @@
 * better (faster) time of impact computation
 * compiled sfsim.scm not being found
 * decribe and render object using configuration
-* 3D model: Dream Chaser, Soyuz, PTK NP
+* 3D model: Dream Chaser, Soyuz, PTK NP, https://www.thingiverse.com/thing:2565361
 * LLVM-based structs
 * 3d collision with object (points, lines, surfaces?)
 * body with gears
@@ -25,6 +25,7 @@
 * Guile array implementation of simulator
 * 3D moon rendering
 * 3D cockpit
+* autopilot programs: baseland, helicopter, hover/autoland, launch/deorbit, aerocapture/aerobrake, airspeed hold, attitude hold, altitude hold, heading alignment cylinder, VOR/ILS, eject, capture, base sync, station sync, dock
 * on board displays, cameras, MFDs
 * no need to adjust MFDs during critical parts of the mission
 * model with multiple moving parts (e.g. gear)
