@@ -1,5 +1,6 @@
 # TODO
 
+* robot arm path with inverse kinematics, 3D print robot
 * OpenGL bindings for rendering vertex array objects
 * render articulated objects with configuration
 * multiple rigid body collisions
@@ -25,6 +26,8 @@
 * Guile array implementation of simulator
 * 3D moon rendering
 * 3D cockpit
+* music player, mp3 player
+* video communication with screen in 3D cockpit
 * autopilot programs: baseland, helicopter, hover/autoland, launch/deorbit, aerocapture/aerobrake, airspeed hold, attitude hold, altitude hold, heading alignment cylinder, VOR/ILS, eject, capture, base sync, station sync, dock
 * on board displays, cameras, MFDs
 * no need to adjust MFDs during critical parts of the mission
