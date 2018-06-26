@@ -1,6 +1,6 @@
 # TODO
 
-* robot arm path with inverse kinematics, 3D print robot
+* XBox controller
 * OpenGL bindings for rendering vertex array objects
 * render articulated objects with configuration
 * multiple rigid body collisions
