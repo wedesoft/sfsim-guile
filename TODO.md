@@ -1,15 +1,15 @@
 # TODO
 
+* multiple rigid body (polyhedra) collisions
+* contacts with friction
 * XBox controller
 * OpenGL bindings for rendering vertex array objects
+* bump maps
 * render articulated objects with configuration
-* multiple rigid body collisions
 * suspension using spring damper elements
 * amend collision impulses for dynamics of linked bodies
 * propagation of impulses during collision
 * mass matrix
-* contacts with friction
-* check`friction creep
 * better (faster) time of impact computation
 * compiled sfsim.scm not being found
 * decribe and render object using configuration
@@ -33,7 +33,6 @@
 * no need to adjust MFDs during critical parts of the mission
 * model with multiple moving parts (e.g. gear)
 * https://github.com/HappyEnte/DreamChaser
-* bump maps
 * add license
 * load two objects
 * flip textures when loading
