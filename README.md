@@ -10,7 +10,7 @@ make run
 
 * [Guile OpenGL](https://github.com/guildhall/guile-opengl)
 * [Runge-Kutta 4th order](https://en.wikipedia.org/wiki/Runge%E2%80%93Kutta_methods)
-* [Brian Mirtich et al.: Impulse-based simulation of rigid bodies](https://people.eecs.berkeley.edu/~jfc/papers/95/ibsrb95.pdf)
+* [Brian Mirtich et al.: Impulse-based simulation of rigid bodies](https://people.eecs.berkeley.edu/~jfc/mirtich/thesis/mirtichThesis.pdf)
 * [Brian Mirtich: Impulse-based Dynamic Simulation of Rigid Body Systems](http://www.kuffner.org/james/software/dynamics/mirtich/)
 * [Rahil Baber: A correction to Brian Mirtich's thesis](https://www.euclideanspace.com/physics/dynamics/collision/practical/RahilBaberCorrectionToBrianMirtich.pdf)
 * [Robert F. Stengel: Lectures on aircraft flight dynamics](http://www.princeton.edu/~stengel/MAE331Lectures.html)

@@ -1,5 +1,6 @@
 # TODO
 
+* cockpit: frontal and side view of moon lander
 * multiple rigid body (polyhedra) collisions
 * contacts with friction
 * XBox controller
