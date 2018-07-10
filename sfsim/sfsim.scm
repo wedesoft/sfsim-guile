@@ -24,7 +24,7 @@
 (define state (list '(0 0.7 0)
                     '(0 0 0)
                     (quaternion-rotation 0 '(1 0 0))
-                    '(0.01 0.0 0.04)))
+                    '(0.01 0.06 0.04)))
 (define (position         state) (car    state))
 (define (speed            state) (cadr   state))
 (define (orientation      state) (caddr  state))
@@ -38,6 +38,7 @@
 (define inertia (inertia-body (cuboid-inertia m w h d)))
 
 (define loss 0.4)
+(define mu 0.4)
 
 (define ground -0.99)
 (define dtmax 0.1)
@@ -81,7 +82,7 @@
     (gl-viewport 0 0 width height)
     (set-gl-matrix-mode (matrix-mode projection))
     (gl-load-identity)
-    (gl-ortho (- w) w (- h) h -1 +1)))
+    (gl-ortho (- w) w (- h) h -100 +100)))
 
 (define (on-display)
   (let* [(b   (make-bytevector (* 4 4 4)))
@@ -110,15 +111,21 @@
     (swap-buffers)))
 
 (define (collision contact state)
-  (let* [(r    (- (particle-pos state contact) (position state)))
-         (n    '(0 1 0))
-         (d    (- ground (height state contact)))
-         (v    (particle-vel state contact))
-         (vrel (inner-product n v))
-         (vtgt (if (>= vrel (- ve)) (* -2 vrel) (* (- loss 2) vrel)))
-         (j    (/ vtgt
-                  (+ (/ 1 m) (inner-product n (cross-product (dot (inverse (inertia (orientation state))) (cross-product r n)) r)))))
-         (J    (* j n))]
+  (let* [(r      (- (particle-pos state contact) (position state)))
+         (n      '(0 1 0))
+         (d      (- ground (height state contact)))
+         (v      (particle-vel state contact))
+         (vrel   (inner-product n v))
+         (vtan   (- v (* vrel n)))
+         (vtnorm (norm vtan))
+         (vtgt   (if (>= vrel (- ve)) (* -2 vrel) (* (- loss 2) vrel)))
+         (vfr    (min vtnorm (* mu vtgt)))
+         (vtgt2  (sqrt (+ (* vfr vfr) (* vtgt vtgt))))
+         (dir    (* (+ (* vfr (* vtan (/ -1 (max vtnorm 1e-6)))) (* vtgt n)) (/ 1 vtgt2)))
+         (j      (/ vtgt2
+                   (+ (/ 1 m) (inner-product dir (cross-product (dot (inverse (inertia (orientation state)))
+                                                                     (cross-product r dir)) r)))))
+         (J      (* j dir))]
     (if (< vrel 0)
       (list (position state)
             (+ (speed state) (* (/ 1 m) J))
