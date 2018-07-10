@@ -1,8 +1,8 @@
 # TODO
 
+* contacts with friction
 * cockpit: frontal and side view of moon lander
 * multiple rigid body (polyhedra) collisions
-* contacts with friction
 * XBox controller
 * OpenGL bindings for rendering vertex array objects
 * bump maps
