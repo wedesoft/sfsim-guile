@@ -21,3 +21,4 @@ make run
 * [Thomas Jakobsen: Advanced Character Physics](http://www.cs.cmu.edu/afs/cs/academic/class/15462-s13/www/lec_slides/Jakobsen.pdf)
 * [Quaternion differentiation](https://fgiesen.wordpress.com/2012/08/24/quaternion-differentiation/)
 * [Kawachi et al.: Simulation of Rigid Body Motion with Impulsive Friction Force](http://citeseerx.ist.psu.edu/viewdoc/download?doi=10.1.1.130.6905&rep=rep1&type=pdf)
+* [Space simulator project](http://www.spacesimulator.net/tutorials/)
