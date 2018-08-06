@@ -70,10 +70,20 @@ def simplex_closest_point simplex
   end
 end
 
+def lookup a, b, simplex
+  simplex.collect do |s|
+    result = nil
+    for x in a
+      for y in b
+        result = [x, y] if x - y == s
+      end
+    end
+    result
+  end
+end
+
 a = [Vector[1, 4], Vector[3, 4], Vector[3, 1], Vector[1, 1]]
 b = [Vector[-1, 3], Vector[1, 2], Vector[-1, 2]]
 d = minkowski_difference a, b
-gjk d
-
-simplex_closest_point [Vector[-1, -1], Vector[3, 2]]
-simplex = [Vector[-1, -1], Vector[3, 2]]
+c = gjk d
+lookup a, b, c[1]
