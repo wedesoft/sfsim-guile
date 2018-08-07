@@ -36,10 +36,6 @@ def support_point points, vector
   points.argmax { |point| support point, vector }
 end
 
-def minkowski_difference a, b
-  a.collect { |x| b.collect { |y| x - y } }.flatten 1
-end
-
 def average points
   points.inject(:+) * (1.0 / points.size)
 end
@@ -55,7 +51,6 @@ def gjk a, b
     wk = [support_point(a, -vector(v)), support_point(b, +vector(v))]
     return v, w if support(vector(v), -vector(v)) >= support(vector(wk), -vector(v)) - 1e-6
     w += [wk]
-    p w
     v, w = simplex_closest_point w
   end
 end
@@ -80,7 +75,5 @@ def simplex_closest_point simplex
 end
 
 a = [Vector[1, 4], Vector[3, 4], Vector[3, 1], Vector[1, 1]]
-#b = [Vector[-1, 3], Vector[0.9, 2], Vector[-1, 2]]
-b = [Vector[-1, 3], Vector[-1, 2], Vector[0.9, 2]]
-d = minkowski_difference a, b
+b = [Vector[-1, 3], Vector[0.9, 2], Vector[-1, 2]]
 c = gjk a, b
