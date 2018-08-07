@@ -1,6 +1,8 @@
 require 'numo/linalg'
+require 'rmagick'
 require 'matrix'
 include Numo
+
 
 class Array
   def argmax
@@ -45,27 +47,28 @@ end
 def gjk points
   w = []
   v = average points
+  t = [1]
   while true
     wk = support_point points, -v
-    return v, w if support(v, -v) >= support(wk, -v) - 1e-6
+    return v, w, t if support(v, -v) >= support(wk, -v) - 1e-6
     w += [wk]
-    v, w = simplex_closest_point w
+    v, w, t = simplex_closest_point w
   end
 end
 
 def simplex_closest_point simplex
   if simplex.size == 1
-    return simplex[0], simplex
+    return simplex[0], simplex, [1]
   else
     p = simplex[0]
     n = simplex[1 ... simplex.size].collect { |s| s - p }
     t = Linalg.lstsq(NArray[*n.collect(&:to_a)].transpose, -NArray[*p])[0].to_a
     if t.all? { |ti| ti >= 0 } and t.inject(:+) <= 1
-      return p + n.zip(t).collect { |ni, ti| ni * ti }.inject(:+), simplex
+      return p + n.zip(t).collect { |ni, ti| ni * ti }.inject(:+), simplex, t
     else
       simplex.subsets.collect do |s|
         simplex_closest_point s
-      end.argmin { |p, s| p.norm }
+      end.argmin { |p, s, t| p.norm }
     end
   end
 end
@@ -83,7 +86,17 @@ def lookup a, b, simplex
 end
 
 a = [Vector[1, 4], Vector[3, 4], Vector[3, 1], Vector[1, 1]]
-b = [Vector[-1, 3], Vector[1, 2], Vector[-1, 2]]
+#b = [Vector[-1, 3], Vector[0.9, 2], Vector[-1, 2]]
+b = [Vector[-1, 3], Vector[-1, 2], Vector[0.9, 2]]
 d = minkowski_difference a, b
 c = gjk d
-lookup a, b, c[1]
+c[0] # vector
+c[1] # simplex
+c[2] # linear-combination
+lookup(a, b, c[1])
+# linear-combine collision point
+# t und x oder t und y -> Kollisionspunkt
+# plane-fit SVD von Vektoren vom Punkt aus -> Normale
+# oder: epsilon Abstand ergibt Normale
+# [0.9, 2]
+# [1, 2]
