@@ -49,7 +49,7 @@ def gjk a, b
   v = [average(a), average(b)]
   while true
     wk = [support_point(a, -vector(v)), support_point(b, +vector(v))]
-    return v, w if support(vector(v), -vector(v)) >= support(vector(wk), -vector(v)) - 1e-6
+    return v if support(vector(v), -vector(v)) >= support(vector(wk), -vector(v)) - 1e-6
     w += [wk]
     v, w = simplex_closest_point w
   end
@@ -76,4 +76,8 @@ end
 
 a = [Vector[1, 4], Vector[3, 4], Vector[3, 1], Vector[1, 1]]
 b = [Vector[-1, 3], Vector[0.9, 2], Vector[-1, 2]]
-c = gjk a, b
+gjk a, b
+
+a = [Vector[1, 4], Vector[3, 4], Vector[3, 1], Vector[1, 1]]
+b = [Vector[-1, 3], Vector[2, 2], Vector[-1, 2]]
+gjk a, b
