@@ -22,8 +22,8 @@
 (define time #f)
 (define main-window #f)
 
-(define state (make-state '(0 -0.3 0) '(0 0 0) (quaternion-rotation 0 '(1 0 0)) '(0.01 0.08 0.04)))
-(define g '(0.2 -1.0 0))
+(define state (make-state '(0 0.7 0) '(0 0 0) (quaternion-rotation 0 '(1 0 0)) '(0.01 0.06 0.04)))
+(define g '(0 -1.0 0))
 
 (define m 1)
 (define w 1)
@@ -31,8 +31,8 @@
 (define d 0.15)
 (define inertia (inertia-body (cuboid-inertia m w h d)))
 
-(define loss 0.7)
-(define mu 0.7)
+(define loss 0.6)
+(define mu 0.6)
 
 (define ground -0.99)
 (define dtmax 0.025)
