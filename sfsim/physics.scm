@@ -24,7 +24,7 @@
          (k2  (dy (+ y0 (* k1 dt2)) dt2))
          (k3  (dy (+ y0 (* k2 dt2)) dt2))
          (k4  (dy (+ y0 (* k3 dt )) dt ))]
-    (+ y0 (* (/ dt 6) (+ k1 (* 2 k2) (* 2 k3) k4)))))
+    (+ y0 (* (+ k1 (* k2 2) (* k3 2) k4) (/ dt 6)))))
 
 (define (cuboid-inertia mass width height depth)
   "Determine diagonal elements of a cuboid's inertial matrix"

@@ -12,6 +12,7 @@
              (sfsim linear-algebra)
              (sfsim physics)
              (sfsim quaternion)
+             (sfsim state)
              (sfsim util))
 
 
@@ -21,15 +22,8 @@
 (define time #f)
 (define main-window #f)
 
-(define state (list '(0 0.7 0)
-                    '(0 0 0)
-                    (quaternion-rotation 0 '(1 0 0))
-                    '(0.01 0.05 0.04)))
-(define (position         state) (car    state))
-(define (speed            state) (cadr   state))
-(define (orientation      state) (caddr  state))
-(define (angular-momentum state) (cadddr state))
-(define g '(0 -0.4 0))
+(define state (make-state '(0 -0.3 0) '(0 0 0) (quaternion-rotation 0 '(1 0 0)) '(0.01 0.08 0.04)))
+(define g '(0.2 -1.0 0))
 
 (define m 1)
 (define w 1)
@@ -37,14 +31,14 @@
 (define d 0.15)
 (define inertia (inertia-body (cuboid-inertia m w h d)))
 
-(define loss 0.4)
-(define mu 0.4)
+(define loss 0.7)
+(define mu 0.7)
 
 (define ground -0.99)
-(define dtmax 0.05)
+(define dtmax 0.025)
 (define epsilon (* 0.5 (abs (cadr g)) (* dtmax dtmax)))
 (define ve (sqrt (* 2 (- (cadr g)) epsilon)))
-(define max-depth 4)
+(define max-depth 3)
 
 (define speed-scale 0.3)
 
@@ -70,10 +64,7 @@
   (let [(v (speed state))
         (q (orientation state))
         (l (angular-momentum state))]
-    (list v
-          g
-          (* (vector->quaternion (* 0.5 (angular-velocity inertia q l))) q)
-          '(0 0 0))))
+    (make-state v g (* (vector->quaternion (* 0.5 (angular-velocity inertia q l))) q) '(0 0 0))))
 
 (define (on-reshape width height)
   (let* [(aspect (/ width height))
@@ -126,10 +117,10 @@
                                                                      (cross-product r dir)) r)))))
          (J      (* j dir))]
     (if (< vrel 0)
-      (list (position state)
-            (+ (speed state) (* (/ 1 m) J))
-            (quaternion-normalize (orientation state))
-            (+ (angular-momentum state) (cross-product r J)))
+      (make-state (position state)
+                  (+ (speed state) (* (/ 1 m) J))
+                  (quaternion-normalize (orientation state))
+                  (+ (angular-momentum state) (cross-product r J)))
       state)))
 
 (define (height state corner)

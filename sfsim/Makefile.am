@@ -2,9 +2,9 @@ SUFFIXES = .scm
 
 bin_SCRIPTS = sfsim
 
-EXTRA_DIST =  linear-algebra.scm physics.scm quaternion.scm sfsim.scm util.scm
+EXTRA_DIST =  linear-algebra.scm physics.scm quaternion.scm sfsim.scm util.scm state.scm
 
-pkgdata_DATA = linear-algebra.scm physics.scm quaternion.scm sfsim.scm util.scm
+pkgdata_DATA = linear-algebra.scm physics.scm quaternion.scm sfsim.scm util.scm state.scm
 
 cachedir = $(GUILE_CACHE)/sfsim
 
