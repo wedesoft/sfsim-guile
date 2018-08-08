@@ -113,7 +113,6 @@
 (define (collision contact state)
   (let* [(r      (- (particle-pos state contact) (position state)))
          (n      '(0 1 0))
-         (d      (- ground (height state contact)))
          (v      (particle-vel state contact))
          (vrel   (inner-product n v))
          (vtan   (- v (* vrel n)))
@@ -143,15 +142,15 @@
   (argmax (cut depth state <>) corners))
 
 (define (collisions state)
-  (let [(contacts (filter (lambda (corner) (>= (depth state corner) (- epsilon))) corners))]
+  (let [(contacts (filter (lambda (corner) (>= (depth state corner) (* -2 epsilon))) corners))]
     (fold collision state contacts)))
 
 (define* (timestep state dt #:optional (recursion 1))
   (let [(update (runge-kutta state dt dstate))]
     (let* [(contact (candidate update))
            (d       (depth update contact))]
-      (if (>= d (- epsilon))
-        (if (or (<= d epsilon) (>= recursion max-depth))
+      (if (>= d (* -2 epsilon))
+        (if (or (<= d (- epsilon)) (>= recursion max-depth))
           (collisions update)
           (timestep (timestep state (/ dt 2) (1+ recursion)) (/ dt 2) (1+ recursion)))
         update))))
