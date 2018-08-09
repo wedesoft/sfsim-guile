@@ -1,8 +1,9 @@
 (define-module (sfsim state)
   #:use-module (oop goops)
+  #:use-module (sfsim physics)
   #:use-module (sfsim linear-algebra)
   #:export (make-state position speed orientation angular-momentum <state>)
-  #:re-export (+ *))
+  #:re-export (+ * particle-position))
 
 
 (define-class <state> (<object>)
@@ -25,3 +26,6 @@
               (+ (speed            state) (speed            dstate))
               (+ (orientation      state) (orientation      dstate))
               (+ (angular-momentum state) (angular-momentum dstate))))
+
+(define-method (particle-position state corner)
+  (particle-position (position state) (orientation state) corner))

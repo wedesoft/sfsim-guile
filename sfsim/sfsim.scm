@@ -56,8 +56,6 @@
         (list (- w2) (+ h2) (+ d2))
         (list (+ w2) (+ h2) (+ d2))))
 
-(define (particle-pos state corner) (particle-position (position state) (orientation state) corner))
-
 (define (particle-vel state corner) (particle-speed inertia (orientation state) (speed state) (angular-momentum state) corner))
 
 (define (dstate state dt)
@@ -94,7 +92,7 @@
     (gl-color 0 0 1)
     (gl-begin (begin-mode lines)
       (for-each (lambda (corner)
-        (let [(pos (particle-pos state corner))
+        (let [(pos (particle-position state corner))
               (vel (particle-vel state corner))]
           (apply gl-vertex pos)
           (apply gl-vertex (+ pos (* speed-scale vel)))))
@@ -102,7 +100,7 @@
     (swap-buffers)))
 
 (define (collision contact state)
-  (let* [(r      (- (particle-pos state contact) (position state)))
+  (let* [(r      (- (particle-position state contact) (position state)))
          (n      '(0 1 0))
          (v      (particle-vel state contact))
          (vrel   (inner-product n v))
@@ -124,7 +122,7 @@
       state)))
 
 (define (height state corner)
-  (cadr (particle-position (position state) (orientation state) corner)))
+  (cadr (particle-position state corner)))
 
 (define (depth state corner)
   (- ground (height state corner)))

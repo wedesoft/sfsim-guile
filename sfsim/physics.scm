@@ -1,4 +1,5 @@
 (define-module (sfsim physics)
+  #:use-module (oop goops)
   #:use-module (ice-9 curried-definitions)
   #:use-module (srfi srfi-19)
   #:use-module (sfsim linear-algebra)
@@ -40,11 +41,11 @@
   "Angular velocity determined using the angular momentum and the (rotated) inertia tensor"
   (dot (inverse (inertia orientation)) angular-momentum))
 
-(define (particle-position center orientation radius-vector)
+(define-method (particle-position center orientation radius-vector)
   "Determine position of a rigid body's particle"
   (+ center (rotate-vector orientation radius-vector)))
 
-(define (particle-speed inertia orientation body-velocity angular-momentum radius-vector)
+(define-method (particle-speed inertia orientation body-velocity angular-momentum radius-vector)
   "Determine speed of a rigid body's particle"
   (+ body-velocity
      (cross-product (angular-velocity inertia orientation angular-momentum)

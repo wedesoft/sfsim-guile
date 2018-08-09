@@ -1,5 +1,6 @@
 (use-modules (srfi srfi-64)
              (sfsim linear-algebra)
+             (sfsim physics)
              (sfsim state))
 
 
@@ -36,5 +37,9 @@
     1.1 (orientation (+ s s2)))
   (test-equal "angular momentum"
     '(0.6 0.5 0.7) (angular-momentum (+ s s2))))
+
+(define s (make-state '(2 3 5) '(0 0 0) 1.0 '(0 0 0)))
+(test-group "particle states"
+  '(3.0 5.0 8.0) (particle-position s '(1 2 3)))
 
 (test-end "sfsim state")

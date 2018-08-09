@@ -1,6 +1,6 @@
 # TODO
 
-* contacts with friction
+* put particle-pos and particle-vel under test
 * cockpit: frontal and side view of moon lander
 * multiple rigid body (polyhedra) collisions
 * XBox controller
