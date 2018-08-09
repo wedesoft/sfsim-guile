@@ -86,9 +86,9 @@
          (vtan   (orthogonal-component normal v))
          (vtgt   (if (>= vrel (- ve)) (- ve vrel) (* (- loss 2) vrel)))
          (vfr    (* mu vtgt))
-         (vtgt2  (sqrt (+ (* vfr vfr) (* vtgt vtgt))))
-         (dir    (* (+ (* (- vfr) (normalize vtan)) (* vtgt normal)) (/ 1 vtgt2)))
-         (j      (/ vtgt2
+         (vtgt2  (- (* vtgt normal) (* vfr (normalize vtan))))
+         (dir    (normalize vtgt2))
+         (j      (/ (norm vtgt2)
                    (+ (/ 1 m) (inner-product dir (cross-product (dot (inverse (inertia (orientation state)))
                                                                      (cross-product radius dir)) radius)))))
          (J      (* j dir))]
