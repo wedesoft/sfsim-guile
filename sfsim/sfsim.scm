@@ -100,11 +100,8 @@
                   (+ (angular-momentum state) (cross-product r J)))
       state)))
 
-(define (height state corner)
-  (cadr (particle-position state corner)))
-
 (define (depth state corner)
-  (- ground (height state corner)))
+  (- ground (cadr (particle-position state corner))))
 
 (define (candidate state)
   (argmax (cut depth state <>) corners))
