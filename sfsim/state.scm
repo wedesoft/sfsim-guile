@@ -3,7 +3,7 @@
   #:use-module (sfsim physics)
   #:use-module (sfsim linear-algebra)
   #:export (make-state position speed orientation angular-momentum <state>)
-  #:re-export (+ * particle-position))
+  #:re-export (+ * particle-position particle-speed))
 
 
 (define-class <state> (<object>)
@@ -29,3 +29,6 @@
 
 (define-method (particle-position state corner)
   (particle-position (position state) (orientation state) corner))
+
+(define-method (particle-speed inertia state corner)
+  (particle-speed inertia (orientation state) (speed state) (angular-momentum state) corner))

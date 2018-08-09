@@ -38,8 +38,13 @@
   (test-equal "angular momentum"
     '(0.6 0.5 0.7) (angular-momentum (+ s s2))))
 
-(define s (make-state '(2 3 5) '(0 0 0) 1.0 '(0 0 0)))
+(define s1 (make-state '(2 3 5) '(0 0 0) 1.0 '(0 0 0)))
+(define s2 (make-state '(0 0 0) '(0 0 0) 1.0 '(1 0 0)))
+(define inertia (inertia-body '((1 0 0) (0 1 0) (0 0 1))))
 (test-group "particle states"
-  '(3.0 5.0 8.0) (particle-position s '(1 2 3)))
+  (test-equal "position of particle"
+    '(3.0 5.0 8.0) (particle-position s1 '(1 2 3)))
+  (test-equal "speed of particle"
+    '(0.0 0.0 1.0) (particle-speed inertia s2 '(0 1 0))))
 
 (test-end "sfsim state")
