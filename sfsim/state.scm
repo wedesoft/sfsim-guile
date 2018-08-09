@@ -1,8 +1,11 @@
 (define-module (sfsim state)
   #:use-module (oop goops)
+  #:use-module (ice-9 curried-definitions)
   #:use-module (sfsim physics)
+  #:use-module (sfsim quaternion)
   #:use-module (sfsim linear-algebra)
-  #:export (make-state position speed orientation angular-momentum <state>)
+  #:export (make-state position speed orientation angular-momentum <state>
+            state-change)
   #:re-export (+ * particle-position particle-speed))
 
 
@@ -32,3 +35,10 @@
 
 (define-method (particle-speed inertia state corner)
   (particle-speed inertia (orientation state) (speed state) (angular-momentum state) corner))
+
+(define ((state-change inertia acceleration) state dt)
+  (make-state (speed state)
+              acceleration
+              (* (vector->quaternion (* 0.5 (angular-velocity inertia (orientation state) (angular-momentum state))))
+                 (orientation state))
+              '(0 0 0)))

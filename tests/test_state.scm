@@ -1,6 +1,7 @@
 (use-modules (srfi srfi-64)
              (sfsim linear-algebra)
              (sfsim physics)
+             (sfsim quaternion)
              (sfsim state))
 
 
@@ -46,5 +47,25 @@
     '(3.0 5.0 8.0) (particle-position s1 '(1 2 3)))
   (test-equal "speed of particle"
     '(0.0 0.0 1.0) (particle-speed inertia s2 '(0 1 0))))
+
+(define s (make-state '(2 3 5) '(0.2 0.3 0.5) 1.0 '(0.1 0.2 0.3)))
+(define s2 (make-state '(2 3 5) '(0.2 0.3 0.5) -1.0 '(0.1 0.2 0.3)))
+(define inertia (inertia-body '((1 0 0) (0 1 0) (0 0 1))))
+(define inertia2 (inertia-body '((0.5 0 0) (0 0.5 0) (0 0 0.5))))
+(define acceleration '(0 -10 0))
+(define torque '(0 -10 0))
+(test-group "time derivative of state"
+  (test-equal "derivative of position is speed"
+    '(0.2 0.3 0.5) (position ((state-change inertia acceleration) s 0)))
+  (test-equal "derivative of speed is acceleration"
+    acceleration (speed ((state-change inertia acceleration) s 0)))
+  (test-equal "derivative of orientation requires computation of angular speed"
+    0.05 (imag-part (orientation ((state-change inertia acceleration) s 0))))
+  (test-equal "derivative of orientation takes into account inertia"
+    0.1 (imag-part (orientation ((state-change inertia2 acceleration) s 0))))
+  (test-equal "derivative of orientation takes into account orientation"
+    -0.05 (imag-part (orientation ((state-change inertia acceleration) s2 0))))
+  (test-equal "derivative of rotational impulse is zero"
+    '(0 0 0) (angular-momentum ((state-change inertia acceleration) s 0))))
 
 (test-end "sfsim state")

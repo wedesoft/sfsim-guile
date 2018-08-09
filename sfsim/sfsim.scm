@@ -56,12 +56,6 @@
         (list (- w2) (+ h2) (+ d2))
         (list (+ w2) (+ h2) (+ d2))))
 
-(define (dstate state dt)
-  (let [(v (speed state))
-        (q (orientation state))
-        (l (angular-momentum state))]
-    (make-state v g (* (vector->quaternion (* 0.5 (angular-velocity inertia q l))) q) '(0 0 0))))
-
 (define (on-reshape width height)
   (let* [(aspect (/ width height))
          (h      1.0)
@@ -133,7 +127,7 @@
     (fold collision state contacts)))
 
 (define* (timestep state dt #:optional (recursion 1))
-  (let [(update (runge-kutta state dt dstate))]
+  (let [(update (runge-kutta state dt (state-change inertia g)))]
     (let* [(contact (candidate update))
            (d       (depth update contact))]
       (if (>= d (* -2 epsilon))
