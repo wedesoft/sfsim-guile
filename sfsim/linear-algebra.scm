@@ -4,7 +4,7 @@
   #:use-module (srfi srfi-1)
   #:use-module (srfi srfi-26)
   #:export (cross-product inner-product norm diagonal dot permutations determinant submatrix inverse transpose
-            homogeneous-matrix orthogonal-component)
+            homogeneous-matrix orthogonal-component normalize)
   #:re-export (+ - *))
 
 
@@ -95,3 +95,7 @@
 (define (orthogonal-component normal vec)
   "Get component of VEC orthogonal to normal"
   (- vec (* (inner-product normal vec) normal)))
+
+(define (normalize vec)
+  (let [(l (norm vec))]
+    (if (zero? l) vec (* vec (/ 1 (norm vec))))))

@@ -102,4 +102,12 @@
   (test-equal "Non-trivial orthogonal component"
     '(0 3 0) (orthogonal-component '(1 0 0) '(2 3 0))))
 
+(test-group "Normalise vector"
+  (test-equal "Vector already normalized"
+    '(1 0 0) (normalize '(1 0 0)))
+  (test-equal "Normalize vector"
+    '(0 1 0) (normalize '(0 3 0)))
+  (test-equal "Catch zero vector"
+    '(0 0 0) (normalize '(0 0 0))))
+
 (test-end "sfsim linear-algebra")
