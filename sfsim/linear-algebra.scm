@@ -4,7 +4,7 @@
   #:use-module (srfi srfi-1)
   #:use-module (srfi srfi-26)
   #:export (cross-product inner-product norm diagonal dot permutations determinant submatrix inverse transpose
-            homogeneous-matrix)
+            homogeneous-matrix orthogonal-component)
   #:re-export (+ - *))
 
 
@@ -91,3 +91,7 @@
 (define* (homogeneous-matrix rotation #:optional (translation '(0 0 0)))
   "Convert rotation and optional translation to a homogeneous matrix"
   (append (map append rotation (map list translation)) '((0 0 0 1))))
+
+(define (orthogonal-component normal vec)
+  "Get component of VEC orthogonal to normal"
+  (- vec (* (inner-product normal vec) normal)))

@@ -22,8 +22,8 @@
 (define time #f)
 (define main-window #f)
 
-(define state (make-state '(0 0.7 0) '(0 0 0) (quaternion-rotation 0 '(1 0 0)) '(0.01 0.06 0.04)))
-(define g '(0 -1.0 0))
+(define state (make-state '(-0.5 0.7 0) '(0 0 0) (quaternion-rotation 0 '(1 0 0)) '(0.01 0.06 0.04)))
+(define g '(0 -2.0 0))
 
 (define m 1)
 (define w 1)
@@ -83,10 +83,10 @@
          (n      '(0 1 0))
          (v      (particle-speed inertia state contact))
          (vrel   (inner-product n v))
-         (vtan   (- v (* vrel n)))
+         (vtan   (orthogonal-component n v))
          (vtnorm (norm vtan))
          (vtgt   (if (>= vrel (- ve)) (- ve vrel) (* (- loss 2) vrel)))
-         (vfr    (min vtnorm (* mu vtgt)))
+         (vfr    (* mu vtgt))
          (vtgt2  (sqrt (+ (* vfr vfr) (* vtgt vtgt))))
          (dir    (* (+ (* vfr (* vtan (/ -1 (max vtnorm 1e-6)))) (* vtgt n)) (/ 1 vtgt2)))
          (j      (/ vtgt2

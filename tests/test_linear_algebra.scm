@@ -96,4 +96,10 @@
   (test-equal "Create homogeneous matrix from 3x3 matrix and translation vector"
     '((1 2 3 -1) (4 5 6 -2) (7 8 9 -3) (0 0 0 1)) (homogeneous-matrix '((1 2 3) (4 5 6) (7 8 9)) '(-1 -2 -3))))
 
+(test-group "orthogonal component"
+  (test-equal "Orthogonal component is zero vector"
+    '(0 0 0) (orthogonal-component '(1 0 0) '(2 0 0)))
+  (test-equal "Non-trivial orthogonal component"
+    '(0 3 0) (orthogonal-component '(1 0 0) '(2 3 0))))
+
 (test-end "sfsim linear-algebra")
