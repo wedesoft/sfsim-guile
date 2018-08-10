@@ -112,4 +112,16 @@
   (test-equal "Catch zero vector"
     '(0 0 0) (normalize '(0 0 0))))
 
+(test-group "Least-squares algorithmus"
+  (test-equal "Least-squares trivial case"
+    '(0) (least-squares '((1)) '(0)))
+  (test-equal "Least-squares overdetermined system"
+    '(0) (least-squares '((1) (1)) '(0 0)))
+  (test-equal "Least-squares with non-zero error"
+    '(1/2) (least-squares '((1) (1)) '(0 1)))
+  (test-equal "Least-squares with two variables"
+    '(2 3) (least-squares '((1 0) (0 1)) '(2 3)))
+  (test-equal "Empty matrix"
+    '() (least-squares '() '())))
+
 (test-end "sfsim linear-algebra")

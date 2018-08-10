@@ -4,7 +4,7 @@
   #:use-module (srfi srfi-1)
   #:use-module (srfi srfi-26)
   #:export (cross-product inner-product norm diagonal dot permutations determinant submatrix inverse transpose
-            homogeneous-matrix orthogonal-component normalize)
+            homogeneous-matrix orthogonal-component normalize least-squares)
   #:re-export (+ - *))
 
 
@@ -101,5 +101,13 @@
   (- vec (* (inner-product normal vec) normal)))
 
 (define (normalize vec)
+  "Return normalized vector"
   (let [(l (norm vec))]
     (if (zero? l) vec (* vec (/ 1 (norm vec))))))
+
+(define (least-squares design-matrix observation)
+  "Least-squares solver"
+  (if (null? design-matrix)
+    '()
+    (let [(design-matrix-transposed (transpose design-matrix))]
+      (dot (inverse (dot design-matrix-transposed design-matrix)) (dot design-matrix-transposed observation)))))

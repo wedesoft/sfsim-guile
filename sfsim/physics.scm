@@ -8,7 +8,8 @@
   #:use-module (sfsim linear-algebra)
   #:use-module (sfsim quaternion)
   #:export (clock elapsed cuboid-inertia runge-kutta inertia-body angular-velocity
-            particle-position particle-speed deflect support-point center-of-gravity))
+            particle-position particle-speed deflect support-point center-of-gravity
+            closest-point-pair))
 
 
 (define (clock)
@@ -61,6 +62,10 @@
 (define (center-of-gravity points)
   "Compute average of given points"
   (* (reduce + #f points) (/ 1 (exact->inexact (length points)))))
+
+(define (closest-point-pair simplex-a simplex-b)
+  "Determine closest point pair of two simplices"
+  (cons (car simplex-a) (car simplex-b)))
 
 (define (deflect relative-speed normal loss friction micro-speed)
   "Determine speed change necessary to deflect particle. If the particle is very slow, a lossless micro-collision is computed instead."

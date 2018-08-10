@@ -99,6 +99,10 @@
   (test-equal "Center of two points is average of points"
     '(2.5 4.0 6.0) (center-of-gravity '((2 3 5) (3 5 7)))))
 
+(test-group "closest point pair"
+  (test-equal "Closest point pair of two zero-dimensional simplices is trivial"
+    (cons '(2 3 5) '(3 5 7)) (closest-point-pair '((2 3 5)) '((3 5 7)))))
+
 (test-group "deflection of particle"
   (test-equal "Zero speed"
     '(0 0 0) (deflect '(0 0 0) '(1 0 0) 0 0 0))
