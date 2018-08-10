@@ -95,13 +95,24 @@
 
 (test-group "center of gravity"
   (test-equal "Center of one point is point"
-    '(2.0 3.0 5.0) (center-of-gravity '((2 3 5))))
+    '(2 3 5) (center-of-gravity '((2 3 5))))
   (test-equal "Center of two points is average of points"
-    '(2.5 4.0 6.0) (center-of-gravity '((2 3 5) (3 5 7)))))
+    '(5/2 4 6) (center-of-gravity '((2 3 5) (3 5 7)))))
 
-(test-group "closest point pair"
-  (test-equal "Closest point pair of two zero-dimensional simplices is trivial"
-    (cons '(2 3 5) '(3 5 7)) (closest-point-pair '((2 3 5)) '((3 5 7)))))
+(test-group "closest point pair and simplex pair"
+  (test-equal "Closest point pair of zero-dimensional simplex is trivial"
+    (cons '(2 3 5) '(3 5 7)) (car (closest-simplex-points '((2 3 5)) '((3 5 7)))))
+  (test-equal "Return zero-dimensional simplex"
+    (cons '((2 3 5)) '((3 5 7))) (cdr (closest-simplex-points '((2 3 5)) '((3 5 7)))))
+  (test-equal "Closest point on a line"
+    (cons '(0 0 1) '(0 0 -1)) (car (closest-simplex-points '((-1 0 1) (1 0 1)) '((0 0 -1) (0 0 -1)))))
+  (test-equal "Return simplex"
+    (cons '((-1 0 1) (1 0 1)) '((0 -1 -1) (0 1 -1)))
+    (cdr (closest-simplex-points '((-1 0 1) (1 0 1)) '((0 -1 -1) (0 1 -1)))))
+  (test-equal "Closest point of shifted line in first argument"
+    (cons '(0 0 1) '(0 0 -1)) (car (closest-simplex-points '((-1 0 1) (3 0 1)) '((0 0 -1) (0 0 -1)))))
+  (test-equal "Closest point of shifted line in second argument"
+    (cons '(0 0 1) '(0 0 -1)) (car (closest-simplex-points '((0 0 1) (0 0 1)) '((-1 0 -1) (3 0 -1))))))
 
 (test-group "deflection of particle"
   (test-equal "Zero speed"

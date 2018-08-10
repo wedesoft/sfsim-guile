@@ -90,7 +90,9 @@
   (test-equal "One element matrix transpose"
     '((42)) (transpose '((42))))
   (test-equal "Transpose 2x3 matrix"
-    '((1 4) (2 5) (3 6)) (transpose '((1 2 3) (4 5 6)))))
+    '((1 4) (2 5) (3 6)) (transpose '((1 2 3) (4 5 6))))
+  (test-equal "Transpose of empty matrix"
+    '() (transpose '())))
 
 (test-group "homogeneous-matrix"
   (test-equal "Create homogeneous matrix from 3x3 matrix"

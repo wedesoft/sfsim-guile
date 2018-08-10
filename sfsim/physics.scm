@@ -9,7 +9,7 @@
   #:use-module (sfsim quaternion)
   #:export (clock elapsed cuboid-inertia runge-kutta inertia-body angular-velocity
             particle-position particle-speed deflect support-point center-of-gravity
-            closest-point-pair))
+            closest-simplex-points))
 
 
 (define (clock)
@@ -61,11 +61,17 @@
 
 (define (center-of-gravity points)
   "Compute average of given points"
-  (* (reduce + #f points) (/ 1 (exact->inexact (length points)))))
+  (* (reduce + #f points) (/ 1 (length points))))
 
-(define (closest-point-pair simplex-a simplex-b)
+(define (closest-simplex-points simplex-a simplex-b)
   "Determine closest point pair of two simplices"
-  (cons (car simplex-a) (car simplex-b)))
+  (cons
+    (let* [(observation   (- (car simplex-a) (car simplex-b)))
+           (design-matrix (transpose (map (lambda (a b) (- observation (- a b))) (cdr simplex-a) (cdr simplex-b))))
+           (factors       (least-squares design-matrix observation))]
+        (cons (fold + (car simplex-a) (map * factors (map (cut - <> (car simplex-a)) (cdr simplex-a))))
+              (fold + (car simplex-b) (map * factors (map (cut - <> (car simplex-b)) (cdr simplex-b))))))
+        (cons simplex-a simplex-b)))
 
 (define (deflect relative-speed normal loss friction micro-speed)
   "Determine speed change necessary to deflect particle. If the particle is very slow, a lossless micro-collision is computed instead."
