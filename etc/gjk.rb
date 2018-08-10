@@ -48,7 +48,9 @@ def gjk a, b
   w = []
   v = [average(a), average(b)]
   while true
+    puts "closest #{v}"
     wk = [support_point(a, -vector(v)), support_point(b, +vector(v))]
+    puts "candidates #{wk}"
     return v if support(vector(v), -vector(v)) >= support(vector(wk), -vector(v)) - 1e-6
     w += [wk]
     v, w = simplex_closest_point w
@@ -80,4 +82,8 @@ gjk a, b
 
 a = [Vector[1, 4], Vector[3, 4], Vector[3, 1], Vector[1, 1]]
 b = [Vector[-1, 3], Vector[2, 2], Vector[-1, 2]]
+gjk a, b
+
+a = [Vector[-1, 0, 1], Vector[1, 0, 1]]
+b = [Vector[0, -1, -1], Vector[ 0, 1, -1]]
 gjk a, b

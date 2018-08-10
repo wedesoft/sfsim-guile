@@ -9,7 +9,7 @@
   #:use-module (sfsim quaternion)
   #:export (clock elapsed cuboid-inertia runge-kutta inertia-body angular-velocity
             particle-position particle-speed deflect support-point center-of-gravity
-            closest-simplex-points))
+            closest-simplex-points gjk-algorithm))
 
 
 (define (clock)
@@ -74,6 +74,23 @@
               (cons simplex-a simplex-b))
         (argmin (lambda (result) (norm (- (caar result) (cdar result))))
                 (map closest-simplex-points (leave-one-out simplex-a) (leave-one-out simplex-b))))))
+
+(define (gjk-algorithm convex-a convex-b)
+  "Get pair of closest points of two convex hulls each defined by a set of points"
+  (let [(simplex-a '())
+        (simplex-b '())
+        (closest (cons (center-of-gravity convex-a) (center-of-gravity convex-b)))]
+    (while #t
+      (format #t "closest ~a~&" closest)
+      (let* [(direction  (- (car closest) (cdr closest)))
+             (candidates (cons (support-point (- direction) convex-a) (support-point direction convex-b)))]
+        (format #t "candidates ~a~&" candidates)
+        (if (>= (inner-product direction (- direction)) (inner-product (- (car candidates) (cdr candidates)) (- direction)))
+          (break closest))
+        (let [(result (closest-simplex-points (cons (car candidates) simplex-a) (cons (cdr candidates) simplex-b)))]
+          (set! closest (car result))
+          (set! simplex-a (cadr result))
+          (set! simplex-b (cddr result)))))))
 
 (define (deflect relative-speed normal loss friction micro-speed)
   "Determine speed change necessary to deflect particle. If the particle is very slow, a lossless micro-collision is computed instead."

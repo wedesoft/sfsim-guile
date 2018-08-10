@@ -101,22 +101,30 @@
 
 (test-group "closest point pair and simplex pair"
   (test-equal "Closest point pair of zero-dimensional simplex is trivial"
-    (cons '(2 3 5) '(3 5 7)) (car (closest-simplex-points '((2 3 5)) '((3 5 7)))))
+    '((2 3 5) . (3 5 7)) (car (closest-simplex-points '((2 3 5)) '((3 5 7)))))
   (test-equal "Return zero-dimensional simplex"
-    (cons '((2 3 5)) '((3 5 7))) (cdr (closest-simplex-points '((2 3 5)) '((3 5 7)))))
+    '(((2 3 5)) . ((3 5 7))) (cdr (closest-simplex-points '((2 3 5)) '((3 5 7)))))
   (test-equal "Closest point on a line"
-    (cons '(0 0 1) '(0 0 -1)) (car (closest-simplex-points '((-1 0 1) (1 0 1)) '((0 0 -1) (0 0 -1)))))
+    '((0 0 1) . (0 0 -1)) (car (closest-simplex-points '((-1 0 1) (1 0 1)) '((0 0 -1) (0 0 -1)))))
   (test-equal "Return simplex"
-    (cons '((-1 0 1) (1 0 1)) '((0 -1 -1) (0 1 -1)))
+    '(((-1 0 1) (1 0 1)) . ((0 -1 -1) (0 1 -1)))
     (cdr (closest-simplex-points '((-1 0 1) (1 0 1)) '((0 -1 -1) (0 1 -1)))))
   (test-equal "Closest point of shifted line in first argument"
-    (cons '(0 0 1) '(0 0 -1)) (car (closest-simplex-points '((-1 0 1) (3 0 1)) '((0 0 -1) (0 0 -1)))))
+    '((0 0 1) . (0 0 -1)) (car (closest-simplex-points '((-1 0 1) (3 0 1)) '((0 0 -1) (0 0 -1)))))
   (test-equal "Closest point of shifted line in second argument"
-    (cons '(0 0 1) '(0 0 -1)) (car (closest-simplex-points '((0 0 1) (0 0 1)) '((-1 0 -1) (3 0 -1)))))
+    '((0 0 1) . (0 0 -1)) (car (closest-simplex-points '((0 0 1) (0 0 1)) '((-1 0 -1) (3 0 -1)))))
   (test-equal "Limit closest point to starting point of line segment"
-    (cons '(2 0 1) '(0 0 -1)) (car (closest-simplex-points '((2 0 1) (3 0 1)) '((0 0 -1) (0 0 -1)))))
+    '((2 0 1) . (0 0 -1)) (car (closest-simplex-points '((2 0 1) (3 0 1)) '((0 0 -1) (0 0 -1)))))
   (test-equal "Limit closest point to ending point of line segment"
-    (cons '(-2 0 1) '(0 0 -1)) (car (closest-simplex-points '((-3 0 1) (-2 0 1)) '((0 0 -1) (0 0 -1))))))
+    '((-2 0 1) . (0 0 -1)) (car (closest-simplex-points '((-3 0 1) (-2 0 1)) '((0 0 -1) (0 0 -1))))))
+
+(test-group "Gilbert-Johnson-Keerthi algorithm"
+  (test-equal "Two points are the closest two points"
+    '((-1 0 0) . (1 0 0)) (gjk-algorithm '((-1 0 0)) '((1 0 0))))
+  (test-equal "Closest points of two lines"
+    '((0 0 1) . (0 0 -1)) (gjk-algorithm '((-1 0 1) (1 0 1)) '((0 -1 -1) (0 1 -1))))
+  (test-equal "Closest point of triangle and point"
+    '((0 0 1) . (0 0 -1)) (gjk-algorithm '((2 -1 1) (-3 -1 1) (0 4 1)) '((0 0 -1)))))
 
 (test-group "deflection of particle"
   (test-equal "Zero speed"
