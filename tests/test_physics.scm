@@ -87,4 +87,18 @@
     (test-equal "Speed of rotation depends on orientation of inertia tensor"
       '(0 0 2) (round-vector (particle-speed inertia (quaternion-rotation (/ pi 2) '(0 1 0)) '(0 0 0) '(1 0 0) '(0 1 0))))))
 
+(test-group "deflection of particle"
+  (test-equal "Zero speed"
+    '(0 0 0) (deflect '(0 0 0) '(1 0 0) 0 0 0))
+  (test-equal "Inverting speed vector"
+    '(6 0 0) (deflect '(-3 0 0) '(1 0 0) 0 0 0))
+  (test-equal "Lossless reflection of speed"
+    '(6 0 0) (deflect '(-3 5 0) '(1 0 0) 0 0 0))
+  (test-equal "Reflect speed with loss"
+    '(4.5 0.0 0.0) (deflect '(-3 5 0) '(1 0 0) 0.5 0 0))
+  (test-equal "Reflect speed with friction"
+    '(6.0 -3.0 -0.0) (deflect '(-3 5 0) '(1 0 0) 0 0.5 0))
+  (test-equal "Lossless micro-collision"
+    '(0.325 0.0 0.0) (deflect '(-0.125 0 0) '(1 0 0) 0.5 0.5 0.2)))
+
 (test-end "sfsim physics")

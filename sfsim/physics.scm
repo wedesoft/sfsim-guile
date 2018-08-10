@@ -5,7 +5,7 @@
   #:use-module (sfsim linear-algebra)
   #:use-module (sfsim quaternion)
   #:export (clock elapsed cuboid-inertia runge-kutta inertia-body angular-velocity
-            particle-position particle-speed))
+            particle-position particle-speed deflect))
 
 
 (define (clock)
@@ -50,3 +50,10 @@
   (+ body-velocity
      (cross-product (angular-velocity inertia orientation angular-momentum)
                     (rotate-vector orientation radius-vector))))
+
+(define (deflect relative-speed normal loss friction micro-speed)
+  (let* [(normal-speed     (inner-product normal relative-speed))
+         (tangential-speed (orthogonal-component normal relative-speed))
+         (normal-target    (if (>= normal-speed (- micro-speed)) (- micro-speed normal-speed) (* (- loss 2) normal-speed)))
+         (friction-target  (* friction normal-target))]
+    (- (* normal-target normal) (* friction-target (normalize tangential-speed)))))

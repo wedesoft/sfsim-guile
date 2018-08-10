@@ -78,19 +78,11 @@
     (glut-wire-cube 1.0)
     (swap-buffers)))
 
-(define (deflect relative-speed normal)
-  (let* [(normal-speed     (inner-product normal relative-speed))
-         (tangential-speed (orthogonal-component normal relative-speed))
-         (normal-target     (if (>= normal-speed (- ve)) (- ve normal-speed) (* (- loss 2) normal-speed)))
-         (friction-target   (* mu normal-target))
-         (speed-delta       (- (* normal-target normal) (* friction-target (normalize tangential-speed))))]
-    speed-delta))
-
 (define (collision contact state)
   (let* [(radius           (- (particle-position state contact) (position state)))
          (relative-speed   (particle-speed inertia state contact))
          (normal           '(0 1 0))
-         (speed-delta      (deflect relative-speed normal))
+         (speed-delta      (deflect relative-speed normal loss mu ve))
          (direction         (normalize speed-delta))
          (impulse           (/ (norm speed-delta)
                                (+ (/ 1 m) (inner-product direction (cross-product (dot (inverse (inertia (orientation state)))

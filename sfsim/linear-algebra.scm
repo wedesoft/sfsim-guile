@@ -8,6 +8,10 @@
   #:re-export (+ - *))
 
 
+(define-method (- (a <list>))
+  "Negate vector"
+  (map - a))
+
 (define-method (+ (a <list>) (b <list>))
   "Add two vectors."
   (map + a b))

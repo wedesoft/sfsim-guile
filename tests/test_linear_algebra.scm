@@ -5,6 +5,8 @@
 (test-begin "sfsim linear-algebra")
 
 (test-group "vector operations"
+  (test-equal "invert vector"
+    '(-2 3 -5) (- '(2 -3 5)))
   (test-equal "add two vectors"
     '(7 10) (+ '(2 3) '(5 7)))
   (test-equal "subtract a vector from another"
