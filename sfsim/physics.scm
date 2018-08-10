@@ -1,13 +1,14 @@
 (define-module (sfsim physics)
   #:use-module (oop goops)
-  #:use-module (srfi srfi-26)
   #:use-module (ice-9 curried-definitions)
+  #:use-module (srfi srfi-1)
   #:use-module (srfi srfi-19)
+  #:use-module (srfi srfi-26)
   #:use-module (sfsim util)
   #:use-module (sfsim linear-algebra)
   #:use-module (sfsim quaternion)
   #:export (clock elapsed cuboid-inertia runge-kutta inertia-body angular-velocity
-            particle-position particle-speed deflect support-point))
+            particle-position particle-speed deflect support-point center-of-gravity))
 
 
 (define (clock)
@@ -56,6 +57,10 @@
 (define (support-point direction points)
   "Get outermost point of POINTS in given DIRECTION."
   (argmax (cut inner-product direction <>) points))
+
+(define (center-of-gravity points)
+  "Compute average of given points"
+  (* (reduce + #f points) (/ 1 (exact->inexact (length points)))))
 
 (define (deflect relative-speed normal loss friction micro-speed)
   "Determine speed change necessary to deflect particle. If the particle is very slow, a lossless micro-collision is computed instead."
