@@ -112,7 +112,11 @@
   (test-equal "Closest point of shifted line in first argument"
     (cons '(0 0 1) '(0 0 -1)) (car (closest-simplex-points '((-1 0 1) (3 0 1)) '((0 0 -1) (0 0 -1)))))
   (test-equal "Closest point of shifted line in second argument"
-    (cons '(0 0 1) '(0 0 -1)) (car (closest-simplex-points '((0 0 1) (0 0 1)) '((-1 0 -1) (3 0 -1))))))
+    (cons '(0 0 1) '(0 0 -1)) (car (closest-simplex-points '((0 0 1) (0 0 1)) '((-1 0 -1) (3 0 -1)))))
+  (test-equal "Limit closest point to starting point of line segment"
+    (cons '(2 0 1) '(0 0 -1)) (car (closest-simplex-points '((2 0 1) (3 0 1)) '((0 0 -1) (0 0 -1)))))
+  (test-equal "Limit closest point to ending point of line segment"
+    (cons '(-2 0 1) '(0 0 -1)) (car (closest-simplex-points '((-3 0 1) (-2 0 1)) '((0 0 -1) (0 0 -1))))))
 
 (test-group "deflection of particle"
   (test-equal "Zero speed"

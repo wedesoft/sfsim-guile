@@ -65,13 +65,15 @@
 
 (define (closest-simplex-points simplex-a simplex-b)
   "Determine closest point pair of two simplices"
-  (cons
-    (let* [(observation   (- (car simplex-a) (car simplex-b)))
-           (design-matrix (- observation (transpose (- (cdr simplex-a) (cdr simplex-b)))))
-           (factors       (least-squares design-matrix observation))]
-        (cons (fold + (car simplex-a) (map * factors (map (cut - <> (car simplex-a)) (cdr simplex-a))))
-              (fold + (car simplex-b) (map * factors (map (cut - <> (car simplex-b)) (cdr simplex-b))))))
-        (cons simplex-a simplex-b)))
+  (let* [(observation   (- (car simplex-a) (car simplex-b)))
+         (design-matrix (- observation (transpose (- (cdr simplex-a) (cdr simplex-b)))))
+         (factors       (least-squares design-matrix observation))]
+      (if (and (every positive? factors) (< (reduce + 0 factors) 1))
+        (cons (cons (fold + (car simplex-a) (map * factors (map (cut - <> (car simplex-a)) (cdr simplex-a))))
+                    (fold + (car simplex-b) (map * factors (map (cut - <> (car simplex-b)) (cdr simplex-b)))))
+              (cons simplex-a simplex-b))
+        (argmin (lambda (result) (norm (- (caar result) (cdar result))))
+                (map closest-simplex-points (leave-one-out simplex-a) (leave-one-out simplex-b))))))
 
 (define (deflect relative-speed normal loss friction micro-speed)
   "Determine speed change necessary to deflect particle. If the particle is very slow, a lossless micro-collision is computed instead."
