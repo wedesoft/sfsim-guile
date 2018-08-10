@@ -9,8 +9,16 @@
     '(-2 3 -5) (- '(2 -3 5)))
   (test-equal "add two vectors"
     '(7 10) (+ '(2 3) '(5 7)))
+  (test-equal "add vector and scalar"
+    '(7 8) (+ '(2 3) 5))
+  (test-equal "add scalar and vector"
+    '(7 8) (+ 5 '(2 3)))
   (test-equal "subtract a vector from another"
     '(2 3) (- '(7 10) '(5 7)))
+  (test-equal "subtract scalar from vector"
+    '(2 5) (- '(7 10) 5))
+  (test-equal "subtract vector from scalar"
+    '(-2 -5) (- 5 '(7 10)))
   (test-equal "multiply vector with scalar"
     '(10 15) (* '(2 3) 5))
   (test-equal "multiply scalar with vector"

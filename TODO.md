@@ -1,6 +1,6 @@
 # TODO
 
-* vector plus scalar
+* vector minus scalar, scalar plus vector, scalar minus vector
 * put particle-pos and particle-vel under test
 * cockpit: frontal and side view of moon lander
 * multiple rigid body (polyhedra) collisions

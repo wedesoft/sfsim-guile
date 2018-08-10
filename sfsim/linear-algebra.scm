@@ -9,16 +9,32 @@
 
 
 (define-method (- (a <list>))
-  "Negate vector"
+  "Negate vector."
   (map - a))
 
 (define-method (+ (a <list>) (b <list>))
   "Add two vectors."
   (map + a b))
 
+(define-method (+ (a <list>) (b <real>))
+  "Add vector and scalar."
+  (map (cut + <> b) a))
+
+(define-method (+ (a <real>) (b <list>))
+  "Add vector and scalar."
+  (map (cut + a <>) b))
+
 (define-method (- (a <list>) (b <list>))
   "Subtract a vector from another."
   (map - a b))
+
+(define-method (- (a <list>) (b <real>))
+  "Subtract a vector from another."
+  (map (cut - <> b) a))
+
+(define-method (- (a <real>) (b <list>))
+  "Subtract a vector from another."
+  (map (cut - a <>) b))
 
 (define-method (* (a <list>) (b <number>))
   "Multiply a vector with a scalar."
