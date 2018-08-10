@@ -87,6 +87,12 @@
     (test-equal "Speed of rotation depends on orientation of inertia tensor"
       '(0 0 2) (round-vector (particle-speed inertia (quaternion-rotation (/ pi 2) '(0 1 0)) '(0 0 0) '(1 0 0) '(0 1 0))))))
 
+(test-group "collisions of polyhedra"
+  (test-equal "First point is outermost point in given direction"
+    '(2 3 5) (support-point '(-1 0 0) '((2 3 5) (3 5 7))))
+  (test-equal "Last point is outermost point in given direction"
+    '(3 5 7) (support-point '(1 0 0) '((2 3 5) (3 5 7)))))
+
 (test-group "deflection of particle"
   (test-equal "Zero speed"
     '(0 0 0) (deflect '(0 0 0) '(1 0 0) 0 0 0))

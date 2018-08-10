@@ -38,7 +38,7 @@
 (define dtmax 0.025)
 (define epsilon (* 0.5 (abs (cadr g)) (* dtmax dtmax)))
 (define ve (sqrt (* 2 (- (cadr g)) epsilon)))
-(define max-depth 3)
+(define max-depth 32)
 
 (define speed-scale 0.3)
 
