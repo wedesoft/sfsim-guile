@@ -67,7 +67,7 @@
   "Determine closest point pair of two simplices"
   (cons
     (let* [(observation   (- (car simplex-a) (car simplex-b)))
-           (design-matrix (transpose (map (lambda (a b) (- observation (- a b))) (cdr simplex-a) (cdr simplex-b))))
+           (design-matrix (- observation (transpose (- (cdr simplex-a) (cdr simplex-b)))))
            (factors       (least-squares design-matrix observation))]
         (cons (fold + (car simplex-a) (map * factors (map (cut - <> (car simplex-a)) (cdr simplex-a))))
               (fold + (car simplex-b) (map * factors (map (cut - <> (car simplex-b)) (cdr simplex-b))))))
