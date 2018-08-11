@@ -124,7 +124,9 @@
   (test-equal "Closest points of two lines"
     '((0 0 1) . (0 0 -1)) (gjk-algorithm '((-1 0 1) (1 0 1)) '((0 -1 -1) (0 1 -1))))
   (test-equal "Closest point of triangle and point"
-    '((0 0 1) . (0 0 -1)) (gjk-algorithm '((2 -1 1) (-3 -1 1) (0 4 1)) '((0 0 -1)))))
+    '((0 0 1) . (0 0 -1)) (gjk-algorithm '((2 -1 1) (-3 -1 1) (0 4 1)) '((0 0 -1))))
+  (test-assert "No infinite loop when handling floating-point inaccuracies"
+    (gjk-algorithm '((2.0 -1.0 1.0) (-3.0 -1.0 1.0) (0.0 4.0 1.0)) '((0.0 0.0 -1.0)))))
 
 (test-group "deflection of particle"
   (test-equal "Zero speed"
