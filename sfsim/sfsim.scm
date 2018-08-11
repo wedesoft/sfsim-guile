@@ -101,17 +101,13 @@
 (define (candidate state)
   (argmax (cut depth state <>) corners))
 
-(define (collisions state)
-  (let [(contacts (filter (lambda (corner) (>= (depth state corner) (* -2 epsilon))) corners))]
-    (fold collision state contacts)))
-
 (define* (timestep state dt #:optional (recursion 1))
   (let [(update (runge-kutta state dt (state-change inertia g)))]
     (let* [(contact (candidate update))
            (d       (depth update contact))]
       (if (>= d (* -2 epsilon))
         (if (or (<= d (- epsilon)) (>= recursion max-depth))
-          (collisions update)
+          (collision contact update)
           (timestep (timestep state (/ dt 2) (1+ recursion)) (/ dt 2) (1+ recursion)))
         update))))
 
