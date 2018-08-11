@@ -81,10 +81,8 @@
         (simplex-b '())
         (closest (cons (center-of-gravity convex-a) (center-of-gravity convex-b)))]
     (while #t
-      (format #t "closest ~a~&" closest)
       (let* [(direction  (- (car closest) (cdr closest)))
              (candidates (cons (support-point (- direction) convex-a) (support-point direction convex-b)))]
-        (format #t "candidates ~a~&" candidates)
         (if (>= (inner-product direction (- direction)) (inner-product (- (car candidates) (cdr candidates)) (- direction)))
           (break closest))
         (let [(result (closest-simplex-points (cons (car candidates) simplex-a) (cons (cdr candidates) simplex-b)))]
