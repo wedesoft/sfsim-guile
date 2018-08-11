@@ -22,13 +22,14 @@
 (define time #f)
 (define main-window #f)
 
-(define state (make-state '(-0.5 0.7 0) '(0 0 0) (quaternion-rotation 0 '(1 0 0)) '(0.01 0.06 0.04)))
-(define g '(0 -2.0 0))
+(define state1 (make-state '(0 0.3 0) '(0 -0.2 0) (quaternion-rotation 0 '(1 0 0)) '(0.0 0.0 0.0)))
+(define state2 (make-state '(0 -0.3 0) '(0 0.2 0) (quaternion-rotation 0 '(1 0 0)) '(0.0 0.0 0.0)))
+(define g '(0 -0.5 0))
 
 (define m 1)
-(define w 1)
-(define h 0.5)
-(define d 0.15)
+(define w 0.5)
+(define h 0.25)
+(define d 0.1)
 (define inertia (inertia-body (cuboid-inertia m w h d)))
 
 (define loss 0.6)
@@ -37,9 +38,10 @@
 (define ground -0.99)
 (define dtmax 0.025)
 (define epsilon (* 0.5 (abs (cadr g)) (* dtmax dtmax)))
-(define ve (sqrt (* 2 (- (cadr g)) epsilon)))
-(define max-depth 32)
+(define ve (sqrt (* 2 (abs (cadr g)) epsilon)))
+(define max-depth 5)
 
+(define g '(0 0 0))
 (define speed-scale 0.3)
 
 (define w2 (/ w 2))
@@ -65,18 +67,23 @@
     (gl-load-identity)
     (gl-ortho (- w) w (- h) h -100 +100)))
 
-(define (on-display)
+(define (show state)
   (let* [(b   (make-bytevector (* 4 4 4)))
          (mat (rotation-matrix (orientation state)))
          (hom (concatenate (homogeneous-matrix mat (position state))))]
     (for-each (lambda (i v) (bytevector-ieee-single-native-set! b (* i 4) v)) (iota (length hom)) hom)
-    (gl-clear (clear-buffer-mask color-buffer))
     (set-gl-matrix-mode (matrix-mode modelview))
     (gl-load-matrix b #:transpose #t)
     (gl-scale w h d)
     (gl-color 0 1 0)
-    (glut-wire-cube 1.0)
-    (swap-buffers)))
+    (glut-wire-cube 1.0))
+)
+
+(define (on-display)
+  (gl-clear (clear-buffer-mask color-buffer))
+  (show state1)
+  (show state2)
+  (swap-buffers))
 
 (define (collision contact state)
   (let* [(radius           (- (particle-position state contact) (position state)))
@@ -101,19 +108,24 @@
 (define (candidate state)
   (argmax (cut depth state <>) corners))
 
-(define* (timestep state dt #:optional (recursion 1))
-  (let [(update (runge-kutta state dt (state-change inertia g)))]
-    (let* [(contact (candidate update))
-           (d       (depth update contact))]
+(define* (timestep state1 state2 dt #:optional (recursion 1))
+  (let [(update1 (runge-kutta state1 dt (state-change inertia g)))
+        (update2 (runge-kutta state2 dt (state-change inertia g)))]
+    (let* [(closest (gjk-algorithm (map (cut particle-position update1 <>) corners)
+                                   (map (cut particle-position update2 <>) corners)))
+           (d       (- (norm (-(car closest) (cdr closest)))))]
       (if (>= d (* -2 epsilon))
         (if (or (<= d (- epsilon)) (>= recursion max-depth))
-          (collision contact update)
-          (timestep (timestep state (/ dt 2) (1+ recursion)) (/ dt 2) (1+ recursion)))
-        update))))
+          (cons state1 state2)
+          (let [(update (timestep state1 state2 (/ dt 2) (1+ recursion)))]
+            (timestep (car update) (cdr update) (/ dt 2) (1+ recursion))))
+        (cons update1 update2)))))
 
 (define (on-idle)
   (let [(dt (min dtmax (elapsed time #t)))]
-    (set! state (timestep state dt))
+    (let [(update (timestep state1 state2 dt))]
+      (set! state1 (car update))
+      (set! state2 (cdr update)))
     (post-redisplay)))
 
 (initialize-glut (program-arguments) #:window-size '(640 . 480) #:display-mode (display-mode rgb double))

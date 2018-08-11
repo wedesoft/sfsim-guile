@@ -22,3 +22,5 @@ make run
 * [Quaternion differentiation](https://fgiesen.wordpress.com/2012/08/24/quaternion-differentiation/)
 * [Kawachi et al.: Simulation of Rigid Body Motion with Impulsive Friction Force](http://citeseerx.ist.psu.edu/viewdoc/download?doi=10.1.1.130.6905&rep=rep1&type=pdf)
 * [Space simulator project](http://www.spacesimulator.net/tutorials/)
+* [D. Baraff: Rigid Body Simulation I](https://www.cs.cmu.edu/~baraff/sigcourse/notesd1.pdf)
+* [D. Baraff: Rigid Body Simulation II](https://www.cs.cmu.edu/~baraff/sigcourse/notesd2.pdf)
