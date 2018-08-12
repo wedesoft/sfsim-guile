@@ -85,24 +85,7 @@
   (show state2)
   (swap-buffers))
 
-(define (collision contact state)
-  (let* [(radius           (- (particle-position state contact) (position state)))
-         (relative-speed   (particle-speed inertia state contact))
-         (normal           '(0 1 0))
-         (speed-delta      (deflect relative-speed normal loss mu ve))
-         (direction         (normalize speed-delta))
-         (impulse           (/ (norm speed-delta)
-                               (+ (/ 1 m) (inner-product direction (cross-product (dot (inverse (inertia (orientation state)))
-                                                                                  (cross-product radius direction)) radius)))))
-         (impulse-vector    (* impulse direction))]
-    (if (< (inner-product normal relative-speed) 0)
-      (make-state (position state)
-                  (+ (speed state) (* (/ 1 m) impulse-vector))
-                  (quaternion-normalize (orientation state))
-                  (+ (angular-momentum state) (cross-product radius impulse-vector)))
-      state)))
-
-(define (collide closest state1 state2)
+(define (collision closest state1 state2)
   (let* [(radius1        (- (car closest) (position state1)))
          (radius2        (- (cdr closest) (position state2)))
          (s1             (+ (speed state1) (cross-product (angular-velocity inertia (orientation state1) (angular-momentum state1)) radius1)))
@@ -144,7 +127,7 @@
            (d       (- (norm (-(car closest) (cdr closest)))))]
       (if (>= d (* -2 epsilon))
         (if (or (<= d (- epsilon)) (>= recursion max-depth))
-          (begin (format #t "depth ~a recursion ~a~&" d recursion) (collide closest update1 update2))
+          (begin (format #t "depth ~a recursion ~a~&" d recursion) (collision closest update1 update2))
           (let [(update (timestep state1 state2 (/ dt 2) (1+ recursion)))]
             (timestep (car update) (cdr update) (/ dt 2) (1+ recursion))))
         (cons update1 update2)))))
