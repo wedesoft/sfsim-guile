@@ -144,7 +144,7 @@
            (d       (- (norm (-(car closest) (cdr closest)))))]
       (if (>= d (* -2 epsilon))
         (if (or (<= d (- epsilon)) (>= recursion max-depth))
-          (begin (format #t "d ~a~&" d) (collide closest update1 update2))
+          (begin (format #t "depth ~a recursion ~a~&" d recursion) (collide closest update1 update2))
           (let [(update (timestep state1 state2 (/ dt 2) (1+ recursion)))]
             (timestep (car update) (cdr update) (/ dt 2) (1+ recursion))))
         (cons update1 update2)))))
