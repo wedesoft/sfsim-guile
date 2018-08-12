@@ -4,6 +4,7 @@
 * cockpit: frontal and side view of moon lander
 * XBox controller
 * OpenGL bindings for rendering 3DS vertex array objects
+* good tessellation for planet spheres
 * 3D cockpit
 * 3D moon rendering
 * bump maps
@@ -33,7 +34,6 @@
 * cloud erosion
 * project on sphere
 * view matrix, model matrix stack, light position
-* good tessellation for planet spheres
 * multiple rigid or flexible objects
 * create windows using blending
 * thrusters

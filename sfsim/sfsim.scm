@@ -35,7 +35,6 @@
 (define loss 0.6)
 (define mu 0.6)
 
-(define ground -0.99)
 (define dtmax 0.025)
 (define epsilon (* 0.5 (abs (cadr g)) (* dtmax dtmax)))
 (define ve (sqrt (* 2 (abs (cadr g)) epsilon)))
@@ -94,30 +93,16 @@
          (normal         (normalize (- (car closest) (cdr closest))))
          (speed-delta    (deflect relative-speed normal loss mu ve))
          (direction      (normalize speed-delta))
-         (impulse        (/ (norm speed-delta)
-                            (+ (/ 1 m) (/ 1 m) (inner-product direction (cross-product (dot (inverse (inertia (orientation state1)))
-                                                                                       (cross-product radius1 direction)) radius1)))))
-         (impulse-vector (* impulse direction))]
-    (if (< (inner-product normal relative-speed) 0)
-     (cons (make-state (position state1)
-                  (+ (speed state1) (* (/ 1 m) impulse-vector))
-                  (quaternion-normalize (orientation state1))
-                  (+ (angular-momentum state1) (cross-product radius1 impulse-vector)))
-          (make-state (position state2)
-                  (+ (speed state2) (* (/ 1 m) (- impulse-vector)))
-                  (quaternion-normalize (orientation state2))
-                  (+ (angular-momentum state2) (cross-product radius2 (- impulse-vector))))
-    )
-     (cons state1 state2)
-     )
-    )
-)
-
-(define (depth state corner)
-  (- ground (cadr (particle-position state corner))))
-
-(define (candidate state)
-  (argmax (cut depth state <>) corners))
+         (impulse-vector (collision-impulse speed-delta m m inertia inertia
+                                            (orientation state1) (orientation state2) radius1 radius2))]
+   (cons (make-state (position state1)
+                (+ (speed state1) (* (/ 1 m) impulse-vector))
+                (quaternion-normalize (orientation state1))
+                (+ (angular-momentum state1) (cross-product radius1 impulse-vector)))
+        (make-state (position state2)
+                (+ (speed state2) (* (/ 1 m) (- impulse-vector)))
+                (quaternion-normalize (orientation state2))
+                (+ (angular-momentum state2) (cross-product radius2 (- impulse-vector)))))))
 
 (define* (timestep state1 state2 dt #:optional (recursion 1))
   (let [(update1 (runge-kutta state1 dt (state-change inertia g)))

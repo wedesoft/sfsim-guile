@@ -9,7 +9,7 @@
   #:use-module (sfsim quaternion)
   #:export (clock elapsed cuboid-inertia runge-kutta inertia-body angular-velocity
             particle-position particle-speed deflect support-point center-of-gravity
-            closest-simplex-points gjk-algorithm))
+            closest-simplex-points gjk-algorithm collision-impulse))
 
 
 (define (clock)
@@ -97,3 +97,15 @@
          (normal-target    (if (>= normal-speed (- micro-speed)) (- micro-speed normal-speed) (* (- loss 2) normal-speed)))
          (friction-target  (* friction normal-target))]
     (- (* normal-target normal) (* friction-target (normalize tangential-speed)))))
+
+(define (collision-impulse speed-change mass-a mass-b inertia-a inertia-b orientation-a orientation-b radius-a radius-b)
+  "Compute impulse of a collision of two objects"
+  (let* [(direction (normalize speed-change))
+         (impulse   (/ (norm speed-change)
+                       (+ (/ 1 mass-a)
+                          (/ 1 mass-b)
+                          (inner-product direction (cross-product (dot (inverse (inertia-a orientation-a))
+                                                                  (cross-product radius-a direction)) radius-a))
+                          (inner-product direction (cross-product (dot (inverse (inertia-b orientation-b))
+                                                                  (cross-product radius-b direction)) radius-b)))))]
+    (* impulse direction)))

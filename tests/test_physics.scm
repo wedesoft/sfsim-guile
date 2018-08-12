@@ -142,4 +142,17 @@
   (test-equal "Lossless micro-collision"
     '(0.325 0.0 0.0) (deflect '(-0.125 0 0) '(1 0 0) 0.5 0.5 0.2)))
 
+(define inertia (inertia-body '((1 0 0) (0 1 0) (0 0 1))))
+(test-group "impulse acting on particle"
+  (test-equal "Collision with planetary object"
+    '(1.0 0.0 0.0) (collision-impulse '(1.0 0.0 0.0) 1.0 5.9742e+24 inertia inertia 1 1 '(1 0 0) '(-1 0 0)))
+  (test-equal "Collision of heavier object"
+    '(10.0 0.0 0.0) (collision-impulse '(1.0 0.0 0.0) 10.0 5.9742e+24 inertia inertia 1 1 '(1 0 0) '(-1 0 0)))
+  (test-equal "Collision of objects of equal mass"
+    '(0.5 0.0 0.0) (collision-impulse '(1.0 0.0 0.0) 1.0 1.0 inertia inertia 1 1 '(1 0 0) '(-1 0 0)))
+  (test-equal "Rotational component in first object"
+    '(0.5 0.0 0.0) (collision-impulse '(1.0 0.0 0.0) 1.0 5.9742e+24 inertia inertia 1 1 '(0 1 0) '(-1 0 0)))
+  (test-equal "Rotational component in second object"
+    '(0.5 0.0 0.0) (collision-impulse '(1.0 0.0 0.0) 5.9742e+24 1.0 inertia inertia 1 1 '(1 0 0) '(0 -1 0))))
+
 (test-end "sfsim physics")

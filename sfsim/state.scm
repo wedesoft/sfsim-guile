@@ -31,9 +31,11 @@
               (+ (angular-momentum state) (angular-momentum dstate))))
 
 (define-method (particle-position state corner)
+  "Rotated and translated position of particle"
   (particle-position (position state) (orientation state) corner))
 
 (define-method (particle-speed inertia state corner)
+  "Speed of particle taking into account rotation of object"
   (particle-speed inertia (orientation state) (speed state) (angular-momentum state) corner))
 
 (define ((state-change inertia acceleration) state dt)
