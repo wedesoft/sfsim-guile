@@ -84,26 +84,6 @@
   (show state2)
   (swap-buffers))
 
-(define (collision closest state1 state2)
-  (let* [(radius1        (- (car closest) (position state1)))
-         (radius2        (- (cdr closest) (position state2)))
-         (s1             (+ (speed state1) (cross-product (angular-velocity inertia (orientation state1) (angular-momentum state1)) radius1)))
-         (s2             (+ (speed state2) (cross-product (angular-velocity inertia (orientation state2) (angular-momentum state2)) radius2)))
-         (relative-speed (- s1 s2))
-         (normal         (normalize (- (car closest) (cdr closest))))
-         (speed-delta    (deflect relative-speed normal loss mu ve))
-         (direction      (normalize speed-delta))
-         (impulse-vector (collision-impulse speed-delta m m inertia inertia
-                                            (orientation state1) (orientation state2) radius1 radius2))]
-   (cons (make-state (position state1)
-                (+ (speed state1) (* (/ 1 m) impulse-vector))
-                (quaternion-normalize (orientation state1))
-                (+ (angular-momentum state1) (cross-product radius1 impulse-vector)))
-        (make-state (position state2)
-                (+ (speed state2) (* (/ 1 m) (- impulse-vector)))
-                (quaternion-normalize (orientation state2))
-                (+ (angular-momentum state2) (cross-product radius2 (- impulse-vector)))))))
-
 (define* (timestep state1 state2 dt #:optional (recursion 1))
   (let [(update1 (runge-kutta state1 dt (state-change inertia g)))
         (update2 (runge-kutta state2 dt (state-change inertia g)))]
@@ -112,7 +92,7 @@
            (d       (- (norm (-(car closest) (cdr closest)))))]
       (if (>= d (* -2 epsilon))
         (if (or (<= d (- epsilon)) (>= recursion max-depth))
-          (begin (format #t "depth ~a recursion ~a~&" d recursion) (collision closest update1 update2))
+          (collision update1 update2 m m inertia inertia closest loss mu ve)
           (let [(update (timestep state1 state2 (/ dt 2) (1+ recursion)))]
             (timestep (car update) (cdr update) (/ dt 2) (1+ recursion))))
         (cons update1 update2)))))

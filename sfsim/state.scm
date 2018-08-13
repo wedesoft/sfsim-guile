@@ -5,7 +5,7 @@
   #:use-module (sfsim quaternion)
   #:use-module (sfsim linear-algebra)
   #:export (make-state position speed orientation angular-momentum <state>
-            state-change)
+            state-change collision)
   #:re-export (+ * particle-position particle-speed))
 
 
@@ -44,3 +44,25 @@
               (* (vector->quaternion (* 0.5 (angular-velocity inertia (orientation state) (angular-momentum state))))
                  (orientation state))
               '(0 0 0)))
+
+(define (collision state-a state-b mass-a mass-b inertia-a inertia-b closest loss friction micro-speed)
+  "Simulate a rigid-body collision"
+  (let* [(radius-a       (- (car closest) (position state-a)))
+         (radius-b       (- (cdr closest) (position state-b)))
+         (speed-a        (+ (speed state-a)
+                            (cross-product (angular-velocity inertia-a (orientation state-a) (angular-momentum state-a)) radius-a)))
+         (speed-b        (+ (speed state-b)
+                            (cross-product (angular-velocity inertia-b (orientation state-b) (angular-momentum state-b)) radius-b)))
+         (relative-speed (- speed-a speed-b))
+         (normal         (normalize (- (car closest) (cdr closest))))
+         (speed-delta    (deflect relative-speed normal loss friction micro-speed))
+         (impulse-vector (collision-impulse speed-delta mass-a mass-b inertia-a inertia-b
+                                            (orientation state-a) (orientation state-b) radius-a radius-b))]
+    (cons (make-state (position state-a)
+                      (+ (speed state-a) (* (/ 1 mass-a) impulse-vector))
+                      (quaternion-normalize (orientation state-a))
+                      (+ (angular-momentum state-a) (cross-product radius-a impulse-vector)))
+          (make-state (position state-b)
+                      (- (speed state-b) (* (/ 1 mass-b) impulse-vector))
+                      (quaternion-normalize (orientation state-b))
+                      (- (angular-momentum state-b) (cross-product radius-b impulse-vector))))))

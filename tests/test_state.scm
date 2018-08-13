@@ -68,4 +68,28 @@
   (test-equal "derivative of rotational impulse is zero"
     '(0 0 0) (angular-momentum ((state-change inertia acceleration) s 0))))
 
+(define s1 (make-state '(2 3 5) '(0 0  1) 1 '(0 0 0)))
+(define s2 (make-state '(2 3 8) '(0 0 -1) 1 '(0 0 0)))
+(define light 1.0)
+(define heavy 5.9742e+24)
+(define inertia-a(inertia-body '((1 0 0) (0 1 0) (0 0 1))))
+(define inertia-b (inertia-body '((0.5 0 0) (0 0.5 0) (0 0 0.5))))
+(define ca '((2 3 6) . (2 3 7)))
+(define cb '((3 3 6) . (3 3 7)))
+(test-group "simulation of collision (initial angular speed, friction, and micro-collision parameters not tested)"
+  (test-equal "Position of first object is preserved"
+    '(2 3 5) (position (car (collision s1 s2 light light inertia-a inertia-b ca 0.0 0.0 0.1))))
+  (test-equal "Position of second object is preserved"
+    '(2 3 8) (position (cdr (collision s1 s2 light light inertia-a inertia-b ca 0.0 0.0 0.1))))
+  (test-equal "deflect first object"
+    '(0.0 0.0 -3.0) (speed (car (collision s1 s2 light heavy inertia-a inertia-b ca 0.0 0.0 0.1))))
+  (test-equal "stop first object"
+    '(0.0 0.0 -1.0) (speed (car (collision s1 s2 light heavy inertia-a inertia-b ca 1.0 0.0 0.1))))
+  (test-equal "Deflect second object"
+    '(-0.0 -0.0 3.0) (speed (cdr (collision s1 s2 heavy light inertia-a inertia-b ca 0.0 0.0 0.1))))
+  (test-equal "Spin first object"
+    '(0.0 1.0 0.0) (angular-momentum (car (collision s1 s2 light heavy inertia-a inertia-b cb 0.0 0.0 0.1))))
+  (test-equal "Spin second object"
+    '(-0.0 -1.0 -0.0) (angular-momentum (cdr (collision s1 s2 heavy light inertia-a inertia-b cb 0.0 0.0 0.1)))))
+
 (test-end "sfsim state")
