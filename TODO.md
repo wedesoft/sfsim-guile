@@ -1,6 +1,6 @@
 # TODO
 
-* propagation of impulses during collision in linked bodies (body with spring-damper gears)
+* compute forces of zero-mass spring damper gears
 * cockpit: frontal and side view of moon lander
 * XBox controller
 * OpenGL bindings for rendering 3DS vertex array objects

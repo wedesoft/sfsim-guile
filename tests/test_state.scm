@@ -78,7 +78,7 @@
 (define inertia-b (inertia-body '((0.5 0 0) (0 0.5 0) (0 0 0.5))))
 (define ca '((2 3 6) . (2 3 7)))
 (define cb '((3 3 6) . (3 3 7)))
-(test-group "simulation of collision (friction and micro-collision parameters not tested)"
+(test-group "simulation of collision (no collision case, friction, and micro-collision parameters not tested)"
   (test-equal "Position of first object is preserved"
     '(2 3 5) (position (car (collision s1 s2 light light inertia-a inertia-b ca 0.0 0.0 0.1))))
   (test-equal "Position of second object is preserved"

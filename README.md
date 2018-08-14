@@ -24,3 +24,4 @@ make run
 * [Space simulator project](http://www.spacesimulator.net/tutorials/)
 * [David Baraff: Rigid Body Simulation I](https://www.cs.cmu.edu/~baraff/sigcourse/notesd1.pdf)
 * [David Baraff: Rigid Body Simulation II](https://www.cs.cmu.edu/~baraff/sigcourse/notesd2.pdf)
+* [Ruspini et al.: Collision/contact models for the dynamic simulation of complex environments](http://robotics.stanford.edu/users/ruspini/publications/iros97b.ps)
