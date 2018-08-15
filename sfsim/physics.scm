@@ -49,11 +49,9 @@
   "Determine position of a rigid body's particle"
   (+ center (rotate-vector orientation radius-vector)))
 
-(define-method (particle-speed inertia orientation body-velocity angular-momentum radius-vector)
+(define-method (particle-speed inertia center orientation body-velocity angular-momentum particle-pos)
   "Determine speed of a rigid body's particle"
-  (+ body-velocity
-     (cross-product (angular-velocity inertia orientation angular-momentum)
-                    (rotate-vector orientation radius-vector))))
+  (+ body-velocity (cross-product (angular-velocity inertia orientation angular-momentum) (- particle-pos center))))
 
 (define (support-point direction points)
   "Get outermost point of POINTS in given DIRECTION."

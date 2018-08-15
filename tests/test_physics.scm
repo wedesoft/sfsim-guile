@@ -76,16 +76,16 @@
 (test-group "speed of a particle"
   (let [(inertia (inertia-body '((1 0 0) (0 1 0) (0 0 1))))]
     (test-equal "Speed of particle on non-rotating object"
-      '(1.0 2.0 3.0) (particle-speed inertia (quaternion-rotation 0 '(1 0 0)) '(1 2 3) '(0 0 0) '(0 1 0)))
+      '(1.0 2.0 3.0) (particle-speed inertia '(0 0 0) (quaternion-rotation 0 '(1 0 0)) '(1 2 3) '(0 0 0) '(0 1 0)))
     (test-equal "Speed of particle on rotating object"
-      '(0.0 0.0 1.0) (particle-speed inertia (quaternion-rotation 0 '(1 0 0)) '(0 0 0) '(1 0 0) '(0 1 0)))
-    (test-equal "Direction of speed vector depends on orientation of object"
-      '(0 0 -1) (round-vector (particle-speed inertia (quaternion-rotation pi '(1 0 0)) '(0 0 0) '(1 0 0) '(0 1 0)))))
+      '(0.0 0.0 1.0) (particle-speed inertia '(0 0 0) (quaternion-rotation 0 '(1 0 0)) '(0 0 0) '(1 0 0) '(0 1 0)))
+    (test-equal "Direction of speed vector depends on center of object"
+      '(0 0 2) (round-vector (particle-speed inertia '(0 -1 0) (quaternion-rotation 0 '(1 0 0)) '(0 0 0) '(1 0 0) '(0 1 0)))))
   (let [(inertia (inertia-body '((2 0 0) (0 0.5 0) (0 0 0.5))))]
     (test-equal "Heavier object rotates more slowly"
-      '(0.0 0.0 0.5) (particle-speed inertia (quaternion-rotation 0 '(1 0 0)) '(0 0 0) '(1 0 0) '(0 1 0)))
+      '(0.0 0.0 0.5) (particle-speed inertia '(0 0 0) (quaternion-rotation 0 '(1 0 0)) '(0 0 0) '(1 0 0) '(0 1 0)))
     (test-equal "Speed of rotation depends on orientation of inertia tensor"
-      '(0 0 2) (round-vector (particle-speed inertia (quaternion-rotation (/ pi 2) '(0 1 0)) '(0 0 0) '(1 0 0) '(0 1 0))))))
+      '(0 0 2) (round-vector (particle-speed inertia '(0 0 0) (quaternion-rotation (/ pi 2) '(0 1 0)) '(0 0 0) '(1 0 0) '(0 1 0))))))
 
 (test-group "support point"
   (test-equal "First point is outermost point in given direction"

@@ -22,12 +22,12 @@
 (define time #f)
 (define main-window #f)
 
-(define state1 (make-state '(0 0.3 0) '(0 -0.1 0) (quaternion-rotation 0 '(1 0 0)) '(0.0 0.0 0.0)))
-(define state2 (make-state '(0 -0.3 0) '(0 0.0 0) (quaternion-rotation 0 '(1 0 0)) '(0.0 0.0 0.0)))
+(define state1 (make-state '(0 0.2 0) '(0 -0.4 0) (quaternion-rotation 0 '(1 0 0)) '(0.0 0.0 0.0)))
+(define state2 (make-state '(0 -0.2 0) '(0 0.4 0) (quaternion-rotation 0 '(1 0 0)) '(0.0 0.0 0.0)))
 (define g '(0 -0.5 0))
 
 (define m1 1)
-(define m2 1e+24)
+(define m2 1)
 (define w 0.5)
 (define h 0.1)
 (define d 0.25)
@@ -35,12 +35,12 @@
 (define inertia2 (inertia-body (cuboid-inertia m2 w h d)))
 
 (define loss 0.6)
-(define mu 0.0)
+(define mu 0.6)
 
-(define dtmax 0.025)
+(define dtmax 0.05)
 (define epsilon (* 0.5 (abs (cadr g)) (* dtmax dtmax)))
 (define ve (sqrt (* 2 (abs (cadr g)) epsilon)))
-(define max-depth 5)
+(define max-depth 10)
 
 (define g '(0 0 0))
 (define speed-scale 0.3)
