@@ -1,5 +1,8 @@
 # TODO
 
+* gear physics
+* OpenGL, 3DS
+* quaternion, state vectors
 * compute forces of zero-mass spring damper gears
 * cockpit: frontal and side view of moon lander
 * XBox controller

@@ -40,7 +40,7 @@
 (define dtmax 0.025)
 (define epsilon (* 0.5 (abs (cadr g)) (* dtmax dtmax)))
 (define ve (sqrt (* 2 (abs (cadr g)) epsilon)))
-(define max-depth 10)
+(define max-depth 5)
 
 (define g '(0 0 0))
 (define speed-scale 0.3)
@@ -85,7 +85,7 @@
   (show state2)
   (swap-buffers))
 
-(define* (timestep state1 state2 dt #:optional (recursion 1) (dold -100))
+(define* (timestep state1 state2 dt #:optional (recursion 1))
   (let [(update1 (runge-kutta state1 dt (state-change inertia1 g)))
         (update2 (runge-kutta state2 dt (state-change inertia2 g)))]
     (let* [(closest (gjk-algorithm (map (cut particle-position update1 <>) corners)
@@ -93,9 +93,9 @@
            (d       (- (norm (-(car closest) (cdr closest)))))]
       (if (>= d (* -2 epsilon))
         (if (or (<= d (- epsilon)) (>= recursion max-depth))
-          (collision update1 update2 m1 m2 inertia1 inertia2 closest loss mu ve)
+          (begin (format #t "recursion ~a~&" recursion) (collision update1 update2 m1 m2 inertia1 inertia2 closest loss mu ve))
           (let [(update (timestep state1 state2 (/ dt 2) (1+ recursion)))]
-            (timestep (car update) (cdr update) (/ dt 2) (1+ recursion) d)))
+            (timestep (car update) (cdr update) (/ dt 2) (1+ recursion))))
         (cons update1 update2)))))
 
 (define (on-idle)

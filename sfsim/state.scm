@@ -59,7 +59,7 @@
          (impulse-vector (collision-impulse speed-delta mass-a mass-b inertia-a inertia-b
                                             (orientation state-a) (orientation state-b) radius-a radius-b))]
     (if (< (inner-product normal relative-speed) 0)
-      (begin (format #t "normal ~a~&" normal)
+      (begin (format #t "closest ~a~&" (norm (- (car closest) (cdr closest))))
       (cons (make-state (position state-a)
                         (+ (speed state-a) (* (/ 1 mass-a) impulse-vector))
                         (quaternion-normalize (orientation state-a))
