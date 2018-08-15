@@ -85,18 +85,17 @@
   (show state2)
   (swap-buffers))
 
-(define* (timestep state1 state2 dt #:optional (recursion 1))
+(define* (timestep state1 state2 dt #:optional (recursion 0))
   (let [(update1 (runge-kutta state1 dt (state-change inertia1 g)))
         (update2 (runge-kutta state2 dt (state-change inertia2 g)))]
     (let* [(closest  (gjk-algorithm (map (cut particle-position update1 <>) corners)
                                     (map (cut particle-position update2 <>) corners)))
            (distance (norm (-(car closest) (cdr closest))))]
-      (if (<= distance (* 2 epsilon))
+      (if (and (eqv? recursion 0) (>= distance epsilon))
+        (cons update1 update2)
         (if (or (>= distance epsilon) (>= recursion max-depth))
           (collision update1 update2 m1 m2 inertia1 inertia2 closest loss mu ve)
-          (let [(update (timestep state1 state2 (/ dt 2) (1+ recursion)))]
-            (timestep (car update) (cdr update) (/ dt 2) (1+ recursion))))
-        (cons update1 update2)))))
+          (timestep state1 state2 (/ dt 2) (1+ recursion)))))))
 
 (define (on-idle)
   (let [(dt (min dtmax (elapsed time #t)))]
