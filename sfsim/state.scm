@@ -4,9 +4,9 @@
   #:use-module (sfsim physics)
   #:use-module (sfsim quaternion)
   #:use-module (sfsim linear-algebra)
-  #:export (make-state position speed orientation angular-momentum <state>
+  #:export (make-state orientation angular-momentum <state>
             state-change collision)
-  #:re-export (+ * particle-position particle-speed))
+  #:re-export (+ * particle-position particle-speed position speed))
 
 
 (define-class <state> (<object>)

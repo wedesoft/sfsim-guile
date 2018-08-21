@@ -155,4 +155,14 @@
   (test-equal "Rotational component in second object"
     '(0.5 0.0 0.0) (collision-impulse '(1.0 0.0 0.0) 5.9742e+24 1.0 inertia inertia 1 1 '(1 0 0) '(0 -1 0))))
 
+(test-group "spring"
+  (test-equal "elongation of spring"
+    3 (position (make-spring 3 2)))
+  (test-equal "speed of spring"
+    2 (speed (make-spring 3 2)))
+  (test-equal "position change of spring is speed"
+    2 (position ((spring-change 12 6 2) (make-spring 3 2))))
+  (test-equal "speed change depends on elongation of spring"
+    -30 (speed ((spring-change 12 6 2) (make-spring 5 0)))))
+
 (test-end "sfsim physics")

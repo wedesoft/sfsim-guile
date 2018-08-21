@@ -9,7 +9,8 @@
   #:use-module (sfsim quaternion)
   #:export (clock elapsed cuboid-inertia runge-kutta inertia-body angular-velocity
             particle-position particle-speed deflect support-point center-of-gravity
-            closest-simplex-points gjk-algorithm collision-impulse))
+            closest-simplex-points gjk-algorithm collision-impulse
+            make-spring position speed spring-change))
 
 
 (define (clock)
@@ -107,3 +108,15 @@
                           (inner-product direction (cross-product (dot (inverse (inertia-b orientation-b))
                                                                   (cross-product radius-b direction)) radius-b)))))]
     (* impulse direction)))
+
+(define-class <spring> (<object>)
+              (position #:init-keyword #:position #:getter position)
+              (speed    #:init-keyword #:speed    #:getter speed   ))
+
+(define (make-spring position speed)
+  (make <spring> #:position position #:speed speed))
+
+(define ((spring-change strength damping mass) spring)
+  (make-spring (speed spring)
+               (- (+ (* (position spring) (/ strength mass))
+                     (* (speed spring) (/ damping mass))))))
