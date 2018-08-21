@@ -81,7 +81,7 @@
     (while #t
       (let* [(direction  (- (car closest) (cdr closest)))
              (candidates (cons (support-point (- direction) convex-a) (support-point direction convex-b)))]
-        (if (>= (+ (inner-product direction (- direction)) 1e-12) (inner-product (- (car candidates) (cdr candidates)) (- direction)))
+        (if (>= (+ (inner-product direction (- direction)) 1e-9) (inner-product (- (car candidates) (cdr candidates)) (- direction)))
           (break closest))
         (let [(result (closest-simplex-points (cons (car candidates) simplex-a) (cons (cdr candidates) simplex-b)))]
           (set! closest (car result))
