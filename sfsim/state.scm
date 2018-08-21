@@ -16,7 +16,11 @@
               (angular-momentum #:init-keyword #:angular-momentum #:getter angular-momentum))
 
 (define (make-state position speed orientation angular-momentum)
-  (make <state> #:position position #:speed speed #:orientation orientation #:angular-momentum angular-momentum))
+  (make <state>
+        #:position         position
+        #:speed            speed
+        #:orientation      orientation
+        #:angular-momentum angular-momentum))
 
 (define-method (* (state <state>) (scalar <real>))
   (make-state (* (position         state) scalar)

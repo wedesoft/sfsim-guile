@@ -22,7 +22,7 @@
 (define time #f)
 (define main-window #f)
 
-(define state1 (make-state '(0 0.3 0) '(0 -0.1 0) (quaternion-rotation 0 '(1 0 0)) '(0.0 0.0 0.0)))
+(define state1 (make-state '(0 0.3 0) '(0 -0.1 0) (quaternion-rotation 0 '(1 0 0)) '(0.0 0.1 0.1)))
 (define state2 (make-state '(0 -0.3 0) '(0 0.0 0) (quaternion-rotation 0 '(0 0 1)) '(0.0 0.0 0.0)))
 (define g '(0 -0.5 0))
 
@@ -42,7 +42,6 @@
 (define ve (sqrt (* 2 (abs (cadr g)) epsilon)))
 (define max-depth 20)
 
-(define g '(0 0 0))
 (define speed-scale 0.3)
 
 (define w2 (/ w 2))
@@ -90,7 +89,7 @@
 
 (define* (timestep state1 state2 dt #:optional (recursion 0))
   (let [(update1 (runge-kutta state1 dt (state-change inertia1 g)))
-        (update2 (runge-kutta state2 dt (state-change inertia2 g)))]
+        (update2 (runge-kutta state2 dt (state-change inertia2 '(0 0 0))))]
     (let* [(closest  (gjk-algorithm (map (cut particle-position update1 <>) corners1)
                                     (map (cut particle-position update2 <>) corners2)))
            (distance       (norm (- (car closest) (cdr closest))))]
