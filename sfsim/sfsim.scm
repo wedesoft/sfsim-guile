@@ -22,8 +22,8 @@
 (define time #f)
 (define main-window #f)
 
-(define state1 (make-state '(0 0.2 0) '(0 -0.2 0) (quaternion-rotation 0 '(1 0 0)) '(0.0 0.0 0.0)))
-(define state2 (make-state '(0 -0.2 0) '(0 0.0 0) (quaternion-rotation 0 '(1 0 0)) '(0.0 0.0 0.0)))
+(define state1 (make-state '(0 0.3 0) '(0 -0.2 0) (quaternion-rotation 0 '(1 0 0)) '(0.0 0.1 0.0)))
+(define state2 (make-state '(0 -0.3 0) '(0 0.0 0) (quaternion-rotation 0.2 '(0 0 1)) '(0.0 0.0 0.0)))
 (define g '(0 -0.5 0))
 
 (define m1 1)
@@ -40,7 +40,7 @@
 (define dtmax 0.05)
 (define epsilon (* 0.5 (abs (cadr g)) (* dtmax dtmax)))
 (define ve (sqrt (* 2 (abs (cadr g)) epsilon)))
-(define max-depth 10)
+(define max-depth 20)
 
 (define g '(0 0 0))
 (define speed-scale 0.3)
@@ -93,7 +93,11 @@
         (update2 (runge-kutta state2 dt (state-change inertia2 g)))]
     (let* [(closest  (gjk-algorithm (map (cut particle-position update1 <>) corners1)
                                     (map (cut particle-position update2 <>) corners2)))
-           (distance (norm (-(car closest) (cdr closest))))]
+           (normal         (- (car closest) (cdr closest)))
+           (distance       (norm normal))
+           (speed-a        (particle-speed inertia1 state1 (car closest)))
+           (speed-b        (particle-speed inertia2 state2 (cdr closest)))
+           (relative-speed (- speed-a speed-b))]
       (if (and (eqv? recursion 0) (>= distance epsilon))
         (cons update1 update2)
         (if (or (>= distance epsilon) (>= recursion max-depth))
