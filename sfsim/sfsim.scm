@@ -22,8 +22,8 @@
 (define time #f)
 (define main-window #f)
 
-(define state1 (make-state '(0 0.3 0) '(0 -0.1 0) (quaternion-rotation 0 '(1 0 0)) '(0.0 0.0 0.0)))
-(define state2 (make-state '(0 -0.3 0) '(0 0.0 0) (quaternion-rotation 0 '(0 0 1)) '(0.0 0.0 0.0)))
+(define state1 (make-state '(0 0.3 0) '(0 -0.1 0) (quaternion-rotation 0 '(1 0 0)) '(0.0 0.1 0.0)))
+(define state2 (make-state '(0 -0.3 0) '(0 0.0 0) (quaternion-rotation 0.2 '(0 0 1)) '(0.0 0.0 0.0)))
 (define g '(0 -0.5 0))
 
 (define m1 1)
@@ -88,8 +88,8 @@
   (swap-buffers))
 
 (define* (timestep state1 state2 dt #:optional (recursion 0))
-  (let [(update1 (runge-kutta state1 dt (state-change inertia1 g)))
-        (update2 (runge-kutta state2 dt (state-change inertia2 '(0 0 0))))]
+  (let [(update1 (runge-kutta state1 dt (state-change m1 inertia1 '(0 0 0))))
+        (update2 (runge-kutta state2 dt (state-change m2 inertia2 '(0 0 0))))]
     (let* [(closest  (gjk-algorithm (map (cut particle-position update1 <>) corners1)
                                     (map (cut particle-position update2 <>) corners2)))
            (distance       (norm (- (car closest) (cdr closest))))]

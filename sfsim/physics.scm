@@ -50,9 +50,9 @@
   "Determine position of a rigid body's particle"
   (+ center (rotate-vector orientation radius-vector)))
 
-(define-method (particle-speed inertia center orientation body-velocity angular-momentum particle-pos)
+(define-method (particle-speed mass inertia center orientation linear-momentum angular-momentum particle-pos)
   "Determine speed of a rigid body's particle"
-  (+ body-velocity (cross-product (angular-velocity inertia orientation angular-momentum) (- particle-pos center))))
+  (+ (* (/ 1 mass) linear-momentum) (cross-product (angular-velocity inertia orientation angular-momentum) (- particle-pos center))))
 
 (define (support-point direction points)
   "Get outermost point of POINTS in given DIRECTION."
@@ -121,9 +121,9 @@
                (- (+ (* (position spring) (/ strength mass))
                      (* (speed spring) (/ damping mass))))))
 
-(define ((apply-linear-impulse mass) speed impulse)
+(define (apply-linear-impulse linear-impulse impulse)
   "Apply speed change"
-  (+ speed (* (/ 1 mass) impulse)))
+  (+ linear-impulse impulse))
 
 (define (apply-rotational-impulse momentum radius impulse)
   "Apply angular momentum change "

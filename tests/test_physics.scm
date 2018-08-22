@@ -76,16 +76,18 @@
 (test-group "speed of a particle"
   (let [(inertia (inertia-body '((1 0 0) (0 1 0) (0 0 1))))]
     (test-equal "Speed of particle on non-rotating object"
-      '(1.0 2.0 3.0) (particle-speed inertia '(0 0 0) (quaternion-rotation 0 '(1 0 0)) '(1 2 3) '(0 0 0) '(0 1 0)))
+      '(1.0 2.0 3.0) (particle-speed 1 inertia '(0 0 0) (quaternion-rotation 0 '(1 0 0)) '(1 2 3) '(0 0 0) '(0 1 0)))
+    (test-equal "Speed of particle on heavier object"
+      '(0.1 0.2 0.3) (particle-speed 10 inertia '(0 0 0) (quaternion-rotation 0 '(1 0 0)) '(1 2 3) '(0 0 0) '(0 1 0)))
     (test-equal "Speed of particle on rotating object"
-      '(0.0 0.0 1.0) (particle-speed inertia '(0 0 0) (quaternion-rotation 0 '(1 0 0)) '(0 0 0) '(1 0 0) '(0 1 0)))
+      '(0.0 0.0 1.0) (particle-speed 1 inertia '(0 0 0) (quaternion-rotation 0 '(1 0 0)) '(0 0 0) '(1 0 0) '(0 1 0)))
     (test-equal "Direction of speed vector depends on center of object"
-      '(0 0 2) (round-vector (particle-speed inertia '(0 -1 0) (quaternion-rotation 0 '(1 0 0)) '(0 0 0) '(1 0 0) '(0 1 0)))))
+      '(0 0 2) (round-vector (particle-speed 1 inertia '(0 -1 0) (quaternion-rotation 0 '(1 0 0)) '(0 0 0) '(1 0 0) '(0 1 0)))))
   (let [(inertia (inertia-body '((2 0 0) (0 0.5 0) (0 0 0.5))))]
     (test-equal "Heavier object rotates more slowly"
-      '(0.0 0.0 0.5) (particle-speed inertia '(0 0 0) (quaternion-rotation 0 '(1 0 0)) '(0 0 0) '(1 0 0) '(0 1 0)))
+      '(0.0 0.0 0.5) (particle-speed 1 inertia '(0 0 0) (quaternion-rotation 0 '(1 0 0)) '(0 0 0) '(1 0 0) '(0 1 0)))
     (test-equal "Speed of rotation depends on orientation of inertia tensor"
-      '(0 0 2) (round-vector (particle-speed inertia '(0 0 0) (quaternion-rotation (/ pi 2) '(0 1 0)) '(0 0 0) '(1 0 0) '(0 1 0))))))
+      '(0 0 2) (round-vector (particle-speed 1 inertia '(0 0 0) (quaternion-rotation (/ pi 2) '(0 1 0)) '(0 0 0) '(1 0 0) '(0 1 0))))))
 
 (test-group "support point"
   (test-equal "First point is outermost point in given direction"
@@ -168,10 +170,10 @@
     -3 (speed ((spring-change 12 6 2) (make-spring 0 1)))))
 
 (test-group "apply impulses"
-  (test-equal "applying an impulse increases speed"
-    8 ((apply-linear-impulse 2) 5 6))
-  (test-equal "applying an impulse to a speed vector"
-    '(8) ((apply-linear-impulse 2) '(5) '(6)))
+  (test-equal "applying an impulse increases momentum"
+    11 (apply-linear-impulse 5 6))
+  (test-equal "applying an impulse to an momentum vector"
+    '(11) (apply-linear-impulse '(5) '(6)))
   (test-equal "rotational impulse with no effect"
     '(2 3 5) (apply-rotational-impulse '(2 3 5) '(1 0 0) '(1 0 0)))
   (test-equal "rotational impulse with lever"
