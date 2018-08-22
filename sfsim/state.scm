@@ -52,7 +52,7 @@
 (define (state-impulse state mass radius impulse)
   "Apply impulse to an object"
   (make-state (position state)
-              ((apply-impulse mass) (speed state) impulse)
+              ((apply-linear-impulse mass) (speed state) impulse)
               (quaternion-normalize (orientation state))
               (apply-rotational-impulse (angular-momentum state) radius impulse)))
 

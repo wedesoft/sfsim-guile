@@ -169,9 +169,9 @@
 
 (test-group "apply impulses"
   (test-equal "applying an impulse increases speed"
-    8 ((apply-impulse 2) 5 6))
+    8 ((apply-linear-impulse 2) 5 6))
   (test-equal "applying an impulse to a speed vector"
-    '(8) ((apply-impulse 2) '(5) '(6)))
+    '(8) ((apply-linear-impulse 2) '(5) '(6)))
   (test-equal "rotational impulse with no effect"
     '(2 3 5) (apply-rotational-impulse '(2 3 5) '(1 0 0) '(1 0 0)))
   (test-equal "rotational impulse with lever"

@@ -10,7 +10,7 @@
   #:export (clock elapsed cuboid-inertia runge-kutta inertia-body angular-velocity
             particle-position particle-speed deflect support-point center-of-gravity
             closest-simplex-points gjk-algorithm collision-impulse
-            make-spring position speed spring-change apply-impulse apply-rotational-impulse))
+            make-spring position speed spring-change apply-linear-impulse apply-rotational-impulse))
 
 
 (define (clock)
@@ -121,7 +121,7 @@
                (- (+ (* (position spring) (/ strength mass))
                      (* (speed spring) (/ damping mass))))))
 
-(define ((apply-impulse mass) speed impulse)
+(define ((apply-linear-impulse mass) speed impulse)
   "Apply speed change"
   (+ speed (* (/ 1 mass) impulse)))
 
