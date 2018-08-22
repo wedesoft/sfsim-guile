@@ -49,12 +49,12 @@
                  (orientation state))
               '(0 0 0)))
 
-(define (apply-impulse state mass radius impulse)
+(define (state-impulse state mass radius impulse)
   "Apply impulse to an object"
   (make-state (position state)
-              (+ (speed state) (* (/ 1 mass) impulse))
+              ((apply-impulse mass) (speed state) impulse)
               (quaternion-normalize (orientation state))
-              (+ (angular-momentum state) (cross-product radius impulse))))
+              (apply-rotational-impulse (angular-momentum state) radius impulse)))
 
 (define (collision state-a state-b mass-a mass-b inertia-a inertia-b closest loss friction micro-speed)
   "Simulate a rigid-body collision"
@@ -67,5 +67,5 @@
          (radius-b       (- (cdr closest) (position state-b)))
          (impulse-vector (collision-impulse speed-delta mass-a mass-b inertia-a inertia-b
                                             (orientation state-a) (orientation state-b) radius-a radius-b))]
-    (cons (apply-impulse state-a mass-a radius-a impulse-vector)
-          (apply-impulse state-b mass-b radius-b (- impulse-vector)))))
+    (cons (state-impulse state-a mass-a radius-a impulse-vector)
+          (state-impulse state-b mass-b radius-b (- impulse-vector)))))

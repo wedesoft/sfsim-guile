@@ -167,4 +167,14 @@
   (test-equal "speed change depends on damping of spring"
     -3 (speed ((spring-change 12 6 2) (make-spring 0 1)))))
 
+(test-group "apply impulses"
+  (test-equal "applying an impulse increases speed"
+    8 ((apply-impulse 2) 5 6))
+  (test-equal "applying an impulse to a speed vector"
+    '(8) ((apply-impulse 2) '(5) '(6)))
+  (test-equal "rotational impulse with no effect"
+    '(2 3 5) (apply-rotational-impulse '(2 3 5) '(1 0 0) '(1 0 0)))
+  (test-equal "rotational impulse with lever"
+    '(2 3 6) (apply-rotational-impulse '(2 3 5) '(1 0 0) '(0 1 0))))
+
 (test-end "sfsim physics")
