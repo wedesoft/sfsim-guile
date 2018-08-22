@@ -22,12 +22,15 @@
 (define time #f)
 (define main-window #f)
 
-(define state1 (make-state '(0 0.3 0) '(0 -0.1 0) (quaternion-rotation 0 '(1 0 0)) '(0.0 0.1 0.0)))
-(define state2 (make-state '(0 -0.3 0) '(0 0.0 0) (quaternion-rotation 0.2 '(0 0 1)) '(0.0 0.0 0.0)))
+(define state1 (make-state '(0 0.3 0) '(0 -0.1 0) (quaternion-rotation 0 '(1 0 0)) '(0.0 0.0 0.0)))
+(define state2 (make-state '(0 -0.3 0) '(0 0.0 0) (quaternion-rotation 0.1 '(0 0 1)) '(0.0 0.0 0.0)))
+(define gear  (make-spring 0.05 0.0))
 (define g '(0 -0.5 0))
 
 (define m1 1)
 (define m2 5.9742e+24)
+(define K 10.0)
+(define D 0.5)
 (define w 0.5)
 (define h 0.1)
 (define d 0.25)
@@ -58,6 +61,9 @@
         (list (- w2) (+ h2) (+ d2))
         (list (+ w2) (+ h2) (+ d2))))
 
+(define gears
+  (list (list 0 (- h) 0)))
+
 (define scale 3)
 (define corners2 (* scale corners1))
 
@@ -77,6 +83,12 @@
     (for-each (lambda (i v) (bytevector-ieee-single-native-set! b (* i 4) v)) (iota (length hom)) hom)
     (set-gl-matrix-mode (matrix-mode modelview))
     (gl-load-matrix b #:transpose #t)
+    (if (eqv? scale 1)
+      (begin
+        (glPointSize 5)
+        (gl-begin (begin-mode points)
+          (gl-color 1 0 1)
+          (gl-vertex (caar gears) (+ (cadar gears) (position gear)) (caddar gears)))))
     (gl-scale (* scale w) (* scale h) (* scale d))
     (gl-color 0 1 0)
     (glut-wire-cube 1.0)))
@@ -87,23 +99,26 @@
   (show state2 scale)
   (swap-buffers))
 
-(define* (timestep state1 state2 dt #:optional (recursion 0))
+(define* (timestep state1 state2 gear dt #:optional (recursion 0))
   (let [(update1 (runge-kutta state1 dt (state-change m1 inertia1 '(0 0 0))))
-        (update2 (runge-kutta state2 dt (state-change m2 inertia2 '(0 0 0))))]
+        (update2 (runge-kutta state2 dt (state-change m2 inertia2 '(0 0 0))))
+        (ugear   (runge-kutta gear dt (spring-change K D 0.1)))]
     (let* [(closest  (gjk-algorithm (map (cut particle-position update1 <>) corners1)
                                     (map (cut particle-position update2 <>) corners2)))
            (distance       (norm (- (car closest) (cdr closest))))]
       (if (and (eqv? recursion 0) (>= distance epsilon))
-        (cons update1 update2)
+        (list update1 update2 ugear)
         (if (or (>= distance epsilon) (>= recursion max-depth))
-          (collision update1 update2 m1 m2 inertia1 inertia2 closest loss mu ve)
-          (timestep state1 state2 (/ dt 2) (1+ recursion)))))))
+          (let [(c (collision update1 update2 m1 m2 inertia1 inertia2 closest loss mu ve))]
+            (list (car c) (cdr c) gear))
+          (timestep state1 state2 gear (/ dt 2) (1+ recursion)))))))
 
 (define (on-idle)
   (let [(dt (min dtmax (elapsed time #t)))]
-    (let [(update (timestep state1 state2 dt))]
-      (set! state1 (car update))
-      (set! state2 (cdr update)))
+    (let [(update (timestep state1 state2 gear dt))]
+      (set! state1 (car   update))
+      (set! state2 (cadr  update))
+      (set! gear   (caddr update)))
     (post-redisplay)))
 
 (initialize-glut (program-arguments) #:window-size '(640 . 480) #:display-mode (display-mode rgb double))

@@ -18,7 +18,7 @@
   (test-equal "angular momentum of state"
     '(0.1 0.2 0.3) (angular-momentum s)))
 
-(test-group "scalar multiplication"
+(test-group "scalar multiplication for state"
   (test-equal "multiply position"
     '(4 6 10) (position (* s 2)))
   (test-equal "multiply linear momentum"

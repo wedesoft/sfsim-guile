@@ -163,11 +163,11 @@
   (test-equal "speed of spring"
     2 (speed (make-spring 3 2)))
   (test-equal "position change of spring is speed"
-    2 (position ((spring-change 12 6 2) (make-spring 3 2))))
+    2 (position ((spring-change 12 6 2) (make-spring 3 2) 0)))
   (test-equal "speed change depends on elongation of spring"
-    -30 (speed ((spring-change 12 6 2) (make-spring 5 0))))
+    -30 (speed ((spring-change 12 6 2) (make-spring 5 0) 0)))
   (test-equal "speed change depends on damping of spring"
-    -3 (speed ((spring-change 12 6 2) (make-spring 0 1)))))
+    -3 (speed ((spring-change 12 6 2) (make-spring 0 1) 0))))
 
 (test-group "apply impulses"
   (test-equal "applying an impulse increases momentum"
@@ -178,5 +178,19 @@
     '(2 3 5) (apply-rotational-impulse '(2 3 5) '(1 0 0) '(1 0 0)))
   (test-equal "rotational impulse with lever"
     '(2 3 6) (apply-rotational-impulse '(2 3 5) '(1 0 0) '(0 1 0))))
+
+(define s (make-spring 2 3))
+(test-group "scalar multiplication for spring"
+  (test-equal "multiply position"
+    10 (position (* s 5)))
+  (test-equal "multiply speed"
+    15 (speed (* s 5))))
+
+(define s2 (make-spring 5 7))
+(test-group "add springs"
+  (test-equal "add positions"
+    7 (position (+ s s2)))
+  (test-equal "add speeds"
+    10 (speed (+ s s2))))
 
 (test-end "sfsim physics")
