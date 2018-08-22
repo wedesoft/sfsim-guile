@@ -22,7 +22,7 @@
 (define time #f)
 (define main-window #f)
 
-(define state1 (make-state '(0 0.3 0) '(0 -0.1 0) (quaternion-rotation 0 '(1 0 0)) '(0.0 0.1 0.1)))
+(define state1 (make-state '(0 0.3 0) '(0 -0.1 0) (quaternion-rotation 0 '(1 0 0)) '(0.0 0.0 0.0)))
 (define state2 (make-state '(0 -0.3 0) '(0 0.0 0) (quaternion-rotation 0 '(0 0 1)) '(0.0 0.0 0.0)))
 (define g '(0 -0.5 0))
 

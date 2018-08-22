@@ -163,6 +163,8 @@
   (test-equal "position change of spring is speed"
     2 (position ((spring-change 12 6 2) (make-spring 3 2))))
   (test-equal "speed change depends on elongation of spring"
-    -30 (speed ((spring-change 12 6 2) (make-spring 5 0)))))
+    -30 (speed ((spring-change 12 6 2) (make-spring 5 0))))
+  (test-equal "speed change depends on damping of spring"
+    -3 (speed ((spring-change 12 6 2) (make-spring 0 1)))))
 
 (test-end "sfsim physics")

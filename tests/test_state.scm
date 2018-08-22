@@ -88,14 +88,14 @@
   (test-equal "stop first object"
     '(0.0 0.0 -1.0) (speed (car (collision s1 s2 light heavy inertia-a inertia-b ca 1.0 0.0 0.1))))
   (test-equal "Deflect second object"
-    '(-0.0 -0.0 3.0) (speed (cdr (collision s1 s2 heavy light inertia-a inertia-b ca 0.0 0.0 0.1))))
+    '(0.0 0.0 3.0) (speed (cdr (collision s1 s2 heavy light inertia-a inertia-b ca 0.0 0.0 0.1))))
   (test-equal "Spin first object"
     '(0.0 1.0 0.0) (angular-momentum (car (collision s1 s2 light heavy inertia-a inertia-b cb 0.0 0.0 0.1))))
   (test-equal "Spin second object"
-    '(-0.0 -1.0 -0.0) (angular-momentum (cdr (collision s1 s2 heavy light inertia-a inertia-b cb 0.0 0.0 0.1))))
+    '(0.0 -1.0 0.0) (angular-momentum (cdr (collision s1 s2 heavy light inertia-a inertia-b cb 0.0 0.0 0.1))))
   (test-equal "Change spin of first object"
     '(0.0 1.5 0.0) (angular-momentum (car (collision s3 s4 light heavy inertia-a inertia-b cb 0.0 0.0 0.1))))
   (test-equal "Change spin of second object"
-    '(-0.0 -1.5 -0.0) (angular-momentum (cdr (collision s3 s4 heavy light inertia-a inertia-b cb 0.0 0.0 0.1)))))
+    '(0.0 -1.5 0.0) (angular-momentum (cdr (collision s3 s4 heavy light inertia-a inertia-b cb 0.0 0.0 0.1)))))
 
 (test-end "sfsim state")
