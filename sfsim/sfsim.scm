@@ -22,13 +22,14 @@
 (define time #f)
 (define main-window #f)
 
-(define state1 (make-state '(0 0.3 0) '(0 -0.1 0) (quaternion-rotation 0 '(1 0 0)) '(0.0 0.0 0.0)))
-(define state2 (make-state '(0 -0.3 0) '(0 0.0 0) (quaternion-rotation 0.1 '(0 0 1)) '(0.0 0.0 0.0)))
+(define state1 (make-state '(0 0.3 0) '(0 -0.2 0) (quaternion-rotation 0 '(1 0 0)) '(0.0 0.0 0.0)))
+(define state2 (make-state '(0 -0.3 0) '(0 0.0 0) (quaternion-rotation 0 '(0 0 1)) '(0.0 0.0 0.0)))
 (define gear  (make-spring 0.05 0.0))
 (define g '(0 -0.5 0))
 
 (define m1 1)
 (define m2 5.9742e+24)
+(define mg 0.05)
 (define K 10.0)
 (define D 0.5)
 (define w 0.5)
@@ -88,7 +89,7 @@
         (glPointSize 5)
         (gl-begin (begin-mode points)
           (gl-color 1 0 1)
-          (gl-vertex (caar gears) (+ (cadar gears) (position gear)) (caddar gears)))))
+          (apply gl-vertex (+ (car gears) (list 0 (position gear) 0))))))
     (gl-scale (* scale w) (* scale h) (* scale d))
     (gl-color 0 1 0)
     (glut-wire-cube 1.0)))
@@ -105,12 +106,17 @@
         (ugear   (runge-kutta gear dt (spring-change K D 0.1)))]
     (let* [(closest  (gjk-algorithm (map (cut particle-position update1 <>) corners1)
                                     (map (cut particle-position update2 <>) corners2)))
-           (distance       (norm (- (car closest) (cdr closest))))]
-      (if (and (eqv? recursion 0) (>= distance epsilon))
+           (distance       (norm (- (car closest) (cdr closest))))
+           (closestg (gjk-algorithm (list (particle-position update1 (+ (car gears) (list 0 (position ugear) 0))))
+                                    (map (cut particle-position update2 <>) corners2)))
+           (distanceg      (norm (- (car closestg) (cdr closestg))))]
+      (if (and (eqv? recursion 0) (>= (min distance distanceg) epsilon))
         (list update1 update2 ugear)
-        (if (or (>= distance epsilon) (>= recursion max-depth))
-          (let [(c (collision update1 update2 m1 m2 inertia1 inertia2 closest loss mu ve))]
-            (list (car c) (cdr c) gear))
+        (if (or (>= (min distance distanceg) epsilon) (>= recursion max-depth))
+          (if (<= distance distanceg)
+            (let [(c (collision update1 update2 m1 m2 inertia1 inertia2 closest loss mu ve))]
+              (list (car c) (cdr c) gear))
+            (begin (format #t "~a~&" (speed ugear)) (list update1 update2 (make-spring (position ugear) (- 0.4 (speed ugear))))))
           (timestep state1 state2 gear (/ dt 2) (1+ recursion)))))))
 
 (define (on-idle)
