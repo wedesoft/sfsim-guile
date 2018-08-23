@@ -122,14 +122,6 @@
                (- (+ (* (position spring) (/ strength mass))
                      (* (speed spring) (/ damping mass))))))
 
-(define (apply-linear-impulse linear-impulse impulse)
-  "Apply speed change"
-  (+ linear-impulse impulse))
-
-(define (apply-rotational-impulse momentum radius impulse)
-  "Apply angular momentum change "
-  (+ momentum (cross-product radius impulse)))
-
 (define-method (* (spring <spring>) (scalar <real>))
   (make-spring (* (position spring) scalar)
                (* (speed spring) scalar)))
@@ -137,3 +129,11 @@
 (define-method (+ (spring <spring>) (dspring <spring>))
   (make-spring (+ (position spring) (position dspring))
                (+ (speed spring) (speed dspring))))
+
+(define (apply-linear-impulse linear-impulse impulse)
+  "Apply speed change"
+  (+ linear-impulse impulse))
+
+(define (apply-rotational-impulse momentum radius impulse)
+  "Apply angular momentum change "
+  (+ momentum (cross-product radius impulse)))
