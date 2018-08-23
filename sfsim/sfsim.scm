@@ -12,7 +12,6 @@
              (sfsim linear-algebra)
              (sfsim physics)
              (sfsim quaternion)
-             (sfsim state)
              (sfsim util))
 
 
