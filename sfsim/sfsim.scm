@@ -21,8 +21,8 @@
 (define time #f)
 (define main-window #f)
 
-(define state1 (make-state '(0 0.3 0) '(0 -0.2 0) (quaternion-rotation 0 '(1 0 0)) '(0.0 0.0 0.0)))
-(define state2 (make-state '(0 -0.3 0) '(0 0.0 0) (quaternion-rotation 0 '(0 0 1)) '(0.0 0.0 0.0)))
+(define state1 (make-state '(0 0.3 0) '(0 0 0) (quaternion-rotation 0 '(1 0 0)) '(0.0 0.0 0.0)))
+(define state2 (make-state '(0 -0.3 0) '(0 0 0) (quaternion-rotation 0 '(0 0 1)) '(0.0 0.0 0.0)))
 (define gear  (make-spring 0.05 0.0))
 (define g '(0 -0.5 0))
 
@@ -30,7 +30,7 @@
 (define m2 5.9742e+24)
 (define mg 0.05)
 (define K 10.0)
-(define D 0.5)
+(define D 0.1)
 (define w 0.5)
 (define h 0.1)
 (define d 0.25)
@@ -109,17 +109,12 @@
         (update2 (runge-kutta state2 dt (state-change m2 inertia2 '(0 0 0))))
         (ugear   (runge-kutta gear dt (spring-change K D 0.1)))]
     (let* [(closest  (gjk-algorithm (body1 update1) (body2 update2)))
-           (distance       (norm (- (car closest) (cdr closest))))
-           (closestg (gjk-algorithm (list (particle-position update1 (+ (car gears) (list 0 (position ugear) 0))))
-                                    (map (cut particle-position update2 <>) corners2)))
-           (distanceg      (norm (- (car closestg) (cdr closestg))))]
-      (if (and (eqv? recursion 0) (>= (min distance distanceg) epsilon))
+           (distance       (norm (- (car closest) (cdr closest))))]
+      (if (and (eqv? recursion 0) (>= distance epsilon))
         (list update1 update2 ugear)
-        (if (or (>= (min distance distanceg) epsilon) (>= recursion max-depth))
-          (if (<= distance distanceg)
-            (let [(c (collision update1 update2 m1 m2 inertia1 inertia2 closest loss mu ve))]
-              (list (car c) (cdr c) gear))
-            (begin (format #t "~a~&" (speed ugear)) (list update1 update2 (make-spring (position ugear) (- 0.4 (speed ugear))))))
+        (if (or (>= distance epsilon) (>= recursion max-depth))
+          (let [(c (collision update1 update2 m1 m2 inertia1 inertia2 closest loss mu ve))]
+            (list (car c) (cdr c) gear))
           (timestep state1 state2 gear (/ dt 2) (1+ recursion)))))))
 
 (define (on-idle)

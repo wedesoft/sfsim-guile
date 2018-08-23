@@ -7,11 +7,13 @@
   #:use-module (sfsim util)
   #:use-module (sfsim linear-algebra)
   #:use-module (sfsim quaternion)
-  #:export (clock elapsed cuboid-inertia runge-kutta inertia-body angular-velocity
+  #:export (<spring> <state> <lander>
+            clock elapsed cuboid-inertia runge-kutta inertia-body angular-velocity
             particle-position particle-positions particle-speed deflect support-point center-of-gravity
             closest-simplex-points gjk-algorithm collision-impulse
             make-spring position speed spring-change apply-linear-impulse apply-rotational-impulse
-            make-state orientation linear-momentum angular-momentum state-change collision)
+            make-state orientation linear-momentum angular-momentum state-change collision
+            make-lander state gears)
   #:re-export (+ *))
 
 
@@ -205,3 +207,10 @@
                                             (orientation state-a) (orientation state-b) radius-a radius-b))]
     (cons (state-impulse state-a mass-a radius-a impulse-vector)
           (state-impulse state-b mass-b radius-b (- impulse-vector)))))
+
+(define-class <lander> (<object>)
+              (state #:init-keyword #:state #:getter state)
+              (gears #:init-keyword #:gears #:getter gears))
+
+(define (make-lander state . gears)
+  (make <lander> #:state state #:gears gears))

@@ -286,4 +286,13 @@
   (test-equal "Change spin of second object"
     '(0.0 -1.0 0.0) (angular-momentum (cdr (collision s3 s4 heavy light inertia-a inertia-b cb 0.0 0.0 0.1)))))
 
+(define l (make-lander (make-state '(2 3 5) '(0 0 1) 1 '(0 0 0)) (cons '(0 0 2) (make-spring 2 3))))
+(test-group "structure for lander"
+  (test-equal "Position of main body"
+    '(2 3 5) (position (state l)))
+  (test-equal "Mount point of gear"
+    '(0 0 2) (caar (gears l)))
+  (test-eqv "Position of gear"
+    2 (position (cdar (gears l)))))
+
 (test-end "sfsim physics")
