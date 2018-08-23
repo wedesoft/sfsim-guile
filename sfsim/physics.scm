@@ -8,7 +8,7 @@
   #:use-module (sfsim linear-algebra)
   #:use-module (sfsim quaternion)
   #:export (clock elapsed cuboid-inertia runge-kutta inertia-body angular-velocity
-            particle-position particle-speed deflect support-point center-of-gravity
+            particle-position particle-positions particle-speed deflect support-point center-of-gravity
             closest-simplex-points gjk-algorithm collision-impulse
             make-spring position speed spring-change apply-linear-impulse apply-rotational-impulse
             make-state orientation linear-momentum angular-momentum state-change collision)
@@ -118,10 +118,13 @@
 (define (make-spring position speed)
   (make <spring> #:position position #:speed speed))
 
+(define (spring-force spring strength damping)
+  "Determine force of spring-damper system depending on its position and speed"
+  (- (+ (* (position spring) strength) (* (speed spring) damping))))
+
 (define ((spring-change strength damping mass) spring dt)
-  (make-spring (speed spring)
-               (- (+ (* (position spring) (/ strength mass))
-                     (* (speed spring) (/ damping mass))))))
+  "Derivative of spring-damper system's state"
+  (make-spring (speed spring) (/ (spring-force spring strength damping) mass)))
 
 (define-method (* (spring <spring>) (scalar <real>))
   (make-spring (* (position spring) scalar)
@@ -167,6 +170,9 @@
 (define-method (particle-position state corner)
   "Rotated and translated position of particle"
   (particle-position (position state) (orientation state) corner))
+
+(define ((particle-positions corners) state)
+  (map (cut particle-position state <>) corners))
 
 (define-method (particle-speed mass inertia state particle-pos)
   "Speed of particle taking into account rotation of object"

@@ -61,11 +61,16 @@
         (list (- w2) (+ h2) (+ d2))
         (list (+ w2) (+ h2) (+ d2))))
 
+(define body1 (particle-positions corners1))
+
 (define gears
   (list (list 0 (- h) 0)))
 
 (define scale 3)
+
 (define corners2 (* scale corners1))
+
+(define body2 (particle-positions corners2))
 
 (define (on-reshape width height)
   (let* [(aspect (/ width height))
@@ -103,8 +108,7 @@
   (let [(update1 (runge-kutta state1 dt (state-change m1 inertia1 '(0 0 0))))
         (update2 (runge-kutta state2 dt (state-change m2 inertia2 '(0 0 0))))
         (ugear   (runge-kutta gear dt (spring-change K D 0.1)))]
-    (let* [(closest  (gjk-algorithm (map (cut particle-position update1 <>) corners1)
-                                    (map (cut particle-position update2 <>) corners2)))
+    (let* [(closest  (gjk-algorithm (body1 update1) (body2 update2)))
            (distance       (norm (- (car closest) (cdr closest))))
            (closestg (gjk-algorithm (list (particle-position update1 (+ (car gears) (list 0 (position ugear) 0))))
                                     (map (cut particle-position update2 <>) corners2)))

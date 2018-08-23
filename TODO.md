@@ -1,6 +1,7 @@
 # TODO
 
 * gear physics
+* state -> body
 * OpenGL, 3DS
 * quaternion, state vectors
 * compute forces of zero-mass spring damper gears

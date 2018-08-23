@@ -232,7 +232,9 @@
   (test-equal "position of particle"
     '(3.0 5.0 8.0) (particle-position s1 '(1 2 3)))
   (test-equal "speed of particle"
-    '(0.0 0.0 1.0) (particle-speed 1 inertia s2 '(0 1 0))))
+    '(0.0 0.0 1.0) (particle-speed 1 inertia s2 '(0 1 0)))
+  (test-equal "position of multiple particles"
+    '((3.0 5.0 8.0) (4.0 6.0 10.0)) ((particle-positions '((1 2 3) (2 3 5))) s1)))
 
 (define s (make-state '(2 3 5) '(0.2 0.3 0.5) 1.0 '(0.1 0.2 0.3)))
 (define s2 (make-state '(2 3 5) '(0.2 0.3 0.5) -1.0 '(0.1 0.2 0.3)))
