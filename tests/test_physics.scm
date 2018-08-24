@@ -325,6 +325,6 @@
   (test-equal "rotate gear forces correctly"
     '(0.0 -48.0 0.0) (linear-momentum (state ((lander-change 3 inertia '(0 0 0) 12 6 2 '(0 0 0)) l2 0))))
   (test-equal "introduce rotational moment"
-    '(0 0 0) (angular-momentum (state ((lander-change 3 inertia '(0 0 0) 12 6 2 '(0 0 0)) l2 0)))))
+    '(0.0 0.0 -96.0) (angular-momentum (state ((lander-change 3 inertia '(0 0 0) 12 6 2 '(2 0 0)) l2 0)))))
 
 (test-end "sfsim physics")

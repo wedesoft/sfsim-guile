@@ -36,6 +36,7 @@
 (define w 0.5)
 (define h 0.1)
 (define d 0.25)
+(define gear-pos (list (/ w 2) (- h) 0))
 (define inertia1 (inertia-body (cuboid-inertia m1 w h d)))
 (define inertia2 (inertia-body (cuboid-inertia m2 w h d)))
 
@@ -90,7 +91,7 @@
     (glPointSize 5)
     (gl-begin (begin-mode points)
       (gl-color 1 0 1)
-      (apply gl-vertex (+ (list 0 (- h) 0) (list 0 (position (car (gears lander))) 0))))
+      (apply gl-vertex (+ gear-pos (list 0 (position (car (gears lander))) 0))))
     (gl-scale w h d)
     (gl-color 0 1 0)
     (glut-wire-cube 1.0)))
@@ -113,7 +114,7 @@
   (swap-buffers))
 
 (define* (timestep lander1 state2 gear dt #:optional (recursion 0))
-  (let [(update1 (runge-kutta lander1 dt (lander-change m1 inertia1 '(0 0 0) K D 0.1 '(0 0 0))))
+  (let [(update1 (runge-kutta lander1 dt (lander-change m1 inertia1 '(0 0 0) K D 0.1 gear-pos)))
         (update2 (runge-kutta state2 dt (state-change m2 inertia2 '(0 0 0) '(0 0 0))))]
     (let* [(closest  (gjk-algorithm (body1 (state update1)) (body2 update2)))
            (distance       (norm (- (car closest) (cdr closest))))]

@@ -1,6 +1,6 @@
 # TODO
 
-* rotational moments introduced by gears
+* rotate rotational moments
 * display body with gears
 * influence of gear on main body
 * state -> body
