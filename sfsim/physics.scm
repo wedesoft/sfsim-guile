@@ -218,3 +218,9 @@
 (define ((lander-change mass inertia acceleration strength damping gear-mass) self dt)
   (apply make-lander ((state-change mass inertia acceleration) (state self) dt)
                      (map (cut (spring-change strength damping gear-mass) <> dt) (gears self))))
+
+(define-method (* (self <lander>) (scalar <real>))
+  (apply make-lander (* (state self) scalar) (map (cut * <> scalar) (gears self))))
+
+(define-method (+ (lander <lander>) (dlander <lander>))
+  (apply make-lander (+ (state lander) (state dlander)) (map + (gears lander) (gears dlander))))

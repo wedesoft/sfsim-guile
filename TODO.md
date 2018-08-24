@@ -1,6 +1,5 @@
 # TODO
 
-* lander change
 * differential of gear
 * display body with gears
 * influence of gear on main body

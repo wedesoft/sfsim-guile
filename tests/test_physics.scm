@@ -298,4 +298,19 @@
   (test-eqv "state change of gears"
     2 (position (car (gears ((lander-change 2 inertia '(0 0 0) 12 6 2) l 0))))))
 
+(define l (make-lander (make-state '(2 3 5) '(0 0 1.0) 1 '(0 0 0)) (make-spring 3 2)))
+(test-group "scalar multiplication of lander state"
+  (test-equal "multiply position of main body"
+    '(4 6 10) (position (state (* l 2))))
+  (test-equal "multiply position of gear"
+    6 (position (car (gears (* l 2))))))
+
+(define l1 (make-lander (make-state '(2 3 5) '(0 0 1.0) 1 '(0 0 0)) (make-spring 3 2)))
+(define l2 (make-lander (make-state '(3 5 7) '(0 0 1.0) 1 '(0 0 0)) (make-spring 7 5)))
+(test-group "add lander states"
+  (test-equal "add positions of main bodies"
+    '(5 8 12) (position (state (+ l1 l2))))
+  (test-equal "add posoitions of gears"
+    10 (position (car (gears (+ l1 l2))))))
+
 (test-end "sfsim physics")
