@@ -180,12 +180,12 @@
   "Speed of particle taking into account rotation of object"
   (particle-speed mass inertia (position state) (orientation state) (linear-momentum state) (angular-momentum state) particle-pos))
 
-(define ((state-change mass inertia force_) state dt)
+(define ((state-change mass inertia force_ moment) state dt)
   (make-state (* (/ 1 mass) (linear-momentum state))
               force_
               (* (vector->quaternion (* 0.5 (angular-velocity inertia (orientation state) (angular-momentum state))))
                  (orientation state))
-              '(0 0 0)))
+              moment))
 
 (define (state-impulse state mass radius impulse)
   "Apply impulse to an object"
@@ -219,7 +219,7 @@
   (let [(forces (map (lambda (gear) (rotate-vector (orientation (state self))
                                                    (list 0 (- (spring-force gear strength damping)) 0)))
                      (gears self)))]
-    (apply make-lander ((state-change mass inertia (fold + force_ forces)) (state self) dt)
+    (apply make-lander ((state-change mass inertia (fold + force_ forces) '(0 0 0)) (state self) dt)
                        (map (cut (spring-change strength damping gear-mass) <> dt) (gears self)))))
 
 (define-method (* (self <lander>) (scalar <real>))
