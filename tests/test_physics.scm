@@ -240,21 +240,21 @@
 (define s2 (make-state '(2 3 5) '(0.2 0.3 0.5) -1.0 '(0.1 0.2 0.3)))
 (define inertia (inertia-body '((1 0 0) (0 1 0) (0 0 1))))
 (define inertia2 (inertia-body '((0.5 0 0) (0 0.5 0) (0 0 0.5))))
-(define acceleration '(0 -10 0))
+(define force_ '(0 -10 0))
 (define torque '(0 -10 0))
 (test-group "time derivative of state"
   (test-equal "derivative of position is linear momentum divided by mass"
-    '(0.1 0.15 0.25) (position ((state-change 2 inertia acceleration) s 0)))
-  (test-equal "derivative of linear momentum is acceleration times mass"
-    (* 2 acceleration) (linear-momentum ((state-change 2 inertia acceleration) s 0)))
+    '(0.1 0.15 0.25) (position ((state-change 2 inertia force_) s 0)))
+  (test-equal "derivative of linear momentum is force"
+    force_ (linear-momentum ((state-change 2 inertia force_) s 0)))
   (test-equal "derivative of orientation requires computation of angular speed"
-    0.05 (imag-part (orientation ((state-change 2 inertia acceleration) s 0))))
+    0.05 (imag-part (orientation ((state-change 2 inertia force_) s 0))))
   (test-equal "derivative of orientation takes into account inertia"
-    0.1 (imag-part (orientation ((state-change 2 inertia2 acceleration) s 0))))
+    0.1 (imag-part (orientation ((state-change 2 inertia2 force_) s 0))))
   (test-equal "derivative of orientation takes into account orientation"
-    -0.05 (imag-part (orientation ((state-change 2 inertia acceleration) s2 0))))
+    -0.05 (imag-part (orientation ((state-change 2 inertia force_) s2 0))))
   (test-equal "derivative of rotational impulse is zero"
-    '(0 0 0) (angular-momentum ((state-change 2 inertia acceleration) s 0))))
+    '(0 0 0) (angular-momentum ((state-change 2 inertia force_) s 0))))
 
 (define s1 (make-state '(2 3 5) '(0 0  1) 1 '(0 0 0)))
 (define s2 (make-state '(2 3 8) '(0 0 -1) 1 '(0 0 0)))

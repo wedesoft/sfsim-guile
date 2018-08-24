@@ -180,9 +180,9 @@
   "Speed of particle taking into account rotation of object"
   (particle-speed mass inertia (position state) (orientation state) (linear-momentum state) (angular-momentum state) particle-pos))
 
-(define ((state-change mass inertia acceleration) state dt)
+(define ((state-change mass inertia force_) state dt)
   (make-state (* (/ 1 mass) (linear-momentum state))
-              (* acceleration mass)
+              force_
               (* (vector->quaternion (* 0.5 (angular-velocity inertia (orientation state) (angular-momentum state))))
                  (orientation state))
               '(0 0 0)))
@@ -215,8 +215,8 @@
 (define (make-lander state . gears)
   (make <lander> #:state state #:gears gears))
 
-(define ((lander-change mass inertia acceleration strength damping gear-mass) self dt)
-  (apply make-lander ((state-change mass inertia acceleration) (state self) dt)
+(define ((lander-change mass inertia force_ strength damping gear-mass) self dt)
+  (apply make-lander ((state-change mass inertia force_) (state self) dt)
                      (map (cut (spring-change strength damping gear-mass) <> dt) (gears self))))
 
 (define-method (* (self <lander>) (scalar <real>))

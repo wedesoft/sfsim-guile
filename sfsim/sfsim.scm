@@ -112,8 +112,8 @@
   (show-state state2 scale)
   (swap-buffers))
 
-(define* (timestep state1 state2 gear dt #:optional (recursion 0))
-  (let [(update1 (runge-kutta state1 dt (lander-change m1 inertia1 '(0 0 0) K D 0.1)))
+(define* (timestep lander1 state2 gear dt #:optional (recursion 0))
+  (let [(update1 (runge-kutta lander1 dt (lander-change m1 inertia1 '(0 -0.1 0) K D 0.1)))
         (update2 (runge-kutta state2 dt (state-change m2 inertia2 '(0 0 0))))]
     (let* [(closest  (gjk-algorithm (body1 (state update1)) (body2 update2)))
            (distance       (norm (- (car closest) (cdr closest))))]
@@ -122,7 +122,7 @@
         (if (or (>= distance epsilon) (>= recursion max-depth))
           (let [(c (collision (state update1) update2 m1 m2 inertia1 inertia2 closest loss mu ve))]
             (list (apply make-lander (car c) (gears update1)) (cdr c) gear))
-          (timestep state1 state2 gear (/ dt 2) (1+ recursion)))))))
+          (timestep lander1 state2 gear (/ dt 2) (1+ recursion)))))))
 
 (define (on-idle)
   (let [(dt (min dtmax (elapsed time #t)))]
