@@ -24,6 +24,8 @@
 (define state1 (make-state '(0 0.3 0) '(0 0 0) (quaternion-rotation 0 '(1 0 0)) '(0.0 0.0 0.0)))
 (define state2 (make-state '(0 -0.3 0) '(0 0 0) (quaternion-rotation 0 '(0 0 1)) '(0.0 0.0 0.0)))
 (define gear  (make-spring 0.05 0.0))
+(define lander (make-lander state1 (cons '(0 0 2) gear)))
+
 (define g '(0 -0.5 0))
 
 (define m1 1)
