@@ -314,11 +314,14 @@
     10 (position (car (gears (+ l1 l2))))))
 
 (define l (make-lander (make-state '(2 3 5) '(0 0 1.0) 1 '(0 0 0)) (make-spring 3 2)))
+(define l2 (make-lander (make-state '(2 3 5) '(0 0 1.0) +i '(0 0 0)) (make-spring 3 2)))
 (define inertia (inertia-body '((0.5 0 0) (0 0.5 0) (0 0 0.5))))
 (test-group "gears of lander"
   (test-equal "gear exerts force on lander"
     '(0 48 0) (linear-momentum (state ((lander-change 3 inertia '(0 0 0) 12 6 2) l 0))))
   (test-equal "add external forces"
-    '(2 48 3) (linear-momentum (state ((lander-change 3 inertia '(2 0 3) 12 6 2) l 0)))))
+    '(2 48 3) (linear-momentum (state ((lander-change 3 inertia '(2 0 3) 12 6 2) l 0))))
+  (test-equal "rotate gear forces correctly"
+    '(0.0 -48.0 0.0) (linear-momentum (state ((lander-change 3 inertia '(0 0 0) 12 6 2) l2 0)))))
 
 (test-end "sfsim physics")
