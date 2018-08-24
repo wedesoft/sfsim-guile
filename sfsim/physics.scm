@@ -216,8 +216,9 @@
   (make <lander> #:state state #:gears gears))
 
 (define ((lander-change mass inertia force_ strength damping gear-mass) self dt)
-  (apply make-lander ((state-change mass inertia force_) (state self) dt)
-                     (map (cut (spring-change strength damping gear-mass) <> dt) (gears self))))
+  (let [(force_ (list 0 (- (spring-force (car (gears self)) strength damping)) 0))]
+    (apply make-lander ((state-change mass inertia force_) (state self) dt)
+                       (map (cut (spring-change strength damping gear-mass) <> dt) (gears self)))))
 
 (define-method (* (self <lander>) (scalar <real>))
   (apply make-lander (* (state self) scalar) (map (cut * <> scalar) (gears self))))
