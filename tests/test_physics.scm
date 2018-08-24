@@ -317,6 +317,8 @@
 (define inertia (inertia-body '((0.5 0 0) (0 0.5 0) (0 0 0.5))))
 (test-group "gears of lander"
   (test-equal "gear exerts force on lander"
-    '(0 48 0) (linear-momentum (state ((lander-change 3 inertia '(0 0 0) 12 6 2) l 0)))))
+    '(0 48 0) (linear-momentum (state ((lander-change 3 inertia '(0 0 0) 12 6 2) l 0))))
+  (test-equal "add external forces"
+    '(2 48 3) (linear-momentum (state ((lander-change 3 inertia '(2 0 3) 12 6 2) l 0)))))
 
 (test-end "sfsim physics")
