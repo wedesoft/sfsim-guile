@@ -215,8 +215,10 @@
 (define (make-lander state . gears)
   (make <lander> #:state state #:gears gears))
 
-(define ((lander-change mass inertia force_ strength damping gear-mass) self dt)
-  (let [(forces (map (lambda (gear) (rotate-vector (orientation (state self)) (list 0 (- (spring-force gear strength damping)) 0))) (gears self)))]
+(define ((lander-change mass inertia force_ strength damping gear-mass . gear-positions) self dt)
+  (let [(forces (map (lambda (gear) (rotate-vector (orientation (state self))
+                                                   (list 0 (- (spring-force gear strength damping)) 0)))
+                     (gears self)))]
     (apply make-lander ((state-change mass inertia (fold + force_ forces)) (state self) dt)
                        (map (cut (spring-change strength damping gear-mass) <> dt) (gears self)))))
 
