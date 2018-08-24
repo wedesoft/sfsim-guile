@@ -1,8 +1,7 @@
 # TODO
 
-* rotate rotational moments
+* collision of gear
 * display body with gears
-* influence of gear on main body
 * state -> body
 * OpenGL, 3DS
 * quaternion, state vectors

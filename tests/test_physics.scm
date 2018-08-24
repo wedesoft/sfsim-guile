@@ -241,21 +241,20 @@
 (define inertia (inertia-body '((1 0 0) (0 1 0) (0 0 1))))
 (define inertia2 (inertia-body '((0.5 0 0) (0 0.5 0) (0 0 0.5))))
 (define force_ '(0 -10 0))
-(define torque '(0 -10 0))
-(define moment '(2 3 5))
+(define torque '(2 3 5))
 (test-group "time derivative of state"
   (test-equal "derivative of position is linear momentum divided by mass"
-    '(0.1 0.15 0.25) (position ((state-change 2 inertia force_ moment) s 0)))
+    '(0.1 0.15 0.25) (position ((state-change 2 inertia force_ torque) s 0)))
   (test-equal "derivative of linear momentum is force"
-    force_ (linear-momentum ((state-change 2 inertia force_ moment) s 0)))
+    force_ (linear-momentum ((state-change 2 inertia force_ torque) s 0)))
   (test-equal "derivative of orientation requires computation of angular speed"
-    0.05 (imag-part (orientation ((state-change 2 inertia force_ moment) s 0))))
+    0.05 (imag-part (orientation ((state-change 2 inertia force_ torque) s 0))))
   (test-equal "derivative of orientation takes into account inertia"
-    0.1 (imag-part (orientation ((state-change 2 inertia2 force_ moment) s 0))))
+    0.1 (imag-part (orientation ((state-change 2 inertia2 force_ torque) s 0))))
   (test-equal "derivative of orientation takes into account orientation"
-    -0.05 (imag-part (orientation ((state-change 2 inertia force_ moment) s2 0))))
-  (test-equal "derivative of rotational impulse is rotational momentum"
-    '(2 3 5) (angular-momentum ((state-change 2 inertia force_ moment) s 0))))
+    -0.05 (imag-part (orientation ((state-change 2 inertia force_ torque) s2 0))))
+  (test-equal "derivative of rotational impulse is torque"
+    torque (angular-momentum ((state-change 2 inertia force_ torque) s 0))))
 
 (define s1 (make-state '(2 3 5) '(0 0  1) 1 '(0 0 0)))
 (define s2 (make-state '(2 3 8) '(0 0 -1) 1 '(0 0 0)))
@@ -316,6 +315,8 @@
 
 (define l (make-lander (make-state '(2 3 5) '(0 0 1.0) 1 '(0 0 0)) (make-spring 3 2)))
 (define l2 (make-lander (make-state '(2 3 5) '(0 0 1.0) +i '(0 0 0)) (make-spring 3 2)))
+(define r3 (quaternion-rotation (/ 3.1415926535 2) '(0 0 1)))
+(define l3 (make-lander (make-state '(2 3 5) '(0 0 1.0) r3 '(0 0 0)) (make-spring 3 2)))
 (define inertia (inertia-body '((0.5 0 0) (0 0.5 0) (0 0 0.5))))
 (test-group "gears of lander"
   (test-equal "gear exerts force on lander"
@@ -324,7 +325,9 @@
     '(2 48 3) (linear-momentum (state ((lander-change 3 inertia '(2 0 3) 12 6 2 '(0 0 0)) l 0))))
   (test-equal "rotate gear forces correctly"
     '(0.0 -48.0 0.0) (linear-momentum (state ((lander-change 3 inertia '(0 0 0) 12 6 2 '(0 0 0)) l2 0))))
-  (test-equal "introduce rotational moment"
-    '(0.0 0.0 -96.0) (angular-momentum (state ((lander-change 3 inertia '(0 0 0) 12 6 2 '(2 0 0)) l2 0)))))
+  (test-equal "introduce torque"
+    '(0 0.0 96.0) (angular-momentum (state ((lander-change 3 inertia '(0 0 0) 12 6 2 '(2 0 0)) l 0))))
+  (test-equal "rotate gear position"
+    '(0.0 0.0 96.0) (angular-momentum (state ((lander-change 3 inertia '(0 0 0) 12 6 2 '(2 0 0)) l3 0)))))
 
 (test-end "sfsim physics")
