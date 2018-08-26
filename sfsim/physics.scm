@@ -13,7 +13,7 @@
             closest-simplex-points gjk-algorithm collision-impulse
             make-spring position speed spring-change apply-linear-impulse apply-rotational-impulse
             make-state orientation linear-momentum angular-momentum state-change collision
-            make-lander state gears lander-change)
+            make-lander state gears lander-change gear-position)
   #:re-export (+ *))
 
 
@@ -215,11 +215,11 @@
 (define (make-lander state . gears)
   (make <lander> #:state state #:gears gears))
 
-(define ((lander-change mass inertia force_ strength damping gear-mass . gear-positions) self dt)
+(define ((lander-change mass inertia force_ strength damping gear-mass . gear-offsets) self dt)
   (let* [(forces  (map (lambda (gear) (rotate-vector (orientation (state self))
                                                      (list 0 (- (spring-force gear strength damping)) 0)))
                        (gears self)))
-         (torques (map cross-product (map (cut rotate-vector (orientation (state self)) <>) gear-positions) forces))]
+         (torques (map cross-product (map (cut rotate-vector (orientation (state self)) <>) gear-offsets) forces))]
     (apply make-lander ((state-change mass inertia (fold + force_ forces) (fold + '(0 0 0) torques)) (state self) dt)
                        (map (cut (spring-change strength damping gear-mass) <> dt) (gears self)))))
 
@@ -228,3 +228,6 @@
 
 (define-method (+ (lander <lander>) (dlander <lander>))
   (apply make-lander (+ (state lander) (state dlander)) (map + (gears lander) (gears dlander))))
+
+(define (gear-position state gear-offset gear)
+  (+ (position state) (rotate-vector (orientation state) (+ gear-offset (list 0 (position gear) 0)))))

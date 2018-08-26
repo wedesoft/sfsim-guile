@@ -328,6 +328,10 @@
   (test-equal "introduce torque"
     '(0 0.0 96.0) (angular-momentum (state ((lander-change 3 inertia '(0 0 0) 12 6 2 '(2 0 0)) l 0))))
   (test-equal "rotate gear position"
-    '(0.0 0.0 96.0) (angular-momentum (state ((lander-change 3 inertia '(0 0 0) 12 6 2 '(2 0 0)) l3 0)))))
+    '(0.0 0.0 96.0) (angular-momentum (state ((lander-change 3 inertia '(0 0 0) 12 6 2 '(2 0 0)) l3 0))))
+  (test-equal "position of gear is offset in y-direction to lander position"
+    '(3 8 8) (gear-position (state l) '(1 2 3) (make-spring 3 2)))
+  (test-equal "position of gear is rotated with main body"
+    '(3.0 -2.0 2.0) (gear-position (state l2) '(1 2 3) (make-spring 3 2))))
 
 (test-end "sfsim physics")

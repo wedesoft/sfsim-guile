@@ -32,7 +32,7 @@
 (define m2 5.9742e+24)
 (define mg 0.05)
 (define K 20.0)
-(define D 0.5)
+(define D 2.0)
 (define w 0.5)
 (define h 0.1)
 (define d 0.25)
@@ -118,7 +118,7 @@
         (update2 (runge-kutta state2 dt (state-change m2 inertia2 '(0 0 0) '(0 0 0))))]
     (let* [(closest  (gjk-algorithm (body1 (state update1)) (body2 update2)))
            (distance (norm (- (car closest) (cdr closest))))
-           (closest2 (gjk-algorithm (list (particle-position (state update1) (+ gear-pos (list 0 (position (car (gears update1))) 0)))) (body2 update2)))
+           (closest2 (gjk-algorithm (list (gear-position (state update1) gear-pos (car (gears update1)))) (body2 update2)))
            (distance2 (norm (- (car closest2) (cdr closest2))))]
       (if (and (eqv? recursion 0) (>= (min distance distance2) epsilon))
         (list update1 update2)
@@ -137,7 +137,6 @@
   (let [(dt (min dtmax (elapsed time #t)))]
     (let [(update (timestep lander state2 dt))]
       (set! lander (car   update))
-      (format #t "~a~&" (position (car (gears lander))))
       (set! state2 (cadr  update)))
     (post-redisplay)))
 
