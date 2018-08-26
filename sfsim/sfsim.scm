@@ -126,11 +126,11 @@
           (if (<= distance distance2)
             (let [(c (collision (state update1) update2 m1 m2 inertia1 inertia2 closest loss mu ve))]
               (list (apply make-lander (car c) (gears update1)) (cdr c)))
-            (let* [(g  (car (gears update1)))
-                   (va (cadr (gear-speed (state update1) m1 inertia1 gear-offset g)))
-                   (vb (cadr (particle-speed m1 inertia1 (state update1) gear-offset)))
-                   (v  (- (- va) vb))]
-              (list (make-lander (state update1) (make-spring (position g) v)) update2)))
+            (let* [(gear (car (gears update1)))
+                   (va   (cadr (gear-speed (state update1) m1 inertia1 gear-offset gear)))
+                   (vb   (cadr (particle-speed m1 inertia1 (state update1) gear-offset)))
+                   (v    (- (- va) vb))]
+              (list (make-lander (state update1) (make-spring (position gear) v)) update2)))
           (timestep lander1 state2 (/ dt 2) (1+ recursion)))))))
 
 (define (on-idle)
