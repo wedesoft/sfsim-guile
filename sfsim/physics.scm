@@ -13,7 +13,7 @@
             closest-simplex-points gjk-algorithm collision-impulse
             make-spring position speed spring-change apply-linear-impulse apply-rotational-impulse
             make-state orientation linear-momentum angular-momentum state-change collision
-            make-lander state gears lander-change gear-position)
+            make-lander state gears lander-change gear-position gear-speed)
   #:re-export (+ *))
 
 
@@ -230,4 +230,8 @@
   (apply make-lander (+ (state lander) (state dlander)) (map + (gears lander) (gears dlander))))
 
 (define (gear-position state gear-offset gear)
-  (+ (position state) (rotate-vector (orientation state) (+ gear-offset (list 0 (position gear) 0)))))
+  (particle-position state (+ gear-offset (list 0 (position gear) 0))))
+
+(define (gear-speed state mass inertia gear-offset gear)
+  (+ (particle-speed mass inertia state (+ gear-offset (list 0 (position gear) 0)))
+     (rotate-vector (orientation state) (list 0 (speed gear) 0))))

@@ -332,6 +332,10 @@
   (test-equal "position of gear is offset in y-direction to lander position"
     '(3 8 8) (gear-position (state l) '(1 2 3) (make-spring 3 2)))
   (test-equal "position of gear is rotated with main body"
-    '(3.0 -2.0 2.0) (gear-position (state l2) '(1 2 3) (make-spring 3 2))))
+    '(3.0 -2.0 2.0) (gear-position (state l2) '(1 2 3) (make-spring 3 2)))
+  (test-equal "speed of gear takes into account speed of main body"
+    '(0.0 2.0 0.5) (gear-speed (state l) 2 inertia '(1 2 3) (make-spring 3 2)))
+  (test-equal "speed of gear takes into account orientation of main body"
+    '(0.0 -2.0 0.5) (gear-speed (state l2) 2 inertia '(1 2 3) (make-spring 3 2))))
 
 (test-end "sfsim physics")
