@@ -93,26 +93,6 @@
           (set! simplex-a (cadr result))
           (set! simplex-b (cddr result)))))))
 
-(define (deflect relative-speed normal loss friction micro-speed)
-  "Determine speed change necessary to deflect particle. If the particle is very slow, a lossless micro-collision is computed instead."
-  (let* [(normal-speed     (inner-product normal relative-speed))
-         (tangential-speed (orthogonal-component normal relative-speed))
-         (normal-target    (if (>= normal-speed (- micro-speed)) (- micro-speed normal-speed) (* (- loss 2) normal-speed)))
-         (friction-target  (* friction normal-target))]
-    (- (* normal-target normal) (* friction-target (normalize tangential-speed)))))
-
-(define (collision-impulse speed-change mass-a mass-b inertia-a inertia-b orientation-a orientation-b radius-a radius-b)
-  "Compute impulse of a collision of two objects"
-  (let* [(direction (normalize speed-change))
-         (impulse   (/ (norm speed-change)
-                       (+ (/ 1 mass-a)
-                          (/ 1 mass-b)
-                          (inner-product direction (cross-product (dot (inverse (inertia-a orientation-a))
-                                                                  (cross-product radius-a direction)) radius-a))
-                          (inner-product direction (cross-product (dot (inverse (inertia-b orientation-b))
-                                                                  (cross-product radius-b direction)) radius-b)))))]
-    (* impulse direction)))
-
 (define-class <spring> (<object>)
               (position #:init-keyword #:position #:getter position)
               (speed    #:init-keyword #:speed    #:getter speed   ))
@@ -186,6 +166,26 @@
               (* (vector->quaternion (* 0.5 (angular-velocity inertia (orientation state) (angular-momentum state))))
                  (orientation state))
               torque))
+
+(define (deflect relative-speed normal loss friction micro-speed)
+  "Determine speed change necessary to deflect particle. If the particle is very slow, a lossless micro-collision is computed instead."
+  (let* [(normal-speed     (inner-product normal relative-speed))
+         (tangential-speed (orthogonal-component normal relative-speed))
+         (normal-target    (if (>= normal-speed (- micro-speed)) (- micro-speed normal-speed) (* (- loss 2) normal-speed)))
+         (friction-target  (* friction normal-target))]
+    (- (* normal-target normal) (* friction-target (normalize tangential-speed)))))
+
+(define (collision-impulse speed-change mass-a mass-b inertia-a inertia-b orientation-a orientation-b radius-a radius-b)
+  "Compute impulse of a collision of two objects"
+  (let* [(direction (normalize speed-change))
+         (impulse   (/ (norm speed-change)
+                       (+ (/ 1 mass-a)
+                          (/ 1 mass-b)
+                          (inner-product direction (cross-product (dot (inverse (inertia-a orientation-a))
+                                                                  (cross-product radius-a direction)) radius-a))
+                          (inner-product direction (cross-product (dot (inverse (inertia-b orientation-b))
+                                                                  (cross-product radius-b direction)) radius-b)))))]
+    (* impulse direction)))
 
 (define (state-impulse state mass radius impulse)
   "Apply impulse to an object"

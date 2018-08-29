@@ -1,6 +1,7 @@
 # TODO
 
 * collision of gear
+* estimate friction impulse
 * display body with gears
 * state -> body
 * OpenGL, 3DS
