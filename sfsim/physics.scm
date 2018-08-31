@@ -7,13 +7,12 @@
   #:use-module (sfsim util)
   #:use-module (sfsim linear-algebra)
   #:use-module (sfsim quaternion)
-  #:export (<spring> <state> <lander>
+  #:export (<spring> <state>
             clock elapsed cuboid-inertia runge-kutta inertia-body angular-velocity
             particle-position particle-positions particle-speed deflect support-point center-of-gravity
             closest-simplex-points gjk-algorithm collision-impulse
-            make-spring position speed spring-change apply-linear-impulse apply-rotational-impulse
-            make-state orientation linear-momentum angular-momentum state-change collision
-            make-lander state gears lander-change gear-position gear-speed)
+            apply-linear-impulse apply-rotational-impulse position
+            make-state orientation linear-momentum angular-momentum state-change collision)
   #:re-export (+ *))
 
 
@@ -92,29 +91,6 @@
           (set! closest (car result))
           (set! simplex-a (cadr result))
           (set! simplex-b (cddr result)))))))
-
-(define-class <spring> (<object>)
-              (position #:init-keyword #:position #:getter position)
-              (speed    #:init-keyword #:speed    #:getter speed   ))
-
-(define (make-spring position speed)
-  (make <spring> #:position position #:speed speed))
-
-(define (spring-force spring strength damping)
-  "Determine force of spring-damper system depending on its position and speed"
-  (- (+ (* (position spring) strength) (* (speed spring) damping))))
-
-(define ((spring-change strength damping mass) spring dt)
-  "Derivative of spring-damper system's state"
-  (make-spring (speed spring) (/ (spring-force spring strength damping) mass)))
-
-(define-method (* (spring <spring>) (scalar <real>))
-  (make-spring (* (position spring) scalar)
-               (* (speed spring) scalar)))
-
-(define-method (+ (spring <spring>) (dspring <spring>))
-  (make-spring (+ (position spring) (position dspring))
-               (+ (speed spring) (speed dspring))))
 
 (define (apply-linear-impulse linear-impulse impulse)
   "Apply speed change"
@@ -207,31 +183,3 @@
                                             (orientation state-a) (orientation state-b) radius-a radius-b))]
     (cons (state-impulse state-a mass-a radius-a impulse-vector)
           (state-impulse state-b mass-b radius-b (- impulse-vector)))))
-
-(define-class <lander> (<object>)
-              (state #:init-keyword #:state #:getter state)
-              (gears #:init-keyword #:gears #:getter gears))
-
-(define (make-lander state . gears)
-  (make <lander> #:state state #:gears gears))
-
-(define ((lander-change mass inertia force_ strength damping gear-mass . gear-offsets) self dt)
-  (let* [(forces  (map (lambda (gear) (rotate-vector (orientation (state self))
-                                                     (list 0 (- (spring-force gear strength damping)) 0)))
-                       (gears self)))
-         (torques (map cross-product (map (cut rotate-vector (orientation (state self)) <>) gear-offsets) forces))]
-    (apply make-lander ((state-change mass inertia (fold + force_ forces) (fold + '(0 0 0) torques)) (state self) dt)
-                       (map (cut (spring-change strength damping gear-mass) <> dt) (gears self)))))
-
-(define-method (* (self <lander>) (scalar <real>))
-  (apply make-lander (* (state self) scalar) (map (cut * <> scalar) (gears self))))
-
-(define-method (+ (lander <lander>) (dlander <lander>))
-  (apply make-lander (+ (state lander) (state dlander)) (map + (gears lander) (gears dlander))))
-
-(define (gear-position state gear-offset gear)
-  (particle-position state (+ gear-offset (list 0 (position gear) 0))))
-
-(define (gear-speed state mass inertia gear-offset gear)
-  (+ (particle-speed mass inertia state (+ gear-offset (list 0 (position gear) 0)))
-     (rotate-vector (orientation state) (list 0 (speed gear) 0))))

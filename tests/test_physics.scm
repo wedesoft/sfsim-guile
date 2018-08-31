@@ -157,18 +157,6 @@
   (test-equal "Rotational component in second object"
     '(0.5 0.0 0.0) (collision-impulse '(1.0 0.0 0.0) 5.9742e+24 1.0 inertia inertia 1 1 '(1 0 0) '(0 -1 0))))
 
-(test-group "spring"
-  (test-equal "elongation of spring"
-    3 (position (make-spring 3 2)))
-  (test-equal "speed of spring"
-    2 (speed (make-spring 3 2)))
-  (test-equal "position change of spring is speed"
-    2 (position ((spring-change 12 6 2) (make-spring 3 2) 0)))
-  (test-equal "speed change depends on elongation of spring"
-    -30 (speed ((spring-change 12 6 2) (make-spring 5 0) 0)))
-  (test-equal "speed change depends on damping of spring"
-    -3 (speed ((spring-change 12 6 2) (make-spring 0 1) 0))))
-
 (test-group "apply impulses"
   (test-equal "applying an impulse increases momentum"
     11 (apply-linear-impulse 5 6))
@@ -178,20 +166,6 @@
     '(2 3 5) (apply-rotational-impulse '(2 3 5) '(1 0 0) '(1 0 0)))
   (test-equal "rotational impulse with lever"
     '(2 3 6) (apply-rotational-impulse '(2 3 5) '(1 0 0) '(0 1 0))))
-
-(define s (make-spring 2 3))
-(test-group "scalar multiplication for spring"
-  (test-equal "multiply position"
-    10 (position (* s 5)))
-  (test-equal "multiply speed"
-    15 (speed (* s 5))))
-
-(define s2 (make-spring 5 7))
-(test-group "add springs"
-  (test-equal "add positions"
-    7 (position (+ s s2)))
-  (test-equal "add speeds"
-    10 (speed (+ s s2))))
 
 (define s (make-state '(2 3 5) '(0.2 0.3 0.5) 1.0 '(0.1 0.2 0.3)))
 (test-group "state struct"
@@ -285,57 +259,5 @@
     '(0.0 1.0 0.0) (angular-momentum (car (collision s3 s4 light heavy inertia-a inertia-b cb 0.0 0.0 0.1))))
   (test-equal "Change spin of second object"
     '(0.0 -1.0 0.0) (angular-momentum (cdr (collision s3 s4 heavy light inertia-a inertia-b cb 0.0 0.0 0.1)))))
-
-(define l (make-lander (make-state '(2 3 5) '(0 0 1.0) 1 '(0 0 0)) (make-spring 3 2)))
-(define inertia (inertia-body '((0.5 0 0) (0 0.5 0) (0 0 0.5))))
-(test-group "structure for lander"
-  (test-equal "Position of main body"
-    '(2 3 5) (position (state l)))
-  (test-eqv "Position of gear"
-    3 (position (car (gears l))))
-  (test-equal "state change of main body"
-    '(0 0 0.5) (position (state ((lander-change 2 inertia '(0 0 0) 12 6 2 '(0 0 0)) l 0))))
-  (test-eqv "state change of gears"
-    2 (position (car (gears ((lander-change 2 inertia '(0 0 0) 12 6 2 '(0 0 0)) l 0))))))
-
-(define l (make-lander (make-state '(2 3 5) '(0 0 1.0) 1 '(0 0 0)) (make-spring 3 2)))
-(test-group "scalar multiplication of lander state"
-  (test-equal "multiply position of main body"
-    '(4 6 10) (position (state (* l 2))))
-  (test-equal "multiply position of gear"
-    6 (position (car (gears (* l 2))))))
-
-(define l1 (make-lander (make-state '(2 3 5) '(0 0 1.0) 1 '(0 0 0)) (make-spring 3 2)))
-(define l2 (make-lander (make-state '(3 5 7) '(0 0 1.0) 1 '(0 0 0)) (make-spring 7 5)))
-(test-group "add lander states"
-  (test-equal "add positions of main bodies"
-    '(5 8 12) (position (state (+ l1 l2))))
-  (test-equal "add posoitions of gears"
-    10 (position (car (gears (+ l1 l2))))))
-
-(define l (make-lander (make-state '(2 3 5) '(0 0 1.0) 1 '(0 0 0)) (make-spring 3 2)))
-(define l2 (make-lander (make-state '(2 3 5) '(0 0 1.0) +i '(0 0 0)) (make-spring 3 2)))
-(define r3 (quaternion-rotation (/ 3.1415926535 2) '(0 0 1)))
-(define l3 (make-lander (make-state '(2 3 5) '(0 0 1.0) r3 '(0 0 0)) (make-spring 3 2)))
-(define inertia (inertia-body '((0.5 0 0) (0 0.5 0) (0 0 0.5))))
-(test-group "gears of lander"
-  (test-equal "gear exerts force on lander"
-    '(0 48 0) (linear-momentum (state ((lander-change 3 inertia '(0 0 0) 12 6 2 '(0 0 0)) l 0))))
-  (test-equal "add external forces"
-    '(2 48 3) (linear-momentum (state ((lander-change 3 inertia '(2 0 3) 12 6 2 '(0 0 0)) l 0))))
-  (test-equal "rotate gear forces correctly"
-    '(0.0 -48.0 0.0) (linear-momentum (state ((lander-change 3 inertia '(0 0 0) 12 6 2 '(0 0 0)) l2 0))))
-  (test-equal "introduce torque"
-    '(0 0.0 96.0) (angular-momentum (state ((lander-change 3 inertia '(0 0 0) 12 6 2 '(2 0 0)) l 0))))
-  (test-equal "rotate gear position"
-    '(0.0 0.0 96.0) (angular-momentum (state ((lander-change 3 inertia '(0 0 0) 12 6 2 '(2 0 0)) l3 0))))
-  (test-equal "position of gear is offset in y-direction to lander position"
-    '(3 8 8) (gear-position (state l) '(1 2 3) (make-spring 3 2)))
-  (test-equal "position of gear is rotated with main body"
-    '(3.0 -2.0 2.0) (gear-position (state l2) '(1 2 3) (make-spring 3 2)))
-  (test-equal "speed of gear takes into account speed of main body"
-    '(0.0 2.0 0.5) (gear-speed (state l) 2 inertia '(1 2 3) (make-spring 3 2)))
-  (test-equal "speed of gear takes into account orientation of main body"
-    '(0.0 -2.0 0.5) (gear-speed (state l2) 2 inertia '(1 2 3) (make-spring 3 2))))
 
 (test-end "sfsim physics")

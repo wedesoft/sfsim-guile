@@ -21,10 +21,8 @@
 (define time #f)
 (define main-window #f)
 
-(define state1 (make-state '(0 0.3 0) '(0 -0.2 0) (quaternion-rotation 0 '(0 1 0)) '(0.0 0.0 0.0)))
+(define state1 (make-state '(0 0.3 0) '(0 -0.2 0) (quaternion-rotation 0 '(0 1 0)) '(0.0 0.1 0.0)))
 (define state2 (make-state '(0 -0.3 0) '(0 0 0) (quaternion-rotation 0 '(0 0 1)) '(0.0 0.0 0.0)))
-(define gear  (make-spring 0.0 0.0))
-(define lander (make-lander state1 gear))
 
 (define g '(0 -0.5 0))
 
@@ -36,7 +34,6 @@
 (define w 0.5)
 (define h 0.1)
 (define d 0.25)
-(define gear-offset (list 0 (- (* 1.5 h)) 0))
 (define inertia1 (inertia-body (cuboid-inertia m1 w h d)))
 (define inertia2 (inertia-body (cuboid-inertia m2 w h d)))
 
@@ -81,21 +78,6 @@
     (gl-load-identity)
     (gl-ortho (- w) w (- h) h -100 +100)))
 
-(define (show-lander lander)
-  (let* [(b   (make-bytevector (* 4 4 4)))
-         (mat (rotation-matrix (orientation (state lander))))
-         (hom (concatenate (homogeneous-matrix mat (position (state lander)))))]
-    (for-each (lambda (i v) (bytevector-ieee-single-native-set! b (* i 4) v)) (iota (length hom)) hom)
-    (set-gl-matrix-mode (matrix-mode modelview))
-    (gl-load-matrix b #:transpose #t)
-    (glPointSize 5)
-    (gl-begin (begin-mode points)
-      (gl-color 1 0 1)
-      (apply gl-vertex (+ gear-offset (list 0 (position (car (gears lander))) 0))))
-    (gl-scale w h d)
-    (gl-color 0 1 0)
-    (glut-wire-cube 1.0)))
-
 (define (show-state state scale)
   (let* [(b   (make-bytevector (* 4 4 4)))
          (mat (rotation-matrix (orientation state)))
@@ -109,34 +91,26 @@
 
 (define (on-display)
   (gl-clear (clear-buffer-mask color-buffer))
-  (show-lander lander)
+  (show-state state1 1)
   (show-state state2 scale)
   (swap-buffers))
 
 (define* (timestep lander1 state2 dt #:optional (recursion 0))
-  (let [(update1 (runge-kutta lander1 dt (lander-change m1 inertia1 '(0 -0.1 0) K D 0.1 gear-offset)))
+  (let [(update1 (runge-kutta state1 dt (state-change m1 inertia1 '(0 -0.1 0) '(0 0 0))))
         (update2 (runge-kutta state2 dt (state-change m2 inertia2 '(0 0 0) '(0 0 0))))]
-    (let* [(closest  (gjk-algorithm (body1 (state update1)) (body2 update2)))
-           (distance (norm (- (car closest) (cdr closest))))
-           (closest2 (gjk-algorithm (list (gear-position (state update1) gear-offset (car (gears update1)))) (body2 update2)))
-           (distance2 (norm (- (car closest2) (cdr closest2))))]
-      (if (and (eqv? recursion 0) (>= (min distance distance2) epsilon))
+    (let* [(closest  (gjk-algorithm (body1 update1) (body2 update2)))
+           (distance (norm (- (car closest) (cdr closest))))]
+      (if (and (eqv? recursion 0) (>= distance epsilon))
         (list update1 update2)
-        (if (or (>= (min distance distance2) epsilon) (>= recursion max-depth))
-          (if (<= distance distance2)
-            (let [(c (collision (state update1) update2 m1 m2 inertia1 inertia2 closest loss mu ve))]
-              (list (apply make-lander (car c) (gears update1)) (cdr c)))
-            (let* [(gear (car (gears update1)))
-                   (va   (cadr (gear-speed (state update1) m1 inertia1 gear-offset gear)))
-                   (vb   (cadr (particle-speed m1 inertia1 (state update1) gear-offset)))
-                   (v    (- (- va) vb))]
-              (list (make-lander (state update1) (make-spring (position gear) v)) update2)))
-          (timestep lander1 state2 (/ dt 2) (1+ recursion)))))))
+        (if (or (>= distance epsilon) (>= recursion max-depth))
+          (let [(c (collision update1 update2 m1 m2 inertia1 inertia2 closest loss mu ve))]
+            (list (car c) (cdr c)))
+          (timestep state1 state2 (/ dt 2) (1+ recursion)))))))
 
 (define (on-idle)
   (let [(dt (min dtmax (elapsed time #t)))]
-    (let [(update (timestep lander state2 dt))]
-      (set! lander (car   update))
+    (let [(update (timestep state1 state2 dt))]
+      (set! state1 (car   update))
       (set! state2 (cadr  update)))
     (post-redisplay)))
 
