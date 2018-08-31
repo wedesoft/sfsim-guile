@@ -1,24 +1,24 @@
 #!/usr/bin/env guile
 !#
-(use-modules (glut) (gl) (gl low-level) (glu) (srfi srfi-1) (srfi srfi-26))
+(use-modules (glut) (gl) (gl low-level) (glu) (srfi srfi-1) (srfi srfi-26) (sfsim linear-algebra))
 
-(define cx 200)
-(define cy 240)
-(define ox 320)
-(define oy 240)
-(define vx 0)
-(define l 250)
-(define m 20)
+(define p '(220 140))
+(define o 0)
+(define v '(0 0))
+(define w 0.0)
+(define l 100)
+(define m 1)
 
 (define dt 0.08)
 
 (define main-window #f)
 
 (define (euler)
-  (let* [(f  (- 320 cx))
-         (ax (/ f m))]
-    (set! vx (+ vx (* ax dt)))
-    (set! cx (+ cx (* vx dt)))))
+  (let* [(f '(0 3))
+         (a (* f (/ 1 m)))]
+    (set! p (+ p (* v dt)))
+    (set! o (+ o (* w dt)))
+    (set! v (+ v (* a dt)))))
 
 (define (on-idle)
   (euler)
@@ -26,12 +26,10 @@
 
 (define (on-display)
   (gl-clear (clear-buffer-mask color-buffer))
-  (glPointSize 5)
-  (gl-begin (begin-mode points)
-    (gl-color 1 0 0)
-    (gl-vertex cx cy)
-    (gl-color 0 1 0)
-    (gl-vertex ox oy))
+  (gl-begin (begin-mode lines)
+    (gl-color 1 1 1)
+    (gl-vertex (- (car p) (* (cos o) 0.5 l)) (- (cadr p) (* (sin o) 0.5 l)))
+    (gl-vertex (+ (car p) (* (cos o) 0.5 l)) (+ (cadr p) (* (sin o) 0.5 l))))
   (swap-buffers))
 
 (define (on-reshape width height)
