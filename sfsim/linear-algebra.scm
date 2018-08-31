@@ -3,8 +3,9 @@
   #:use-module (ice-9 optargs)
   #:use-module (srfi srfi-1)
   #:use-module (srfi srfi-26)
-  #:export (cross-product inner-product norm diagonal dot permutations determinant submatrix inverse transpose
-            homogeneous-matrix orthogonal-component normalize least-squares)
+  #:export (cross-product cross-product-matrix inner-product norm diagonal dot permutations
+            determinant submatrix inverse transpose homogeneous-matrix orthogonal-component normalize
+            least-squares)
   #:re-export (+ - *))
 
 
@@ -53,6 +54,10 @@
   (list (- (* (cadr  a) (caddr b)) (* (caddr a) (cadr  b)))
         (- (* (caddr a) (car   b)) (* (car   a) (caddr b)))
         (- (* (car   a) (cadr  b)) (* (cadr  a) (car   b)))))
+
+(define (cross-product-matrix v)
+  "Return matrix for computing cross-product with other vectors"
+  (list (list 0 (- (caddr v)) (cadr v)) (list (caddr v) 0 (- (car v))) (list (- (cadr v)) (car v) 0)))
 
 (define (norm v)
   "Return norm of a vector."

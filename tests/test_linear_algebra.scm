@@ -50,7 +50,9 @@
   (test-equal "cross product of third and first basis vector"
     '(0 1 0) (cross-product '(0 0 1) '(1 0 0)))
   (test-equal "cross product of first and third basis vector"
-    '(0 -1 0) (cross-product '(1 0 0) '(0 0 1))))
+    '(0 -1 0) (cross-product '(1 0 0) '(0 0 1)))
+  (test-equal "cross product matrix"
+    '((0 -5 3) (5 0 -2) (-3 2 0)) (cross-product-matrix '(2 3 5))))
 
 (test-group "norm"
   (test-equal "Norm of 1D vector"
