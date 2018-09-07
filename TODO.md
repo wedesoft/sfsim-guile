@@ -1,6 +1,7 @@
 # TODO
 
 * collision of gear
+* notesd2.pdf: separating plane!
 * estimate friction impulse
 * display body with gears
 * state -> body
