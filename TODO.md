@@ -1,6 +1,7 @@
 # TODO
 
-* collision of gear
+* Cline: constraints for acceleration and impulses, joints
+* (micro) collision of gear
 * notesd2.pdf: separating plane!
 * estimate friction impulse
 * display body with gears
@@ -14,6 +15,15 @@
 * good tessellation for planet spheres
 * 3D cockpit
 * 3D moon rendering
+* Ultima Underwold like AIs
+* elevators, trains
+* blinking beacon/position lights
+* cables, pipes
+* garbage
+* advertising
+* airport-like departure tables
+* airlocks, walkways
+* fans, fog, lighting
 * bump maps
 * render articulated objects with configuration
 * suspension using spring damper elements
@@ -28,7 +38,6 @@
 * no need to adjust MFDs during critical parts of the mission
 * https://github.com/HappyEnte/DreamChaser
 * shadows (mask color pipeline output)
-* blinking beacon lights
 * EF2000 like cockpit controls (quick access views)
 * EF2000 like gear suspension
 * HDR bloom (separable convolution)
