@@ -21,7 +21,7 @@
 (define time #f)
 (define main-window #f)
 
-(define state1 (make-state '(0 0.3 0) '(0 -0.2 0) (quaternion-rotation 0 '(0 1 0)) '(0.0 0.1 0.0)))
+(define state1 (make-state '(0 0.3 0) '(0 -0.1 0) (quaternion-rotation (/ 3.1415926 2) '(0 1 0)) '(0.0 0.1 0.01)))
 (define state2 (make-state '(0 -0.3 0) '(0 0 0) (quaternion-rotation 0 '(0 0 1)) '(0.0 0.0 0.0)))
 
 (define g '(0 -0.5 0))
@@ -43,7 +43,7 @@
 (define dtmax 0.05)
 (define epsilon (* 0.5 (abs (cadr g)) (* dtmax dtmax)))
 (define ve (sqrt (* 2 (abs (cadr g)) epsilon)))
-(define max-depth 20)
+(define max-depth 10)
 
 (define speed-scale 0.3)
 
@@ -96,11 +96,11 @@
   (swap-buffers))
 
 (define* (timestep lander1 state2 dt #:optional (recursion 0))
-  (let [(update1 (runge-kutta state1 dt (state-change m1 inertia1 '(0 -0.1 0) '(0 0 0))))
+  (let [(update1 (runge-kutta state1 dt (state-change m1 inertia1 '(0 -0 0) '(0 0 0))))
         (update2 (runge-kutta state2 dt (state-change m2 inertia2 '(0 0 0) '(0 0 0))))]
     (let* [(closest  (gjk-algorithm (body1 update1) (body2 update2)))
            (distance (norm (- (car closest) (cdr closest))))]
-      (if (and (eqv? recursion 0) (>= distance epsilon))
+      (if (and (eqv? recursion 0) (>= distance epsilon)); TODO: check approach speed
         (list update1 update2)
         (if (or (>= distance epsilon) (>= recursion max-depth))
           (let [(c (collision update1 update2 m1 m2 inertia1 inertia2 closest loss mu ve))]

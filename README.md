@@ -27,3 +27,6 @@ make run
 * [Ruspini et al.: Collision/contact models for the dynamic simulation of complex environments](http://robotics.stanford.edu/users/ruspini/publications/iros97b.ps)
 * [Hecker: How to simulate a ponytail](http://chrishecker.com/How_to_Simulate_a_Ponytail) ([part 1](http://chrishecker.com/images/e/e8/Gdmag200003-ponytail-1.pdf), [part 2](http://chrishecker.com/images/a/a5/Gdmag200004-ponytail-2.pdf))
 * [Cline: Rigid body simulation with contact and constraints](https://www.cs.ubc.ca/grads/resources/thesis/Nov02/Michael_Cline.pdf)
+* [Souto: Video game physics tutorial i](https://www.toptal.com/game/video-game-physics-part-i-an-introduction-to-rigid-body-dynamics)
+* [Souto: Video game physics tutorial ii](https://www.toptal.com/game/video-game-physics-part-ii-collision-detection-for-solid-objects)
+* [Souto: Video game physics tutorial iii](https://www.toptal.com/game/video-game-physics-part-iii-constrained-rigid-body-simulation)
