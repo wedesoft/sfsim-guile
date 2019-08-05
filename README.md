@@ -30,3 +30,5 @@ make run
 * [Souto: Video game physics tutorial i](https://www.toptal.com/game/video-game-physics-part-i-an-introduction-to-rigid-body-dynamics)
 * [Souto: Video game physics tutorial ii](https://www.toptal.com/game/video-game-physics-part-ii-collision-detection-for-solid-objects)
 * [Souto: Video game physics tutorial iii](https://www.toptal.com/game/video-game-physics-part-iii-constrained-rigid-body-simulation)
+* Anitescu et al.: Formulating Dynamic Multi-rigid-body Contact Problems with Friction as Solvable Linear Complementary Problems
+* [Brian Mirtich: Rigid Body Contact: Collision Detection to Force Computation](https://merl.com/publications/docs/TR98-01.pdf)

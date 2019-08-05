@@ -96,7 +96,7 @@
   (swap-buffers))
 
 (define* (timestep lander1 state2 dt #:optional (recursion 0))
-  (let [(update1 (runge-kutta state1 dt (state-change m1 inertia1 '(0 -0 0) '(0 0 0))))
+  (let [(update1 (runge-kutta state1 dt (state-change m1 inertia1 '(0 -0.1 0) '(0 0 0))))
         (update2 (runge-kutta state2 dt (state-change m2 inertia2 '(0 0 0) '(0 0 0))))]
     (let* [(closest  (gjk-algorithm (body1 update1) (body2 update2)))
            (distance (norm (- (car closest) (cdr closest))))]
