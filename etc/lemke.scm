@@ -23,13 +23,14 @@
 (define (pivot tableau row column)
   (let [(pivot-vector (scale (list-ref tableau row) column))]
     (map (lambda (row-vector j) (if (eqv? j row) pivot-vector (project row-vector pivot-vector column))) tableau (iota (dim tableau)))))
+(define (update-basis basis row column) (map (lambda (var index) (if (eqv? index row) column var)) basis (iota (dim basis))))
 
 (define tableau (hstack (id (dim m)) (neg m) (vec (z0 (dim m))) (vec q)))
-(define basic (iota (dim m)))
+(define basis (iota (dim m)))
 
 (define row (argmin last tableau))
 (define column (* 2 (dim m)))
-
-(pivot tableau row column)
+(define tableaut (pivot tableau row column))
+(define basis (update-basis basis row column))
 
 
