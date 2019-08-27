@@ -71,3 +71,15 @@
             (2 0 1)))
 (define q '(-1 -1 -1))
 (lcp m q); TODO: prevent cycling
+
+(define m '((-1 -2  3)
+            (-1  2 -1)
+            ( 1 -1 -2)))
+(define q '(3 0 0))
+(lcp m q)
+
+(define m '((-1  2 -1)
+            (-2 -1 -1)
+            (-2 -1  2)))
+(define q '(3 6 16))
+(lcp m q)
