@@ -1,6 +1,6 @@
 #!/usr/bin/env guile
 !#
-(use-modules (glut) (gl) (gl low-level) (srfi srfi-26))
+(use-modules (glut) (gl) (gl low-level) (ice-9 match) (srfi srfi-1) (srfi srfi-26))
 
 (define w 0.5)
 (define h 0.1)
@@ -9,12 +9,6 @@
 (define w2 (/ w 2))
 (define h2 (/ h 2))
 (define d2 (/ d 2))
-
-(define (vertex m n) (logand (ash m (- (* 3 n))) 7))
-
-(define (edge-bits m a b) (and (eqv? (logand a m) (logand b m)) (< a b)))
-
-(define (face-bits m a b c d) (and (eqv? (logand a m) (logand b m) (logand c m) (logand d m)) (< a b c d)))
 
 (define vertices
   (list (list (- w2) (- h2) (- d2))
@@ -26,13 +20,34 @@
         (list (- w2) (+ h2) (+ d2))
         (list (+ w2) (+ h2) (+ d2))))
 
-(define edges
-  (filter (lambda (edge) (or (apply edge-bits 6 edge) (apply edge-bits 5 edge) (apply edge-bits 3 edge)))
-          (map (lambda (idx) (map (cut vertex idx <>) (iota 2))) (iota (* 8 8)))))
+(define edges '((0 1) (2 3) (4 5) (6 7) (0 2) (1 3) (4 6) (5 7) (0 4) (1 5) (2 6) (3 7)))
 
-(define faces
-  (filter (lambda (face) (or (apply face-bits 1 face) (apply face-bits 2 face) (apply face-bits 4 face)))
-          (map (lambda (idx) (map (cut vertex idx <>) (iota 4))) (iota (* 8 8 8 8)))))
+(define faces '((0 1 2 3) (5 4 6 7) (0 2 6 4) (1 5 7 3) (0 4 5 1) (2 3 7 6)))
+; TODO: faces don't have opposing normals
+
+(define make-plane list)
+(define plane-point car)
+(define plane-normal cadr)
+
+(define (cross-product a b)
+  (match-let [((a1 a2 a3) a)
+              ((b1 b2 b3) b)]
+    (list (- (* a2 b3) (* a3 b2))
+          (- (* a3 b1) (* a1 b3))
+          (- (* a1 b2) (* a2 b1)))))
+
+(define (face-normal vertices face)
+  (cross-product (map - (list-ref vertices (cadr face)) (list-ref vertices (car face)))
+                 (map - (list-ref vertices (last face)) (list-ref vertices (car face)))))
+
+(define (voronoi-vertex-edge vertices vertex edge)
+  (let [(a vertex)
+        (b (if (eqv? vertex (car edge)) (cadr edge) (car edge)))]
+    (make-plane (list-ref vertices a) (map - (list-ref vertices b) (list-ref vertices a)))))
+
+(define (voronoi-edge-face vertices face edge)
+  (cross-product (face-normal vertices face) (map - (list-ref vertices (cadr edge)) (list-ref vertices (car edge)))))
+; TODO: invert edge if necessary
 
 (define main-window #f)
 
