@@ -1,6 +1,6 @@
 #!/usr/bin/env guile
 !#
-(use-modules (glut) (gl) (gl low-level))
+(use-modules (glut) (gl) (gl low-level) (srfi srfi-26))
 
 (define w 0.5)
 (define h 0.1)
@@ -12,6 +12,22 @@
 
 (define (bit-complement a b bit)
   (and (zero? (logand a bit)) (not (zero? (logand b bit))) (eqv? (logand a (lognot bit)) (logand b (lognot bit)))))
+
+(define (vertex m n) (logand (ash m (- (* 3 n))) 7))
+
+(define (edge-bits m a b)
+  (and (eqv? (logand a (lognot m))
+             (logand b (lognot m)))
+       (< a b)))
+
+(define (face-bits m a b c d)
+  (and (eqv? (logand a m)
+             (logand b m)
+             (logand c m)
+             (logand d m))
+       (< a b)
+       (< b c)
+       (< c d)))
 
 (define vertices
   (list (list (- w2) (- h2) (- d2))
@@ -25,10 +41,17 @@
 
 (define edges
   (filter
-    (lambda (edge) (or (bit-complement (car edge) (cdr edge) 1)
-                       (bit-complement (car edge) (cdr edge) 2)
-                       (bit-complement (car edge) (cdr edge) 4)))
-    (map (lambda (idx) (cons (modulo idx 8) (floor (/ idx 8)))) (iota (* 8 8)))))
+    (lambda (edge) (or (apply edge-bits 1 edge)
+                       (apply edge-bits 2 edge)
+                       (apply edge-bits 4 edge)))
+    (map (lambda (idx) (map (cut vertex idx <>) (iota 2))) (iota (* 8 8)))))
+
+(define faces
+  (filter
+    (lambda (face) (or (apply face-bits 1 face)
+                       (apply face-bits 2 face)
+                       (apply face-bits 4 face)))
+    (map (lambda (idx) (map (cut vertex idx <>) (iota 4))) (iota (* 8 8 8 8)))))
 
 (define main-window #f)
 
