@@ -77,6 +77,11 @@
         (b (if (eqv? vertex (car edge)) (cadr edge) (car edge)))]
     (make-plane (list-ref vertices a) (map - (list-ref vertices b) (list-ref vertices a)))))
 
+(define (adjacent-edges vertex) (filter (lambda (edge) (member vertex edge)) edges))
+
+(define (in-cone vertices vertex point)
+  (every (lambda (edge) (negative? (plane-distance (voronoi-vertex-edge vertices vertex edge) point))) (adjacent-edges vertex)))
+
 (define (plane-distance plane point) (reduce + 0 (map * (map - point (plane-point plane)) (plane-normal plane))))
 
 (define (voronoi-face-edge vertices face edge)
@@ -105,7 +110,15 @@
         (lambda (edge)
           (apply gl-vertex (list-ref rotated (car edge)))
           (apply gl-vertex (list-ref rotated (cadr edge))))
-        edges))
+        edges)
+      (gl-color 0 0 1)
+      (for-each
+        (lambda (i)
+          (if (in-cone rotated i '(-1 -1 0))
+            (begin
+              (apply gl-vertex (list-ref rotated i))
+              (gl-vertex -1 -1 0))))
+        (iota 8)))
     (swap-buffers)))
 
 (define (on-idle)
