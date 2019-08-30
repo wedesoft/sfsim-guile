@@ -22,7 +22,7 @@
 
 (define edges '((0 1) (2 3) (4 5) (6 7) (0 2) (1 3) (4 6) (5 7) (0 4) (1 5) (2 6) (3 7)))
 
-(define faces '((0 2 3 1) (4 5 7 6) (0 4 6 2) (1 3 7 5) (0 1 5 4) (2 6 7 3)))
+(define faces '((0 2 3 1) (4 5 7 6) (0 1 5 4) (2 6 7 3) (0 4 6 2) (1 3 7 5)))
 
 (define make-plane list)
 (define plane-point car)
