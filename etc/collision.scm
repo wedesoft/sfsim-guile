@@ -24,9 +24,11 @@
 
 (define faces '((0 2 3 1) (4 5 7 6) (0 1 5 4) (2 6 7 3) (0 4 6 2) (1 3 7 5)))
 
-(define make-plane list)
-(define plane-point car)
-(define plane-normal cadr)
+(define (index-of a b) (list-index (cut eqv? a <>) b))
+(define (face-edge face edge)
+  (let [(i (index-of (car edge) face))
+        (j (index-of (cadr edge) face))]
+    (if (or (eqv? (1+ i) j) (eqv? (- i 3) j)) edge (list (cadr edge) (car edge)))))
 
 (define (cross-product a b)
   (match-let [((a1 a2 a3) a)
@@ -39,14 +41,20 @@
   (cross-product (map - (list-ref vertices (cadr face)) (list-ref vertices (car face)))
                  (map - (list-ref vertices (last face)) (list-ref vertices (car face)))))
 
+(define make-plane list)
+(define plane-point car)
+(define plane-normal cadr)
+
 (define (voronoi-vertex-edge vertices vertex edge)
   (let [(a vertex)
         (b (if (eqv? vertex (car edge)) (cadr edge) (car edge)))]
     (make-plane (list-ref vertices a) (map - (list-ref vertices b) (list-ref vertices a)))))
 
-(define (voronoi-edge-face vertices face edge)
-  (cross-product (face-normal vertices face) (map - (list-ref vertices (cadr edge)) (list-ref vertices (car edge)))))
-; TODO: invert edge if necessary
+(define (voronoi-face-edge vertices face edge)
+  (let [(ordered (face-edge face edge))]
+    (make-plane
+      (list-ref vertices (car ordered))
+      (cross-product (map - (list-ref vertices (cadr ordered)) (list-ref vertices (car ordered))) (face-normal vertices face)))))
 
 (define main-window #f)
 
