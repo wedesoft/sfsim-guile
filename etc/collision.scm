@@ -28,6 +28,10 @@
 
 (define faces '((0 2 3 1) (4 5 7 6) (0 1 5 4) (2 6 7 3) (0 4 6 2) (1 3 7 5)))
 
+(define (vertex? v) (number? v))
+(define (edge? e) (and (list? e) (eqv? (length e) 2)))
+(define (face? f) (and (list? f) (eqv? (length f) 4)))
+
 (define (rotate-z gamma)
   (list (list (cos gamma) (- (sin gamma)) 0)
         (list (sin gamma) (cos gamma) 0)
