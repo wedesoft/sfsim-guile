@@ -50,6 +50,8 @@
         (b (if (eqv? vertex (car edge)) (cadr edge) (car edge)))]
     (make-plane (list-ref vertices a) (map - (list-ref vertices b) (list-ref vertices a)))))
 
+(define (plane-distance plane point) (reduce + 0 (map * (map - point (plane-point plane)) (plane-normal plane))))
+
 (define (voronoi-face-edge vertices face edge)
   (let [(ordered (face-edge face edge))]
     (make-plane
