@@ -52,10 +52,17 @@
 (define (rotate matrix vertices) (map (lambda (point) (dot matrix point)) vertices))
 
 (define (index-of a b) (list-index (cut eqv? a <>) b))
+
+(define (swap-edge edge) (list (cadr edge) (car edge)))
+
 (define (face-edge face edge)
   (let [(i (index-of (car edge) face))
         (j (index-of (cadr edge) face))]
-    (if (or (eqv? (1+ i) j) (eqv? (- i 3) j)) edge (list (cadr edge) (car edge)))))
+    (if (or (eqv? (1+ i) j) (eqv? (- i 3) j)) edge (swap-edge edge))))
+
+(define (edge-vector vertices edge) (map - (list-ref vertices (cadr edge)) (list-ref vertices (car edge))))
+
+(define (vertex-edge vertex edge) (if (eqv? (car edge) vertex) edge (swap-edge edge)))
 
 (define (cross-product a b)
   (match-let [((a1 a2 a3) a)
@@ -72,23 +79,29 @@
 (define plane-point car)
 (define plane-normal cadr)
 
-(define (voronoi-vertex-edge vertices vertex edge)
-  (let [(a vertex)
-        (b (if (eqv? vertex (car edge)) (cadr edge) (car edge)))]
-    (make-plane (list-ref vertices a) (map - (list-ref vertices b) (list-ref vertices a)))))
-
-(define (adjacent-edges vertex) (filter (lambda (edge) (member vertex edge)) edges))
-
-(define (in-cone vertices vertex point)
-  (every (lambda (edge) (negative? (plane-distance (voronoi-vertex-edge vertices vertex edge) point))) (adjacent-edges vertex)))
+(define (negative-plane plane) (make-plane (plane-point plane) (map - (plane-normal plane))))
 
 (define (plane-distance plane point) (reduce + 0 (map * (map - point (plane-point plane)) (plane-normal plane))))
 
+(define (voronoi-vertex-edge vertices vertex edge)
+  (let [(ordered (vertex-edge vertex edge))] (make-plane (list-ref vertices vertex) (edge-vector vertices ordered))))
+
+(define (adjacent-edges vertex) (filter (lambda (edge) (member vertex edge)) edges))
+
+(define (adjacent-faces edge) (filter (lambda (face) (and (member (car edge) face) (member (cadr edge) face))) faces))
+
+(define (voronoi-vertex vertices vertex)
+  (map (lambda (edge) (negative-plane (voronoi-vertex-edge vertices vertex edge))) (adjacent-edges vertex)))
+
+(define (in-voronoi-vertex vertices vertex point)
+  (every (lambda (plane) (positive? (plane-distance plane point))) (voronoi-vertex vertices vertex)))
+
 (define (voronoi-face-edge vertices face edge)
   (let [(ordered (face-edge face edge))]
-    (make-plane
-      (list-ref vertices (car ordered))
-      (cross-product (map - (list-ref vertices (cadr ordered)) (list-ref vertices (car ordered))) (face-normal vertices face)))))
+    (make-plane (list-ref vertices (car ordered)) (cross-product (edge-vector vertices ordered) (face-normal vertices face)))))
+
+(define (voronoi-edge vertices edge)
+  (append (map (cut voronoi-vertex-edge vertices <> edge) edge) (map (cut voronoi-face-edge vertices <> edge) (adjacent-faces edge))))
 
 (define main-window #f)
 
@@ -114,7 +127,7 @@
       (gl-color 0 0 1)
       (for-each
         (lambda (i)
-          (if (in-cone rotated i '(-1 -1 0))
+          (if (in-voronoi-vertex rotated i '(-1 -1 0))
             (begin
               (apply gl-vertex (list-ref rotated i))
               (gl-vertex -1 -1 0))))
