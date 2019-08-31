@@ -93,15 +93,25 @@
 (define (voronoi-vertex vertices vertex)
   (map (lambda (edge) (negative-plane (voronoi-vertex-edge vertices vertex edge))) (adjacent-edges vertex)))
 
-(define (in-voronoi-vertex vertices vertex point)
-  (every (lambda (plane) (positive? (plane-distance plane point))) (voronoi-vertex vertices vertex)))
-
 (define (voronoi-face-edge vertices face edge)
   (let [(ordered (face-edge face edge))]
     (make-plane (list-ref vertices (car ordered)) (cross-product (edge-vector vertices ordered) (face-normal vertices face)))))
 
 (define (voronoi-edge vertices edge)
   (append (map (cut voronoi-vertex-edge vertices <> edge) edge) (map (cut voronoi-face-edge vertices <> edge) (adjacent-faces edge))))
+
+(define (in-voronoi-vertex vertices vertex point)
+  (every (lambda (plane) (positive? (plane-distance plane point))) (voronoi-vertex vertices vertex)))
+
+(define (in-voronoi-edge vertices edge point)
+  (every (lambda (plane) (positive? (plane-distance plane point))) (voronoi-edge vertices edge)))
+
+(define (edge-point vertices edge point)
+  (let* [(vec   (edge-vector vertices edge))
+         (norm2 (reduce + 0 (map (cut expt <> 2) vec)))
+         (base  (list-ref vertices (car edge)))
+         (proj  (/ (reduce + 0 (map * (map - point base) vec)) norm2))]
+    (map (lambda (a b) (+ a (* b proj))) base vec)))
 
 (define main-window #f)
 
@@ -129,9 +139,16 @@
         (lambda (i)
           (if (in-voronoi-vertex rotated i '(-1 -1 0))
             (begin
-              (apply gl-vertex (list-ref rotated i))
-              (gl-vertex -1 -1 0))))
-        (iota 8)))
+              (gl-vertex -1 -1 0)
+              (apply gl-vertex (list-ref rotated i)))))
+        (iota 8))
+      (for-each
+        (lambda (edge)
+          (if (in-voronoi-edge rotated edge '(-1 -1 0))
+            (begin
+              (gl-vertex -1 -1 0)
+              (apply gl-vertex (edge-point rotated edge '(-1 -1 0))))))
+        edges))
     (swap-buffers)))
 
 (define (on-idle)
