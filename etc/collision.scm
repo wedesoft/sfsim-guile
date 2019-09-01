@@ -107,14 +107,13 @@
   (cons (make-plane (list-ref vertices (car face)) (face-normal vertices face))
         (map (compose negative-plane (cut voronoi-face-edge vertices face <>)) (face-borders face))))
 
-(define (in-voronoi-vertex vertices vertex point)
-  (every (lambda (plane) (positive? (plane-distance plane point))) (voronoi-vertex vertices vertex)))
+(define (in-voronoi planes point) (every (lambda (plane) (positive? (plane-distance plane point))) planes))
 
-(define (in-voronoi-edge vertices edge point)
-  (every (lambda (plane) (positive? (plane-distance plane point))) (voronoi-edge vertices edge)))
+(define (in-voronoi-vertex vertices vertex point) (in-voronoi (voronoi-vertex vertices vertex) point))
 
-(define (in-voronoi-face vertices face point)
-  (every (lambda (plane) (positive? (plane-distance plane point))) (voronoi-face vertices face)))
+(define (in-voronoi-edge vertices edge point) (in-voronoi (voronoi-edge vertices edge) point))
+
+(define (in-voronoi-face vertices face point) (in-voronoi (voronoi-face vertices face) point))
 
 (define (edge-point vertices edge point)
   (let* [(vec   (edge-vector vertices edge))
