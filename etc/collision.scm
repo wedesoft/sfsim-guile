@@ -123,6 +123,13 @@
          (proj  (/ (reduce + 0 (map * (map - point base) vec)) norm2))]
     (map (lambda (a b) (+ a (* b proj))) base vec)))
 
+(define (face-point vertices face point)
+  (let* [(base  (list-ref vertices (car face)))
+         (vec   (face-normal vertices face))
+         (norm2 (reduce + 0 (map (cut expt <> 2) vec)))
+         (d     (/ (reduce + 0 (map * (map - point base) vec)) norm2))]
+    (map - point (map (cut * d <>) vec))))
+
 (define main-window #f)
 
 (define (on-reshape width height)
@@ -158,7 +165,14 @@
             (begin
               (gl-vertex -1 -1 0)
               (apply gl-vertex (edge-point rotated edge '(-1 -1 0))))))
-        edges))
+        edges)
+      (for-each
+        (lambda (face)
+          (if (in-voronoi-face rotated face '(-1 -1 0))
+            (begin
+              (gl-vertex -1 -1 0)
+              (apply gl-vertex (face-point rotated face '(-1 -1 0))))))
+        faces))
     (swap-buffers)))
 
 (define (on-idle)
