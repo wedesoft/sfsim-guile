@@ -90,6 +90,8 @@
 
 (define (adjacent-faces edge) (filter (lambda (face) (and (member (car edge) face) (member (cadr edge) face))) faces))
 
+(define (face-borders face) (map list face (append (cdr face) (list (car face)))))
+
 (define (voronoi-vertex vertices vertex)
   (map (lambda (edge) (negative-plane (voronoi-vertex-edge vertices vertex edge))) (adjacent-edges vertex)))
 
@@ -98,13 +100,21 @@
     (make-plane (list-ref vertices (car ordered)) (cross-product (edge-vector vertices ordered) (face-normal vertices face)))))
 
 (define (voronoi-edge vertices edge)
-  (append (map (cut voronoi-vertex-edge vertices <> edge) edge) (map (cut voronoi-face-edge vertices <> edge) (adjacent-faces edge))))
+  (append (map (cut voronoi-vertex-edge vertices <> edge) edge)
+          (map (cut voronoi-face-edge vertices <> edge) (adjacent-faces edge))))
+
+(define (voronoi-face vertices face)
+  (cons (make-plane (list-ref vertices (car face)) (face-normal vertices face))
+        (map (compose negative-plane (cut voronoi-face-edge vertices face <>)) (face-borders face))))
 
 (define (in-voronoi-vertex vertices vertex point)
   (every (lambda (plane) (positive? (plane-distance plane point))) (voronoi-vertex vertices vertex)))
 
 (define (in-voronoi-edge vertices edge point)
   (every (lambda (plane) (positive? (plane-distance plane point))) (voronoi-edge vertices edge)))
+
+(define (in-voronoi-face vertices face point)
+  (every (lambda (plane) (positive? (plane-distance plane point))) (voronoi-face vertices face)))
 
 (define (edge-point vertices edge point)
   (let* [(vec   (edge-vector vertices edge))
