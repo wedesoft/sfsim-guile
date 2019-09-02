@@ -168,9 +168,9 @@
     (swap-buffers)))
 
 (define (on-idle)
-  (set! alpha (+ alpha 0.0021))
-  (set! beta (+ beta 0.001))
-  (set! gamma (+ gamma 0.00052))
+  (set! alpha (+ alpha 0.021))
+  (set! beta (+ beta 0.01))
+  (set! gamma (+ gamma 0.0052))
   (post-redisplay))
 
 (initialize-glut (program-arguments) #:window-size '(640 . 480) #:display-mode (display-mode rgb double))
