@@ -86,48 +86,60 @@
 (define (plane-distance plane point) (reduce + 0 (map * (map - point (plane-point plane)) (plane-normal plane))))
 
 (define (voronoi-vertex-edge coordinates vertex edge)
-  (let [(ordered (order-edge-for-vertex vertex edge))] (make-plane (list-ref coordinates vertex) (edge-vector coordinates ordered))))
+  (let [(ordered (order-edge-for-vertex vertex edge))]
+    (make-plane (list-ref coordinates vertex) (edge-vector coordinates ordered))))
 
 (define (voronoi-face-edge coordinates face edge)
   (let [(ordered (order-edge-for-face face edge))]
-    (make-plane (list-ref coordinates (car ordered)) (cross-product (edge-vector coordinates ordered) (face-normal coordinates face)))))
+    (make-plane (list-ref coordinates (car ordered))
+                (cross-product (edge-vector coordinates ordered) (face-normal coordinates face)))))
 
 (define (voronoi-vertex coordinates vertex)
-  (map (lambda (edge) (negative-plane (voronoi-vertex-edge coordinates vertex edge))) (edges-adjacent-to-vertex vertex)))
+  (map (lambda (edge) (cons edge (negative-plane (voronoi-vertex-edge coordinates vertex edge)))) (edges-adjacent-to-vertex vertex)))
 
 (define (voronoi-edge coordinates edge)
-  (append (map (cut voronoi-vertex-edge coordinates <> edge) edge)
-          (map (cut voronoi-face-edge coordinates <> edge) (faces-adjacent-to-edge edge))))
+  (append (map (lambda (vertex) (cons vertex (voronoi-vertex-edge coordinates vertex edge))) edge)
+          (map (lambda (face) (cons face (voronoi-face-edge coordinates face edge))) (faces-adjacent-to-edge edge))))
 
 (define (voronoi-face coordinates face)
-  (cons (make-plane (list-ref coordinates (car face)) (face-normal coordinates face))
-        (map (compose negative-plane (cut voronoi-face-edge coordinates face <>)) (edges-adjacent-to-face face))))
+  (cons (cons (random 8) (make-plane (list-ref coordinates (car face)) (face-normal coordinates face)))
+        (map (lambda (edge) (cons edge (negative-plane (voronoi-face-edge coordinates face edge)))) (edges-adjacent-to-face face))))
 
-(define (in-voronoi planes point) (every (lambda (plane) (positive? (plane-distance plane point))) planes))
+(define (out-of-voronoi feats point) (any (lambda (feat) (if (negative? (plane-distance (cdr feat) point)) (car feat) #f)) feats))
 
-(define (in-voronoi-vertex coordinates vertex point) (in-voronoi (voronoi-vertex coordinates vertex) point))
+(define (out-of-voronoi-vertex coordinates vertex point) (out-of-voronoi (voronoi-vertex coordinates vertex) point))
 
-(define (in-voronoi-edge coordinates edge point) (in-voronoi (voronoi-edge coordinates edge) point))
+(define (out-of-voronoi-edge coordinates edge point) (out-of-voronoi (voronoi-edge coordinates edge) point))
 
-(define (in-voronoi-face coordinates face point) (in-voronoi (voronoi-face coordinates face) point))
-
-(define (vertex-point coordinates vertex point) (list-ref coordinates vertex))
+(define (out-of-voronoi-face coordinates face point) (out-of-voronoi (voronoi-face coordinates face) point))
 
 (define (inner-prod a b) (reduce + 0 (map * a b)))
 
 (define (norm2 vec) (inner-prod vec vec))
 
-(define (edge-point coordinates edge point)
+(define (vertex-closest coordinates vertex point) (list-ref coordinates vertex))
+
+(define (edge-closest coordinates edge point)
   (let* [(base  (list-ref coordinates (car edge)))
          (vec   (edge-vector coordinates edge))
          (d     (/ (inner-prod (map - point base) vec) (norm2 vec)))]
     (map + (map (cut * d <>) vec) base)))
 
-(define (face-point coordinates face point)
+(define (face-closest coordinates face point)
   (let* [(base  (list-ref coordinates (car face)))
          (vec   (face-normal coordinates face))
          (d     (/ (inner-prod (map - point base) vec) (norm2 vec)))]
     (map - point (map (cut * d <>) vec))))
+
+(define (closest-feature coordinates start point)
+  (let [(next (cond ((vertex? start) (out-of-voronoi-vertex coordinates start point))
+                    ((edge?   start) (out-of-voronoi-edge   coordinates start point))
+                    ((face?   start) (out-of-voronoi-face   coordinates start point))))]
+    (if next
+      (closest-feature coordinates next point)
+      (cond ((vertex? start) (vertex-closest coordinates start point))
+            ((edge?   start) (edge-closest   coordinates start point))
+            ((face?   start) (face-closest   coordinates start point))))))
 
 (define main-window #f)
 
@@ -151,33 +163,14 @@
           (apply gl-vertex (list-ref rotated (cadr edge))))
         edges)
       (gl-color 0 0 1)
-      (for-each
-        (lambda (vertex)
-          (if (in-voronoi-vertex rotated vertex '(-1 -1 0))
-            (begin
-              (gl-vertex -1 -1 0)
-              (apply gl-vertex (vertex-point rotated vertex '(-1 -1 0))))))
-        vertices)
-      (for-each
-        (lambda (edge)
-          (if (in-voronoi-edge rotated edge '(-1 -1 0))
-            (begin
-              (gl-vertex -1 -1 0)
-              (apply gl-vertex (edge-point rotated edge '(-1 -1 0))))))
-        edges)
-      (for-each
-        (lambda (face)
-          (if (in-voronoi-face rotated face '(-1 -1 0))
-            (begin
-              (gl-vertex -1 -1 0)
-              (apply gl-vertex (face-point rotated face '(-1 -1 0))))))
-        faces))
+      (gl-vertex -1 -1 0)
+      (apply gl-vertex (closest-feature rotated (random 8) '(-1 -1 0))))
     (swap-buffers)))
 
 (define (on-idle)
-  (set! alpha (+ alpha 0.021))
-  (set! beta (+ beta 0.01))
-  (set! gamma (+ gamma 0.0052))
+  (set! alpha (+ alpha 0.0021))
+  (set! beta (+ beta 0.001))
+  (set! gamma (+ gamma 0.00052))
   (post-redisplay))
 
 (initialize-glut (program-arguments) #:window-size '(640 . 480) #:display-mode (display-mode rgb double))
