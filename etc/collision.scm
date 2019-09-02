@@ -55,13 +55,13 @@
 
 (define (flip-edge edge) (reverse edge))
 
-(define (face-edge face edge)
+(define (order-edge-for-face face edge)
   (let [(i (index-of (car edge) face)) (j (index-of (cadr edge) face))]
     (if (or (eqv? (1+ i) j) (eqv? (- i 3) j)) edge (flip-edge edge))))
 
-(define (edge-vector coordinates edge) (map - (list-ref coordinates (cadr edge)) (list-ref coordinates (car edge))))
+(define (order-edge-for-vertex vertex edge) (if (eqv? (car edge) vertex) edge (flip-edge edge)))
 
-(define (vertex-edge vertex edge) (if (eqv? (car edge) vertex) edge (flip-edge edge)))
+(define (edge-vector coordinates edge) (map - (list-ref coordinates (cadr edge)) (list-ref coordinates (car edge))))
 
 (define (cross-product a b)
   (match-let [((a1 a2 a3) a) ((b1 b2 b3) b)]
@@ -86,11 +86,10 @@
 (define (plane-distance plane point) (reduce + 0 (map * (map - point (plane-point plane)) (plane-normal plane))))
 
 (define (voronoi-vertex-edge coordinates vertex edge)
-  (format #t "~a ~a~&" vertex edge)
-  (let [(ordered (vertex-edge vertex edge))] (make-plane (list-ref coordinates vertex) (edge-vector coordinates ordered))))
+  (let [(ordered (order-edge-for-vertex vertex edge))] (make-plane (list-ref coordinates vertex) (edge-vector coordinates ordered))))
 
 (define (voronoi-face-edge coordinates face edge)
-  (let [(ordered (face-edge face edge))]
+  (let [(ordered (order-edge-for-face face edge))]
     (make-plane (list-ref coordinates (car ordered)) (cross-product (edge-vector coordinates ordered) (face-normal coordinates face)))))
 
 (define (voronoi-vertex coordinates vertex)
