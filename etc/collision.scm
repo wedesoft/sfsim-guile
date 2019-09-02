@@ -53,23 +53,19 @@
 
 (define (index-of a b) (list-index (cut eqv? a <>) b))
 
-(define (swap-edge edge) (list (cadr edge) (car edge)))
+(define (flip-edge edge) (reverse edge))
 
 (define (face-edge face edge)
-  (let [(i (index-of (car edge) face))
-        (j (index-of (cadr edge) face))]
-    (if (or (eqv? (1+ i) j) (eqv? (- i 3) j)) edge (swap-edge edge))))
+  (let [(i (index-of (car edge) face)) (j (index-of (cadr edge) face))]
+    (if (or (eqv? (1+ i) j) (eqv? (- i 3) j)) edge (flip-edge edge))))
 
 (define (edge-vector coordinates edge) (map - (list-ref coordinates (cadr edge)) (list-ref coordinates (car edge))))
 
-(define (vertex-edge vertex edge) (if (eqv? (car edge) vertex) edge (swap-edge edge)))
+(define (vertex-edge vertex edge) (if (eqv? (car edge) vertex) edge (flip-edge edge)))
 
 (define (cross-product a b)
-  (match-let [((a1 a2 a3) a)
-              ((b1 b2 b3) b)]
-    (list (- (* a2 b3) (* a3 b2))
-          (- (* a3 b1) (* a1 b3))
-          (- (* a1 b2) (* a2 b1)))))
+  (match-let [((a1 a2 a3) a) ((b1 b2 b3) b)]
+    (list (- (* a2 b3) (* a3 b2)) (- (* a3 b1) (* a1 b3)) (- (* a1 b2) (* a2 b1)))))
 
 (define (face-normal coordinates face)
   (cross-product (map - (list-ref coordinates (cadr face)) (list-ref coordinates (car face)))
@@ -79,33 +75,34 @@
 (define plane-point car)
 (define plane-normal cadr)
 
+(define (edges-adjacent-to-vertex vertex) (filter (lambda (edge) (member vertex edge)) edges))
+
+(define (faces-adjacent-to-edge edge) (filter (lambda (face) (and (member (car edge) face) (member (cadr edge) face))) faces))
+
+(define (edges-adjacent-to-face face) (map list face (append (cdr face) (list (car face)))))
+
 (define (negative-plane plane) (make-plane (plane-point plane) (map - (plane-normal plane))))
 
 (define (plane-distance plane point) (reduce + 0 (map * (map - point (plane-point plane)) (plane-normal plane))))
 
 (define (voronoi-vertex-edge coordinates vertex edge)
+  (format #t "~a ~a~&" vertex edge)
   (let [(ordered (vertex-edge vertex edge))] (make-plane (list-ref coordinates vertex) (edge-vector coordinates ordered))))
-
-(define (adjacent-edges vertex) (filter (lambda (edge) (member vertex edge)) edges))
-
-(define (adjacent-faces edge) (filter (lambda (face) (and (member (car edge) face) (member (cadr edge) face))) faces))
-
-(define (face-borders face) (map list face (append (cdr face) (list (car face)))))
 
 (define (voronoi-face-edge coordinates face edge)
   (let [(ordered (face-edge face edge))]
     (make-plane (list-ref coordinates (car ordered)) (cross-product (edge-vector coordinates ordered) (face-normal coordinates face)))))
 
 (define (voronoi-vertex coordinates vertex)
-  (map (lambda (edge) (negative-plane (voronoi-vertex-edge coordinates vertex edge))) (adjacent-edges vertex)))
+  (map (lambda (edge) (negative-plane (voronoi-vertex-edge coordinates vertex edge))) (edges-adjacent-to-vertex vertex)))
 
 (define (voronoi-edge coordinates edge)
   (append (map (cut voronoi-vertex-edge coordinates <> edge) edge)
-          (map (cut voronoi-face-edge coordinates <> edge) (adjacent-faces edge))))
+          (map (cut voronoi-face-edge coordinates <> edge) (faces-adjacent-to-edge edge))))
 
 (define (voronoi-face coordinates face)
   (cons (make-plane (list-ref coordinates (car face)) (face-normal coordinates face))
-        (map (compose negative-plane (cut voronoi-face-edge coordinates face <>)) (face-borders face))))
+        (map (compose negative-plane (cut voronoi-face-edge coordinates face <>)) (edges-adjacent-to-face face))))
 
 (define (in-voronoi planes point) (every (lambda (plane) (positive? (plane-distance plane point))) planes))
 
