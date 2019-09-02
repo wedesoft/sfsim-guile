@@ -14,7 +14,7 @@
 (define beta 0.0)
 (define gamma 0.0)
 
-(define vertices
+(define coordinates
   (list (list (- w2) (- h2) (- d2))
         (list (+ w2) (- h2) (- d2))
         (list (- w2) (+ h2) (- d2))
@@ -24,8 +24,8 @@
         (list (- w2) (+ h2) (+ d2))
         (list (+ w2) (+ h2) (+ d2))))
 
+(define vertices '(0 1 2 3 4 5 6 7))
 (define edges '((0 1) (2 3) (4 5) (6 7) (0 2) (1 3) (4 6) (5 7) (0 4) (1 5) (2 6) (3 7)))
-
 (define faces '((0 2 3 1) (4 5 7 6) (0 1 5 4) (2 6 7 3) (0 4 6 2) (1 3 7 5)))
 
 (define (vertex? v) (number? v))
@@ -49,7 +49,7 @@
 
 (define (dot matrix point) (map (lambda (row) (reduce + 0 (map (lambda (m p) (* m p)) row point))) matrix))
 
-(define (rotate matrix vertices) (map (lambda (point) (dot matrix point)) vertices))
+(define (rotate matrix coordinates) (map (lambda (point) (dot matrix point)) coordinates))
 
 (define (index-of a b) (list-index (cut eqv? a <>) b))
 
@@ -60,7 +60,7 @@
         (j (index-of (cadr edge) face))]
     (if (or (eqv? (1+ i) j) (eqv? (- i 3) j)) edge (swap-edge edge))))
 
-(define (edge-vector vertices edge) (map - (list-ref vertices (cadr edge)) (list-ref vertices (car edge))))
+(define (edge-vector coordinates edge) (map - (list-ref coordinates (cadr edge)) (list-ref coordinates (car edge))))
 
 (define (vertex-edge vertex edge) (if (eqv? (car edge) vertex) edge (swap-edge edge)))
 
@@ -71,9 +71,9 @@
           (- (* a3 b1) (* a1 b3))
           (- (* a1 b2) (* a2 b1)))))
 
-(define (face-normal vertices face)
-  (cross-product (map - (list-ref vertices (cadr face)) (list-ref vertices (car face)))
-                 (map - (list-ref vertices (last face)) (list-ref vertices (car face)))))
+(define (face-normal coordinates face)
+  (cross-product (map - (list-ref coordinates (cadr face)) (list-ref coordinates (car face)))
+                 (map - (list-ref coordinates (last face)) (list-ref coordinates (car face)))))
 
 (define make-plane list)
 (define plane-point car)
@@ -83,8 +83,8 @@
 
 (define (plane-distance plane point) (reduce + 0 (map * (map - point (plane-point plane)) (plane-normal plane))))
 
-(define (voronoi-vertex-edge vertices vertex edge)
-  (let [(ordered (vertex-edge vertex edge))] (make-plane (list-ref vertices vertex) (edge-vector vertices ordered))))
+(define (voronoi-vertex-edge coordinates vertex edge)
+  (let [(ordered (vertex-edge vertex edge))] (make-plane (list-ref coordinates vertex) (edge-vector coordinates ordered))))
 
 (define (adjacent-edges vertex) (filter (lambda (edge) (member vertex edge)) edges))
 
@@ -92,39 +92,41 @@
 
 (define (face-borders face) (map list face (append (cdr face) (list (car face)))))
 
-(define (voronoi-vertex vertices vertex)
-  (map (lambda (edge) (negative-plane (voronoi-vertex-edge vertices vertex edge))) (adjacent-edges vertex)))
-
-(define (voronoi-face-edge vertices face edge)
+(define (voronoi-face-edge coordinates face edge)
   (let [(ordered (face-edge face edge))]
-    (make-plane (list-ref vertices (car ordered)) (cross-product (edge-vector vertices ordered) (face-normal vertices face)))))
+    (make-plane (list-ref coordinates (car ordered)) (cross-product (edge-vector coordinates ordered) (face-normal coordinates face)))))
 
-(define (voronoi-edge vertices edge)
-  (append (map (cut voronoi-vertex-edge vertices <> edge) edge)
-          (map (cut voronoi-face-edge vertices <> edge) (adjacent-faces edge))))
+(define (voronoi-vertex coordinates vertex)
+  (map (lambda (edge) (negative-plane (voronoi-vertex-edge coordinates vertex edge))) (adjacent-edges vertex)))
 
-(define (voronoi-face vertices face)
-  (cons (make-plane (list-ref vertices (car face)) (face-normal vertices face))
-        (map (compose negative-plane (cut voronoi-face-edge vertices face <>)) (face-borders face))))
+(define (voronoi-edge coordinates edge)
+  (append (map (cut voronoi-vertex-edge coordinates <> edge) edge)
+          (map (cut voronoi-face-edge coordinates <> edge) (adjacent-faces edge))))
+
+(define (voronoi-face coordinates face)
+  (cons (make-plane (list-ref coordinates (car face)) (face-normal coordinates face))
+        (map (compose negative-plane (cut voronoi-face-edge coordinates face <>)) (face-borders face))))
 
 (define (in-voronoi planes point) (every (lambda (plane) (positive? (plane-distance plane point))) planes))
 
-(define (in-voronoi-vertex vertices vertex point) (in-voronoi (voronoi-vertex vertices vertex) point))
+(define (in-voronoi-vertex coordinates vertex point) (in-voronoi (voronoi-vertex coordinates vertex) point))
 
-(define (in-voronoi-edge vertices edge point) (in-voronoi (voronoi-edge vertices edge) point))
+(define (in-voronoi-edge coordinates edge point) (in-voronoi (voronoi-edge coordinates edge) point))
 
-(define (in-voronoi-face vertices face point) (in-voronoi (voronoi-face vertices face) point))
+(define (in-voronoi-face coordinates face point) (in-voronoi (voronoi-face coordinates face) point))
 
-(define (edge-point vertices edge point)
-  (let* [(vec   (edge-vector vertices edge))
+(define (vertex-point coordinates vertex point) (list-ref coordinates vertex))
+
+(define (edge-point coordinates edge point)
+  (let* [(vec   (edge-vector coordinates edge))
          (norm2 (reduce + 0 (map (cut expt <> 2) vec)))
-         (base  (list-ref vertices (car edge)))
+         (base  (list-ref coordinates (car edge)))
          (proj  (/ (reduce + 0 (map * (map - point base) vec)) norm2))]
     (map (lambda (a b) (+ a (* b proj))) base vec)))
 
-(define (face-point vertices face point)
-  (let* [(base  (list-ref vertices (car face)))
-         (vec   (face-normal vertices face))
+(define (face-point coordinates face point)
+  (let* [(base  (list-ref coordinates (car face)))
+         (vec   (face-normal coordinates face))
          (norm2 (reduce + 0 (map (cut expt <> 2) vec)))
          (d     (/ (reduce + 0 (map * (map - point base) vec)) norm2))]
     (map - point (map (cut * d <>) vec))))
@@ -141,7 +143,7 @@
     (gl-ortho (- w) w (- h) h -100 +100)))
 
 (define (on-display)
-  (let [(rotated (rotate (rotate-z gamma) (rotate (rotate-y beta) (rotate (rotate-x alpha) vertices))))]
+  (let [(rotated (rotate (rotate-z gamma) (rotate (rotate-y beta) (rotate (rotate-x alpha) coordinates))))]
     (gl-clear (clear-buffer-mask color-buffer))
     (gl-begin (begin-mode lines)
       (gl-color 1 0 0)
@@ -152,12 +154,12 @@
         edges)
       (gl-color 0 0 1)
       (for-each
-        (lambda (i)
-          (if (in-voronoi-vertex rotated i '(-1 -1 0))
+        (lambda (vertex)
+          (if (in-voronoi-vertex rotated vertex '(-1 -1 0))
             (begin
               (gl-vertex -1 -1 0)
-              (apply gl-vertex (list-ref rotated i)))))
-        (iota 8))
+              (apply gl-vertex (vertex-point rotated vertex '(-1 -1 0))))))
+        vertices)
       (for-each
         (lambda (edge)
           (if (in-voronoi-edge rotated edge '(-1 -1 0))
