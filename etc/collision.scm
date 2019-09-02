@@ -113,18 +113,20 @@
 
 (define (vertex-point coordinates vertex point) (list-ref coordinates vertex))
 
+(define (inner-prod a b) (reduce + 0 (map * a b)))
+
+(define (norm2 vec) (inner-prod vec vec))
+
 (define (edge-point coordinates edge point)
-  (let* [(vec   (edge-vector coordinates edge))
-         (norm2 (reduce + 0 (map (cut expt <> 2) vec)))
-         (base  (list-ref coordinates (car edge)))
-         (proj  (/ (reduce + 0 (map * (map - point base) vec)) norm2))]
-    (map (lambda (a b) (+ a (* b proj))) base vec)))
+  (let* [(base  (list-ref coordinates (car edge)))
+         (vec   (edge-vector coordinates edge))
+         (d     (/ (inner-prod (map - point base) vec) (norm2 vec)))]
+    (map + (map (cut * d <>) vec) base)))
 
 (define (face-point coordinates face point)
   (let* [(base  (list-ref coordinates (car face)))
          (vec   (face-normal coordinates face))
-         (norm2 (reduce + 0 (map (cut expt <> 2) vec)))
-         (d     (/ (reduce + 0 (map * (map - point base) vec)) norm2))]
+         (d     (/ (inner-prod (map - point base) vec) (norm2 vec)))]
     (map - point (map (cut * d <>) vec))))
 
 (define main-window #f)
