@@ -105,13 +105,13 @@
   (cons (cons (random 8) (make-plane (list-ref coordinates (car face)) (face-normal coordinates face)))
         (map (lambda (edge) (cons edge (negative-plane (voronoi-face-edge coordinates face edge)))) (edges-adjacent-to-face face))))
 
-(define (out-of-voronoi feats point) (any (lambda (feat) (if (negative? (plane-distance (cdr feat) point)) (car feat) #f)) feats))
+(define (voronoi coordinates feature)
+  ((cond ((vertex? feature) voronoi-vertex)
+         ((edge?   feature) voronoi-edge  )
+         ((face?   feature) voronoi-face  )) coordinates feature))
 
-(define (out-of-voronoi-vertex coordinates vertex point) (out-of-voronoi (voronoi-vertex coordinates vertex) point))
-
-(define (out-of-voronoi-edge coordinates edge point) (out-of-voronoi (voronoi-edge coordinates edge) point))
-
-(define (out-of-voronoi-face coordinates face point) (out-of-voronoi (voronoi-face coordinates face) point))
+(define (out-of-voronoi candidates point)
+  (any (lambda (candidate) (if (negative? (plane-distance (cdr candidate) point)) (car candidate) #f)) candidates))
 
 (define (inner-prod a b) (reduce + 0 (map * a b)))
 
@@ -131,15 +131,16 @@
          (d     (/ (inner-prod (map - point base) vec) (norm2 vec)))]
     (map - point (map (cut * d <>) vec))))
 
-(define (closest-feature coordinates start point)
-  (let [(next (cond ((vertex? start) (out-of-voronoi-vertex coordinates start point))
-                    ((edge?   start) (out-of-voronoi-edge   coordinates start point))
-                    ((face?   start) (out-of-voronoi-face   coordinates start point))))]
+(define (feature-closest coordinates feature point)
+  ((cond ((vertex? feature) vertex-closest)
+         ((edge?   feature) edge-closest  )
+         ((face?   feature) face-closest  )) coordinates feature point))
+
+(define (closest coordinates start point)
+  (let [(next (out-of-voronoi (voronoi coordinates start) point))]
     (if next
-      (closest-feature coordinates next point)
-      (cond ((vertex? start) (vertex-closest coordinates start point))
-            ((edge?   start) (edge-closest   coordinates start point))
-            ((face?   start) (face-closest   coordinates start point))))))
+      (closest coordinates next point)
+      (feature-closest coordinates start point))))
 
 (define main-window #f)
 
@@ -164,7 +165,7 @@
         edges)
       (gl-color 0 0 1)
       (gl-vertex -1 -1 0)
-      (apply gl-vertex (closest-feature rotated (random 8) '(-1 -1 0))))
+      (apply gl-vertex (closest rotated (random 8) '(-1 -1 0))))
     (swap-buffers)))
 
 (define (on-idle)
