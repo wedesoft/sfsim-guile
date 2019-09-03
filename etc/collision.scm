@@ -136,10 +136,10 @@
          ((edge?   feature) edge-closest  )
          ((face?   feature) face-closest  )) coordinates feature point))
 
-(define (closest coordinates start point)
+(define (closest-point coordinates start point)
   (let [(next (out-of-voronoi (voronoi coordinates start) point))]
     (if next
-      (closest coordinates next point)
+      (closest-point coordinates next point)
       (feature-closest coordinates start point))))
 
 (define main-window #f)
@@ -165,7 +165,7 @@
         edges)
       (gl-color 0 0 1)
       (gl-vertex -1 -1 0)
-      (apply gl-vertex (closest rotated (random 8) '(-1 -1 0))))
+      (apply gl-vertex (closest-point rotated (random 8) '(-1 -1 0))))
     (swap-buffers)))
 
 (define (on-idle)
