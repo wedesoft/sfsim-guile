@@ -47,6 +47,8 @@
         (list 0 (cos alpha) (- (sin alpha)))
         (list 0 (sin alpha) (cos alpha))))
 
+(define (translate vec coordinates) (map (lambda (point) (map + point vec)) coordinates))
+
 (define (dot matrix point) (map (lambda (row) (reduce + 0 (map (lambda (m p) (* m p)) row point))) matrix))
 
 (define (rotate matrix coordinates) (map (lambda (point) (dot matrix point)) coordinates))
@@ -154,18 +156,22 @@
     (gl-ortho (- w) w (- h) h -100 +100)))
 
 (define (on-display)
-  (let [(rotated (rotate (rotate-z gamma) (rotate (rotate-y beta) (rotate (rotate-x alpha) coordinates))))]
+  (let [(object1 (translate '(-0.5 0 0) (rotate (rotate-z gamma) (rotate (rotate-y beta) (rotate (rotate-x alpha) coordinates)))))
+        (object2 (translate '(+0.5 0 0) (rotate (rotate-x gamma) (rotate (rotate-y beta) (rotate (rotate-z alpha) coordinates)))))]
     (gl-clear (clear-buffer-mask color-buffer))
     (gl-begin (begin-mode lines)
       (gl-color 1 0 0)
       (for-each
-        (lambda (edge)
-          (apply gl-vertex (list-ref rotated (car edge)))
-          (apply gl-vertex (list-ref rotated (cadr edge))))
-        edges)
+        (lambda (object)
+          (for-each
+           (lambda (edge)
+             (apply gl-vertex (list-ref object (car edge)))
+             (apply gl-vertex (list-ref object (cadr edge))))
+           edges))
+        (list object1 object2))
       (gl-color 0 0 1)
-      (gl-vertex -1 -1 0)
-      (apply gl-vertex (closest-point rotated (random 8) '(-1 -1 0))))
+      (apply gl-vertex (car object1))
+      (apply gl-vertex (closest-point object2 (random 8) (car object1))))
     (swap-buffers)))
 
 (define (on-idle)
