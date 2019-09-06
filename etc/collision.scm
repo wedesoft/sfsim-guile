@@ -157,6 +157,22 @@
              (apply gl-vertex (list-ref object (cadr edge))))
            edges))
         (list object1 object2))
+      (match-let [((face . dist) (best-face object1 faces object2 vertices))]
+        (gl-color 0 0 1)
+        (if (positive? dist)
+          (for-each
+            (lambda (edge)
+              (apply gl-vertex (list-ref object1 (car edge)))
+              (apply gl-vertex (list-ref object1 (cadr edge))))
+            (edges-adjacent-to-face face))))
+      (match-let [((face . dist) (best-face object2 faces object1 vertices))]
+        (gl-color 0 0 1)
+        (if (positive? dist)
+          (for-each
+            (lambda (edge)
+              (apply gl-vertex (list-ref object2 (car edge)))
+              (apply gl-vertex (list-ref object2 (cadr edge))))
+            (edges-adjacent-to-face face))))
       (let [(result (separating object1 edges object2 edges))]
         (gl-color 0 1 0)
         (if result
@@ -164,24 +180,7 @@
             (apply gl-vertex (list-ref object1 (car (car result))))
             (apply gl-vertex (list-ref object1 (cadr (car result))))
             (apply gl-vertex (list-ref object2 (car (cdr result))))
-            (apply gl-vertex (list-ref object2 (cadr (cdr result)))))))
-      ;(match-let [((face . dist) (best-face object1 faces object2 vertices))]
-      ;  (gl-color 0 1 0)
-      ;  (if (positive? dist)
-      ;    (for-each
-      ;      (lambda (edge)
-      ;        (apply gl-vertex (list-ref object1 (car edge)))
-      ;        (apply gl-vertex (list-ref object1 (cadr edge))))
-      ;      (edges-adjacent-to-face face))))
-      ;(match-let [((face . dist) (best-face object2 faces object1 vertices))]
-      ;  (gl-color 0 1 0)
-      ;  (if (positive? dist)
-      ;    (for-each
-      ;      (lambda (edge)
-      ;        (apply gl-vertex (list-ref object2 (car edge)))
-      ;        (apply gl-vertex (list-ref object2 (cadr edge))))
-      ;      (edges-adjacent-to-face face))))
-            )
+            (apply gl-vertex (list-ref object2 (cadr (cdr result))))))))
     (swap-buffers)))
 
 (define (on-idle)
