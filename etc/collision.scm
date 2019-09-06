@@ -86,6 +86,9 @@
 
 (define (face-plane coordinates face) (make-plane (list-ref coordinates (car face)) (face-normal coordinates face)))
 
+(define (edges-plane object1 edge1 object2 edge2)
+  (make-plane (edge-tail object1 edge1) (cross-product (edge-vector object1 edge1) (edge-vector object2 edge2))))
+
 (define (edges-adjacent-to-vertex vertex) (filter (lambda (edge) (member vertex edge)) edges))
 
 (define (faces-adjacent-to-edge edge) (filter (lambda (face) (and (member (car edge) face) (member (cadr edge) face))) faces))
@@ -107,12 +110,26 @@
 
 (define (argmax fun lst) (argop max fun lst))
 
-(define (min-elevation object1 face1 object2 vertices2)
-  (apply min (map (lambda (vertex) (plane-distance (face-plane object1 face1) (list-ref object2 vertex))) vertices2)))
+(define (elevation reduce plane object2 vertices2)
+  (apply reduce (map (lambda (vertex) (plane-distance plane (list-ref object2 vertex))) vertices2)))
+
+(define (combine set1 set2)
+  (list (append-map (lambda (x) (make-list (length set2) x)) set1) (apply append (make-list (length set1) set2))))
+
+(define (separation plane object1 vertices1 object2 vertices2)
+  (or (and (<= 0 (elevation min plane object2 vertices2)) (>= 0 (elevation max plane object1 vertices1)))
+      (and (>= 0 (elevation max plane object2 vertices2)) (<= 0 (elevation min plane object1 vertices1)))))
+
+(define (separating object1 edges1 object2 edges2)
+  (find
+    (lambda (pair)
+      (match-let [((edge1 . edge2) pair)]
+        (separation (edges-plane object1 edge1 object2 edge2) object1 vertices object2 vertices)))
+    (apply map cons (combine edges1 edges2))))
 
 (define (best-face object1 faces1 object2 vertices2)
-  (let* [(face (argmax (lambda (face) (min-elevation object1 face object2 vertices2)) faces1))
-         (dist (min-elevation object1 face object2 vertices2))]
+  (let* [(face (argmax (lambda (face) (elevation min (face-plane object1 face) object2 vertices2)) faces1))
+         (dist (elevation min (face-plane object1 face) object2 vertices2))]
     (cons face dist)))
 
 (define main-window #f)
@@ -140,28 +157,37 @@
              (apply gl-vertex (list-ref object (cadr edge))))
            edges))
         (list object1 object2))
-      (match-let [((face . dist) (best-face object1 faces object2 vertices))]
+      (let [(result (separating object1 edges object2 edges))]
         (gl-color 0 1 0)
-        (if (positive? dist)
-          (for-each
-            (lambda (edge)
-              (apply gl-vertex (list-ref object1 (car edge)))
-              (apply gl-vertex (list-ref object1 (cadr edge))))
-            (edges-adjacent-to-face face))))
-      (match-let [((face . dist) (best-face object2 faces object1 vertices))]
-        (gl-color 0 1 0)
-        (if (positive? dist)
-          (for-each
-            (lambda (edge)
-              (apply gl-vertex (list-ref object2 (car edge)))
-              (apply gl-vertex (list-ref object2 (cadr edge))))
-            (edges-adjacent-to-face face)))))
+        (if result
+          (begin
+            (apply gl-vertex (list-ref object1 (car (car result))))
+            (apply gl-vertex (list-ref object1 (cadr (car result))))
+            (apply gl-vertex (list-ref object2 (car (cdr result))))
+            (apply gl-vertex (list-ref object2 (cadr (cdr result)))))))
+      ;(match-let [((face . dist) (best-face object1 faces object2 vertices))]
+      ;  (gl-color 0 1 0)
+      ;  (if (positive? dist)
+      ;    (for-each
+      ;      (lambda (edge)
+      ;        (apply gl-vertex (list-ref object1 (car edge)))
+      ;        (apply gl-vertex (list-ref object1 (cadr edge))))
+      ;      (edges-adjacent-to-face face))))
+      ;(match-let [((face . dist) (best-face object2 faces object1 vertices))]
+      ;  (gl-color 0 1 0)
+      ;  (if (positive? dist)
+      ;    (for-each
+      ;      (lambda (edge)
+      ;        (apply gl-vertex (list-ref object2 (car edge)))
+      ;        (apply gl-vertex (list-ref object2 (cadr edge))))
+      ;      (edges-adjacent-to-face face))))
+            )
     (swap-buffers)))
 
 (define (on-idle)
-  (set! alpha (+ alpha 0.021))
-  (set! beta (+ beta 0.01))
-  (set! gamma (+ gamma 0.0052))
+  (set! alpha (+ alpha 0.0021))
+  (set! beta (+ beta 0.001))
+  (set! gamma (+ gamma 0.00052))
   (post-redisplay))
 
 (initialize-glut (program-arguments) #:window-size '(640 . 480) #:display-mode (display-mode rgb double))
