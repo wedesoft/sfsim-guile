@@ -1,17 +1,24 @@
 # TODO
 
-* Cline: constraints for acceleration and impulses, joints
-* (micro) collision of gear
+* V-Clip algorithm and visualize closest points
+* Euler integration
+* V-Clip multiple contacts
+* collision of blocks
+* contact constraints of blocks
+* joint constraints
+* Runge-Kutta integration
+* 3DS object hierarchy
+* 3DS load vertex array objects
+* convex hull extraction
+* OpenGL visualisation
+* collision of gear
 * notesd2.pdf: separating plane!
 * estimate friction impulse
 * display body with gears
-* state -> body
-* OpenGL, 3DS
 * quaternion, state vectors
 * compute forces of zero-mass spring damper gears
 * cockpit: frontal and side view of moon lander
 * XBox controller
-* OpenGL bindings for rendering 3DS vertex array objects
 * good tessellation for planet spheres
 * 3D cockpit
 * 3D moon rendering

@@ -1,6 +1,6 @@
 #!/usr/bin/env guile
 !#
-(use-modules (glut) (gl) (gl low-level) (ice-9 match) (srfi srfi-1) (srfi srfi-26))
+(use-modules (glut) (gl) (gl low-level) (ice-9 match) (ice-9 format) (srfi srfi-1) (srfi srfi-26))
 
 (define w 0.5)
 (define h 0.1)
@@ -53,7 +53,7 @@
 
 (define (rotate matrix coordinates) (map (lambda (point) (dot matrix point)) coordinates))
 
-(define (index-of a b) (list-index (cut eqv? a <>) b))
+(define (index-of a b) (list-index (cut = a <>) b))
 
 (define (flip-edge edge) (reverse edge))
 
@@ -63,7 +63,14 @@
 
 (define (order-edge-for-vertex vertex edge) (if (eqv? (car edge) vertex) edge (flip-edge edge)))
 
-(define (edge-vector coordinates edge) (map - (list-ref coordinates (cadr edge)) (list-ref coordinates (car edge))))
+(define (edge-head coordinates edge) (list-ref coordinates (cadr edge)))
+
+(define (edge-tail coordinates edge) (list-ref coordinates (car edge)))
+
+(define (edge-vector coordinates edge) (map - (edge-head coordinates edge) (edge-tail coordinates edge)))
+
+(define (edge-point coordinates edge l)
+  (map + (edge-tail coordinates edge) (map (cut * l <>) (edge-vector coordinates edge))))
 
 (define (cross-product a b)
   (match-let [((a1 a2 a3) a) ((b1 b2 b3) b)]
@@ -97,7 +104,8 @@
                 (cross-product (edge-vector coordinates ordered) (face-normal coordinates face)))))
 
 (define (voronoi-vertex coordinates vertex)
-  (map (lambda (edge) (cons edge (negative-plane (voronoi-vertex-edge coordinates vertex edge)))) (edges-adjacent-to-vertex vertex)))
+  (map (lambda (edge) (cons (order-edge-for-vertex vertex edge) (negative-plane (voronoi-vertex-edge coordinates vertex edge))))
+       (edges-adjacent-to-vertex vertex)))
 
 (define (voronoi-edge coordinates edge)
   (append (map (lambda (vertex) (cons vertex (voronoi-vertex-edge coordinates vertex edge))) edge)
@@ -105,7 +113,8 @@
 
 (define (voronoi-face coordinates face)
   (cons (cons (random 8) (make-plane (list-ref coordinates (car face)) (face-normal coordinates face)))
-        (map (lambda (edge) (cons edge (negative-plane (voronoi-face-edge coordinates face edge)))) (edges-adjacent-to-face face))))
+        (map (lambda (edge) (cons (order-edge-for-face edge) (negative-plane (voronoi-face-edge coordinates face edge))))
+             (edges-adjacent-to-face face))))
 
 (define (voronoi coordinates feature)
   ((cond ((vertex? feature) voronoi-vertex)
@@ -144,6 +153,72 @@
       (closest-point coordinates next point)
       (feature-closest coordinates start point))))
 
+(define (swap pair) (cons (cdr pair) (car pair)))
+
+(define (clip-edge-voronoi coordinates edge feature)
+  (let [(dt (plane-distance (cdr feature) (edge-tail coordinates edge)))
+        (dh (plane-distance (cdr feature) (edge-head coordinates edge)))]
+    (if (>= dt 0)
+      (if (>= dh 0)
+        (list -1 2 #f)
+        (let [(l (/ dt (- dt dh)))] (list 0 l (car feature))))
+      (if (< dh 0)
+        (list 1 0 (car feature))
+        (let [(l (/ dt (- dt dh)))] (list l 1 (car feature)))))))
+
+(define (extremum e key lst)
+  (let* [(keys (map key lst))
+         (m    (apply e keys))]
+    (list-ref lst (index-of m keys))))
+
+(define (clip-edge-vertex object1 edge1 object2 vertex2)
+  (let* [(clip (map (cut clip-edge-voronoi object1 edge1 <>) (voronoi-vertex object2 vertex2)))
+         (lower-bound (extremum max car clip))
+         (upper-bound (extremum min cadr clip))]
+    (if (and (eqv? (car lower-bound) -1) (eqv? (cadr upper-bound) 2))
+      (cons (car edge1) vertex2)
+      (if (and (caddr lower-bound)
+               (positive? (inner-prod (edge-vector object1 edge1)
+                                      (map - (edge-point object1 edge1 (car lower-bound)) (list-ref object2 vertex2)))))
+        (edge-edge-test object1 edge1 object2 (caddr lower-bound))
+        (if (and (caddr upper-bound)
+                 (negative? (inner-prod (edge-vector object1 edge1)
+                                        (map - (edge-point object1 edge1 (cadr upper-bound)) (list-ref object2 vertex2)))))
+          (edge-edge-test object1 edge1 object2 (caddr upper-bound))
+          (cons (car edge1) vertex2))))))
+
+(define (edge-vertex-test object1 edge1 object2 vertex2)
+  (let* [(candidates1 (voronoi-edge object1 edge1))
+         (feature1 (out-of-voronoi candidates1 (list-ref object2 vertex2)))]
+    (if feature1
+      (if (vertex? feature1)
+        (vertex-vertex-test object1 feature1 object2 vertex2)
+        (face-vertex-test object1 feature1 object2 vertex2))
+      (clip-edge-vertex object1 edge1 object2 vertex2))))
+
+(define (vertex-edge-test object1 vertex1 object2 edge2)
+  (swap (edge-vertex-test object2 edge2 object1 vertex1)))
+
+(define (vertex-vertex-test object1 vertex1 object2 vertex2)
+  (let* [(candidates1 (voronoi-vertex object1 vertex1))
+         (edge1 (out-of-voronoi candidates1 (list-ref object2 vertex2)))]
+    (if edge1
+      (edge-vertex-test object1 edge1 object2 vertex2)
+      (let* [(candidates2 (voronoi-vertex object2 vertex2))
+             (edge2 (out-of-voronoi candidates2 (list-ref object1 vertex1)))]
+        (if edge2
+          (vertex-edge-test object1 vertex1 object2 edge2)
+          (cons vertex1 vertex2))))))
+
+(define (edge-edge-test object1 edge1 object2 edge2)
+  (cons (car edge1) (car edge2))); TODO: implement this
+
+(define (face-vertex-test object1 face1 object2 vertex2)
+  (cons (car face1) vertex2)); TODO: implement this test
+
+(define (closest-points object1 feature1 object2 feature2)
+  (cons (list-ref object1 feature1) (list-ref object2 feature2)))
+
 (define main-window #f)
 
 (define (on-reshape width height)
@@ -169,9 +244,11 @@
              (apply gl-vertex (list-ref object (cadr edge))))
            edges))
         (list object1 object2))
-      (gl-color 0 0 1)
-      (apply gl-vertex (car object1))
-      (apply gl-vertex (closest-point object2 (random 8) (car object1))))
+      (let* [(feature-pair (vertex-vertex-test object1 (random 8) object2 (random 8)))
+             (points (closest-points object1 (car feature-pair) object2 (cdr feature-pair)))]; TOOD: compute closest points
+        (gl-color 0 0 1)
+        (apply gl-vertex (car points))
+        (apply gl-vertex (cdr points))))
     (swap-buffers)))
 
 (define (on-idle)
