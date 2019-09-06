@@ -76,13 +76,15 @@
   (match-let [((a1 a2 a3) a) ((b1 b2 b3) b)]
     (list (- (* a2 b3) (* a3 b2)) (- (* a3 b1) (* a1 b3)) (- (* a1 b2) (* a2 b1)))))
 
-(define (face-normal coordinates face)
+(define (face-normal coordinates face); TODO: normalise
   (cross-product (map - (list-ref coordinates (cadr face)) (list-ref coordinates (car face)))
                  (map - (list-ref coordinates (last face)) (list-ref coordinates (car face)))))
 
 (define make-plane list)
 (define plane-point car)
 (define plane-normal cadr)
+
+(define (face-plane coordinates face) (make-plane (list-ref coordinates (car face)) (face-normal coordinates face)))
 
 (define (edges-adjacent-to-vertex vertex) (filter (lambda (edge) (member vertex edge)) edges))
 
@@ -94,130 +96,24 @@
 
 (define (plane-distance plane point) (reduce + 0 (map * (map - point (plane-point plane)) (plane-normal plane))))
 
-(define (voronoi-vertex-edge coordinates vertex edge)
-  (let [(ordered (order-edge-for-vertex vertex edge))]
-    (make-plane (list-ref coordinates vertex) (edge-vector coordinates ordered))))
-
-(define (voronoi-face-edge coordinates face edge)
-  (let [(ordered (order-edge-for-face face edge))]
-    (make-plane (list-ref coordinates (car ordered))
-                (cross-product (edge-vector coordinates ordered) (face-normal coordinates face)))))
-
-(define (voronoi-vertex coordinates vertex)
-  (map (lambda (edge) (cons (order-edge-for-vertex vertex edge) (negative-plane (voronoi-vertex-edge coordinates vertex edge))))
-       (edges-adjacent-to-vertex vertex)))
-
-(define (voronoi-edge coordinates edge)
-  (append (map (lambda (vertex) (cons vertex (voronoi-vertex-edge coordinates vertex edge))) edge)
-          (map (lambda (face) (cons face (voronoi-face-edge coordinates face edge))) (faces-adjacent-to-edge edge))))
-
-(define (voronoi-face coordinates face)
-  (cons (cons (random 8) (make-plane (list-ref coordinates (car face)) (face-normal coordinates face)))
-        (map (lambda (edge) (cons (order-edge-for-face edge) (negative-plane (voronoi-face-edge coordinates face edge))))
-             (edges-adjacent-to-face face))))
-
-(define (voronoi coordinates feature)
-  ((cond ((vertex? feature) voronoi-vertex)
-         ((edge?   feature) voronoi-edge  )
-         ((face?   feature) voronoi-face  )) coordinates feature))
-
-(define (out-of-voronoi candidates point)
-  (any (lambda (candidate) (if (negative? (plane-distance (cdr candidate) point)) (car candidate) #f)) candidates))
-
 (define (inner-prod a b) (reduce + 0 (map * a b)))
 
-(define (norm2 vec) (inner-prod vec vec))
+(define (argop op fun lst)
+  (let* [(vals  (map fun lst))
+         (opval (apply op vals))]
+    (list-ref (reverse lst) (1- (length (member opval vals))))))
 
-(define (vertex-closest coordinates vertex point) (list-ref coordinates vertex))
+(define (argmin fun lst) (argop min fun lst))
 
-(define (edge-closest coordinates edge point)
-  (let* [(base  (list-ref coordinates (car edge)))
-         (vec   (edge-vector coordinates edge))
-         (d     (/ (inner-prod (map - point base) vec) (norm2 vec)))]
-    (map + (map (cut * d <>) vec) base)))
+(define (argmax fun lst) (argop max fun lst))
 
-(define (face-closest coordinates face point)
-  (let* [(base  (list-ref coordinates (car face)))
-         (vec   (face-normal coordinates face))
-         (d     (/ (inner-prod (map - point base) vec) (norm2 vec)))]
-    (map - point (map (cut * d <>) vec))))
+(define (min-elevation object1 face1 object2 vertices2)
+  (apply min (map (lambda (vertex) (plane-distance (face-plane object1 face1) (list-ref object2 vertex))) vertices2)))
 
-(define (feature-closest coordinates feature point)
-  ((cond ((vertex? feature) vertex-closest)
-         ((edge?   feature) edge-closest  )
-         ((face?   feature) face-closest  )) coordinates feature point))
-
-(define (closest-point coordinates start point)
-  (let [(next (out-of-voronoi (voronoi coordinates start) point))]
-    (if next
-      (closest-point coordinates next point)
-      (feature-closest coordinates start point))))
-
-(define (swap pair) (cons (cdr pair) (car pair)))
-
-(define (clip-edge-voronoi coordinates edge feature)
-  (let [(dt (plane-distance (cdr feature) (edge-tail coordinates edge)))
-        (dh (plane-distance (cdr feature) (edge-head coordinates edge)))]
-    (if (>= dt 0)
-      (if (>= dh 0)
-        (list -1 2 #f)
-        (let [(l (/ dt (- dt dh)))] (list 0 l (car feature))))
-      (if (< dh 0)
-        (list 1 0 (car feature))
-        (let [(l (/ dt (- dt dh)))] (list l 1 (car feature)))))))
-
-(define (extremum e key lst)
-  (let* [(keys (map key lst))
-         (m    (apply e keys))]
-    (list-ref lst (index-of m keys))))
-
-(define (clip-edge-vertex object1 edge1 object2 vertex2)
-  (let* [(clip (map (cut clip-edge-voronoi object1 edge1 <>) (voronoi-vertex object2 vertex2)))
-         (lower-bound (extremum max car clip))
-         (upper-bound (extremum min cadr clip))]
-    (if (and (eqv? (car lower-bound) -1) (eqv? (cadr upper-bound) 2))
-      (cons (car edge1) vertex2)
-      (if (and (caddr lower-bound)
-               (positive? (inner-prod (edge-vector object1 edge1)
-                                      (map - (edge-point object1 edge1 (car lower-bound)) (list-ref object2 vertex2)))))
-        (edge-edge-test object1 edge1 object2 (caddr lower-bound))
-        (if (and (caddr upper-bound)
-                 (negative? (inner-prod (edge-vector object1 edge1)
-                                        (map - (edge-point object1 edge1 (cadr upper-bound)) (list-ref object2 vertex2)))))
-          (edge-edge-test object1 edge1 object2 (caddr upper-bound))
-          (cons (car edge1) vertex2))))))
-
-(define (edge-vertex-test object1 edge1 object2 vertex2)
-  (let* [(candidates1 (voronoi-edge object1 edge1))
-         (feature1 (out-of-voronoi candidates1 (list-ref object2 vertex2)))]
-    (if feature1
-      (if (vertex? feature1)
-        (vertex-vertex-test object1 feature1 object2 vertex2)
-        (face-vertex-test object1 feature1 object2 vertex2))
-      (clip-edge-vertex object1 edge1 object2 vertex2))))
-
-(define (vertex-edge-test object1 vertex1 object2 edge2)
-  (swap (edge-vertex-test object2 edge2 object1 vertex1)))
-
-(define (vertex-vertex-test object1 vertex1 object2 vertex2)
-  (let* [(candidates1 (voronoi-vertex object1 vertex1))
-         (edge1 (out-of-voronoi candidates1 (list-ref object2 vertex2)))]
-    (if edge1
-      (edge-vertex-test object1 edge1 object2 vertex2)
-      (let* [(candidates2 (voronoi-vertex object2 vertex2))
-             (edge2 (out-of-voronoi candidates2 (list-ref object1 vertex1)))]
-        (if edge2
-          (vertex-edge-test object1 vertex1 object2 edge2)
-          (cons vertex1 vertex2))))))
-
-(define (edge-edge-test object1 edge1 object2 edge2)
-  (cons (car edge1) (car edge2))); TODO: implement this
-
-(define (face-vertex-test object1 face1 object2 vertex2)
-  (cons (car face1) vertex2)); TODO: implement this test
-
-(define (closest-points object1 feature1 object2 feature2)
-  (cons (list-ref object1 feature1) (list-ref object2 feature2)))
+(define (best-face object1 faces1 object2 vertices2)
+  (let* [(face (argmax (lambda (face) (min-elevation object1 face object2 vertices2)) faces1))
+         (dist (min-elevation object1 face object2 vertices2))]
+    (cons face dist)))
 
 (define main-window #f)
 
@@ -231,8 +127,8 @@
     (gl-ortho (- w) w (- h) h -100 +100)))
 
 (define (on-display)
-  (let [(object1 (translate '(-0.5 0 0) (rotate (rotate-z gamma) (rotate (rotate-y beta) (rotate (rotate-x alpha) coordinates)))))
-        (object2 (translate '(+0.5 0 0) (rotate (rotate-x gamma) (rotate (rotate-y beta) (rotate (rotate-z alpha) coordinates)))))]
+  (let [(object1 (translate '(-0.2 0 0) (rotate (rotate-z gamma) (rotate (rotate-y beta) (rotate (rotate-x alpha) coordinates)))))
+        (object2 (translate '(+0.2 0 0) (rotate (rotate-x gamma) (rotate (rotate-y beta) (rotate (rotate-z alpha) coordinates)))))]
     (gl-clear (clear-buffer-mask color-buffer))
     (gl-begin (begin-mode lines)
       (gl-color 1 0 0)
@@ -244,11 +140,22 @@
              (apply gl-vertex (list-ref object (cadr edge))))
            edges))
         (list object1 object2))
-      (let* [(feature-pair (vertex-vertex-test object1 (random 8) object2 (random 8)))
-             (points (closest-points object1 (car feature-pair) object2 (cdr feature-pair)))]; TOOD: compute closest points
-        (gl-color 0 0 1)
-        (apply gl-vertex (car points))
-        (apply gl-vertex (cdr points))))
+      (match-let [((face . dist) (best-face object1 faces object2 vertices))]
+        (gl-color 0 1 0)
+        (if (positive? dist)
+          (for-each
+            (lambda (edge)
+              (apply gl-vertex (list-ref object1 (car edge)))
+              (apply gl-vertex (list-ref object1 (cadr edge))))
+            (edges-adjacent-to-face face))))
+      (match-let [((face . dist) (best-face object2 faces object1 vertices))]
+        (gl-color 0 1 0)
+        (if (positive? dist)
+          (for-each
+            (lambda (edge)
+              (apply gl-vertex (list-ref object2 (car edge)))
+              (apply gl-vertex (list-ref object2 (cadr edge))))
+            (edges-adjacent-to-face face)))))
     (swap-buffers)))
 
 (define (on-idle)

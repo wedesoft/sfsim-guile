@@ -1,5 +1,6 @@
 # TODO
 
+* notesd2.pdf: separating plane!
 * V-Clip algorithm and visualize closest points
 * Euler integration
 * V-Clip multiple contacts
@@ -12,7 +13,6 @@
 * convex hull extraction
 * OpenGL visualisation
 * collision of gear
-* notesd2.pdf: separating plane!
 * estimate friction impulse
 * display body with gears
 * quaternion, state vectors
