@@ -107,9 +107,12 @@
          (c2 (map + p2 (map (cut * <> f1) d2)))]
     (map (lambda (a b) (/ (+ a b) 2)) c1 c2)))
 
+(define (center coordinates) (map (cut / <> (length coordinates)) (apply map + coordinates)))
+
 (define (edges-plane object1 edge1 object2 edge2)
-  (make-plane (point-between-lines object1 edge1 object2 edge2)
-              (cross-product (edge-vector object1 edge1) (edge-vector object2 edge2))))
+  (let [(p (point-between-lines object1 edge1 object2 edge2))
+        (n (cross-product (edge-vector object1 edge1) (edge-vector object2 edge2)))]
+    (make-plane p n)))
 
 (define (edges-adjacent-to-vertex vertex) (filter (lambda (edge) (member vertex edge)) edges))
 
