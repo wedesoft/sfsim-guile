@@ -63,22 +63,28 @@
 
 (define (order-edge-for-vertex vertex edge) (if (eqv? (car edge) vertex) edge (flip-edge edge)))
 
-(define (edge-head coordinates edge) (list-ref coordinates (cadr edge)))
-
 (define (edge-tail coordinates edge) (list-ref coordinates (car edge)))
+
+(define (edge-head coordinates edge) (list-ref coordinates (cadr edge)))
 
 (define (edge-vector coordinates edge) (map - (edge-head coordinates edge) (edge-tail coordinates edge)))
 
 (define (edge-point coordinates edge l)
   (map + (edge-tail coordinates edge) (map (cut * l <>) (edge-vector coordinates edge))))
 
+(define (inner-prod a b) (reduce + 0 (map * a b)))
+
+(define (norm a) (sqrt (inner-prod a a)))
+
 (define (cross-product a b)
   (match-let [((a1 a2 a3) a) ((b1 b2 b3) b)]
     (list (- (* a2 b3) (* a3 b2)) (- (* a3 b1) (* a1 b3)) (- (* a1 b2) (* a2 b1)))))
 
+(define (normalize vec) (let [(n (norm vec))] (map (cut / <> n) vec)))
+
 (define (face-normal coordinates face); TODO: normalise
-  (cross-product (map - (list-ref coordinates (cadr face)) (list-ref coordinates (car face)))
-                 (map - (list-ref coordinates (last face)) (list-ref coordinates (car face)))))
+  (normalize (cross-product (map - (list-ref coordinates (cadr face)) (list-ref coordinates (car face)))
+                            (map - (list-ref coordinates (last face)) (list-ref coordinates (car face))))))
 
 (define make-plane list)
 (define plane-point car)
@@ -86,8 +92,24 @@
 
 (define (face-plane coordinates face) (make-plane (list-ref coordinates (car face)) (face-normal coordinates face)))
 
+; https://math.stackexchange.com/questions/1414285/location-of-shortest-distance-between-two-skew-lines-in-3d
+(define (point-between-lines object1 edge1 object2 edge2)
+  (let* [(p1 (edge-tail object1 edge1))
+         (d1 (edge-vector object1 edge1))
+         (p2 (edge-tail object2 edge2))
+         (d2 (edge-vector object2 edge2))
+         (n (cross-product d1 d2))
+         (n1 (cross-product d1 n))
+         (n2 (cross-product d2 n))
+         (f1 (/ (inner-prod (map - p2 p1) n2) (inner-prod d1 n2)))
+         (f2 (/ (inner-prod (map - p2 p1) n1) (inner-prod d2 n1)))
+         (c1 (map + p1 (map (cut * <> f1) d1)))
+         (c2 (map + p2 (map (cut * <> f1) d2)))]
+    (map (lambda (a b) (/ (+ a b) 2)) c1 c2)))
+
 (define (edges-plane object1 edge1 object2 edge2)
-  (make-plane (edge-tail object1 edge1) (cross-product (edge-vector object1 edge1) (edge-vector object2 edge2))))
+  (make-plane (point-between-lines object1 edge1 object2 edge2)
+              (cross-product (edge-vector object1 edge1) (edge-vector object2 edge2))))
 
 (define (edges-adjacent-to-vertex vertex) (filter (lambda (edge) (member vertex edge)) edges))
 
@@ -98,8 +120,6 @@
 (define (negative-plane plane) (make-plane (plane-point plane) (map - (plane-normal plane))))
 
 (define (plane-distance plane point) (reduce + 0 (map * (map - point (plane-point plane)) (plane-normal plane))))
-
-(define (inner-prod a b) (reduce + 0 (map * a b)))
 
 (define (argop op fun lst)
   (let* [(vals  (map fun lst))
@@ -157,22 +177,22 @@
              (apply gl-vertex (list-ref object (cadr edge))))
            edges))
         (list object1 object2))
-      (match-let [((face . dist) (best-face object1 faces object2 vertices))]
+      (match-let [((face1 . dist1) (best-face object1 faces object2 vertices))
+                  ((face2 . dist2) (best-face object2 faces object1 vertices))]
         (gl-color 0 0 1)
-        (if (positive? dist)
+        (if (and (positive? dist1) (>= dist1 dist2))
           (for-each
             (lambda (edge)
               (apply gl-vertex (list-ref object1 (car edge)))
               (apply gl-vertex (list-ref object1 (cadr edge))))
-            (edges-adjacent-to-face face))))
-      (match-let [((face . dist) (best-face object2 faces object1 vertices))]
+              (edges-adjacent-to-face face1)))
         (gl-color 0 0 1)
-        (if (positive? dist)
+        (if (and (positive? dist2) (> dist2 dist1))
           (for-each
             (lambda (edge)
               (apply gl-vertex (list-ref object2 (car edge)))
               (apply gl-vertex (list-ref object2 (cadr edge))))
-            (edges-adjacent-to-face face))))
+            (edges-adjacent-to-face face2))))
       (let [(result (separating object1 edges object2 edges))]
         (gl-color 0 1 0)
         (if result
