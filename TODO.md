@@ -1,6 +1,6 @@
 # TODO
 
-* find feature pair with maximum separation
+* check gap empty using two edge planes
 * Euler integration
 * multiple contacts
 * collision of blocks
