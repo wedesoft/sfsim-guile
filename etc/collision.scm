@@ -110,7 +110,7 @@
 (define (center coordinates) (map (cut / <> (length coordinates)) (apply map + coordinates)))
 
 (define (edges-plane object1 edge1 object2 edge2)
-  (let* [(p (edge-tail object1 edge1))
+  (let* [(p (edge-tail object2 edge2))
          (n (cross-product (edge-vector object1 edge1) (edge-vector object2 edge2)))]
     (make-plane p n)))
 
@@ -172,7 +172,7 @@
 
 (define (on-display)
   (let [(object1 (translate '(-0.2 0 0) (rotate (rotate-z gamma) (rotate (rotate-y beta) (rotate (rotate-x alpha) coordinates)))))
-        (object2 (translate '(+0.2 0 0) (rotate (rotate-x 0) (rotate (rotate-y 0) (rotate (rotate-z 0) coordinates)))))]
+        (object2 (translate '(+0.2 0 0) (rotate (rotate-x 0.02) (rotate (rotate-y 0.02) (rotate (rotate-z 0) coordinates)))))]
     (gl-clear (clear-buffer-mask color-buffer))
     (gl-begin (begin-mode lines)
       (gl-color 1 0 0)
@@ -211,9 +211,9 @@
     (swap-buffers)))
 
 (define (on-idle)
-  (set! alpha (+ alpha 0.0021))
-  (set! beta (+ beta 0.001))
-  (set! gamma (+ gamma 0.00052))
+  (set! alpha (+ alpha 0.021))
+  (set! beta (+ beta 0.01))
+  (set! gamma (+ gamma 0.0052))
   (post-redisplay))
 
 (initialize-glut (program-arguments) #:window-size '(640 . 480) #:display-mode (display-mode rgb double))
