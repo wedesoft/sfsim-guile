@@ -1,9 +1,8 @@
 # TODO
 
-* notesd2.pdf: separating plane!
-* V-Clip algorithm and visualize closest points
+* find feature pair with maximum separation
 * Euler integration
-* V-Clip multiple contacts
+* multiple contacts
 * collision of blocks
 * contact constraints of blocks
 * joint constraints
