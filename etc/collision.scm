@@ -110,9 +110,16 @@
 (define (center coordinates) (map (cut / <> (length coordinates)) (apply map + coordinates)))
 
 (define (edges-plane object1 edge1 object2 edge2)
-  (let [(p (point-between-lines object1 edge1 object2 edge2))
-        (n (cross-product (edge-vector object1 edge1) (edge-vector object2 edge2)))]
-    (make-plane p n)))
+  (let* [(p (point-between-lines object1 edge1 object2 edge2))
+         (n (cross-product (edge-vector object1 edge1) (edge-vector object2 edge2)))
+         (d1 (plane-distance (make-plane (edge-tail object1 edge1) n) (center object1)))
+         (d2 (plane-distance (make-plane (edge-tail object2 edge2) n) (center object2)))]
+    (if (and (negative? d1) (positive? d2))
+      (make-plane p n)
+      (if (and (positive? d1) (negative? d2))
+        (negative-plane (make-plane p n))
+        #f))))
+
 
 (define (edges-adjacent-to-vertex vertex) (filter (lambda (edge) (member vertex edge)) edges))
 
@@ -140,8 +147,7 @@
   (list (append-map (lambda (x) (make-list (length set2) x)) set1) (apply append (make-list (length set1) set2))))
 
 (define (separation plane object1 vertices1 object2 vertices2)
-  (or (and (<= 0 (elevation min plane object2 vertices2)) (>= 0 (elevation max plane object1 vertices1)))
-      (and (>= 0 (elevation max plane object2 vertices2)) (<= 0 (elevation min plane object1 vertices1)))))
+  (and plane (<= 0 (elevation min plane object2 vertices2)) (>= 0 (elevation max plane object1 vertices1))))
 
 (define (separating object1 edges1 object2 edges2)
   (find
