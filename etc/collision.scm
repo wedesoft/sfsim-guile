@@ -110,16 +110,9 @@
 (define (center coordinates) (map (cut / <> (length coordinates)) (apply map + coordinates)))
 
 (define (edges-plane object1 edge1 object2 edge2)
-  (let* [(p (point-between-lines object1 edge1 object2 edge2))
-         (n (cross-product (edge-vector object1 edge1) (edge-vector object2 edge2)))
-         (d1 (plane-distance (make-plane (edge-tail object1 edge1) n) (center object1)))
-         (d2 (plane-distance (make-plane (edge-tail object2 edge2) n) (center object2)))]
-    (if (and (negative? d1) (positive? d2))
-      (make-plane p n)
-      (if (and (positive? d1) (negative? d2))
-        (negative-plane (make-plane p n))
-        #f))))
-
+  (let* [(p (edge-tail object1 edge1))
+         (n (cross-product (edge-vector object1 edge1) (edge-vector object2 edge2)))]
+    (make-plane p n)))
 
 (define (edges-adjacent-to-vertex vertex) (filter (lambda (edge) (member vertex edge)) edges))
 
@@ -147,10 +140,15 @@
   (list (append-map (lambda (x) (make-list (length set2) x)) set1) (apply append (make-list (length set1) set2))))
 
 (define (separation plane object1 vertices1 object2 vertices2)
-  (and plane (<= 0 (elevation min plane object2 vertices2)) (>= 0 (elevation max plane object1 vertices1))))
+  (max (let [(e2 (elevation min plane object2 vertices2))
+             (e1 (elevation max plane object1 vertices1))]
+         (- e2 e1)))
+       (let [(e2 (elevation max plane object2 vertices2))
+             (e1 (elevation min plane object1 vertices1))]
+         (- e1 e2)))
 
 (define (separating object1 edges1 object2 edges2)
-  (find
+  (argmax
     (lambda (pair)
       (match-let [((edge1 . edge2) pair)]
         (separation (edges-plane object1 edge1 object2 edge2) object1 vertices object2 vertices)))
@@ -174,7 +172,7 @@
 
 (define (on-display)
   (let [(object1 (translate '(-0.2 0 0) (rotate (rotate-z gamma) (rotate (rotate-y beta) (rotate (rotate-x alpha) coordinates)))))
-        (object2 (translate '(+0.2 0 0) (rotate (rotate-x gamma) (rotate (rotate-y beta) (rotate (rotate-z alpha) coordinates)))))]
+        (object2 (translate '(+0.2 0 0) (rotate (rotate-x 0) (rotate (rotate-y 0) (rotate (rotate-z 0) coordinates)))))]
     (gl-clear (clear-buffer-mask color-buffer))
     (gl-begin (begin-mode lines)
       (gl-color 1 0 0)
@@ -204,7 +202,7 @@
             (edges-adjacent-to-face face2))))
       (let [(result (separating object1 edges object2 edges))]
         (gl-color 0 1 0)
-        (if result
+        (if (positive? (separation (edges-plane object1 (car result) object2 (cdr result)) object1 vertices object2 vertices))
           (begin
             (apply gl-vertex (list-ref object1 (car (car result))))
             (apply gl-vertex (list-ref object1 (cadr (car result))))
