@@ -110,9 +110,10 @@
 (define (center coordinates) (map (cut / <> (length coordinates)) (apply map + coordinates)))
 
 (define (edges-plane object1 edge1 object2 edge2)
-  (let* [(p (edge-tail object2 edge2))
+  (let* [(p1 (edge-tail object1 edge1))
+         (p2 (edge-tail object2 edge2))
          (n (cross-product (edge-vector object1 edge1) (edge-vector object2 edge2)))]
-    (make-plane p n)))
+    (cons (make-plane p1 n) (make-plane p2 n))))
 
 (define (edges-adjacent-to-vertex vertex) (filter (lambda (edge) (member vertex edge)) edges))
 
@@ -139,13 +140,14 @@
 (define (combine set1 set2)
   (list (append-map (lambda (x) (make-list (length set2) x)) set1) (apply append (make-list (length set1) set2))))
 
-(define (separation plane object1 vertices1 object2 vertices2)
-  (max (let [(e2 (elevation min plane object2 vertices2))
-             (e1 (elevation max plane object1 vertices1))]
-         (- e2 e1)))
-       (let [(e2 (elevation max plane object2 vertices2))
-             (e1 (elevation min plane object1 vertices1))]
-         (- e1 e2)))
+(define (separation planes object1 vertices1 object2 vertices2)
+  (match-let [((plane1 . plane2) planes)]
+    (max (let [(e2 (elevation min plane2 object2 vertices2))
+               (e1 (elevation max plane1 object1 vertices1))]
+           (if (and (>= e2 -1e-6) (<= e1 1e-6)) (plane-distance plane1 (plane-point plane2)) -1)))
+         (let [(e2 (elevation max plane2 object2 vertices2))
+               (e1 (elevation min plane1 object1 vertices1))]
+           (if (and (>= e1 -1e-6) (<= e2 1e-6)) (plane-distance plane2 (plane-point plane1)) -1))))
 
 (define (separating object1 edges1 object2 edges2)
   (argmax
@@ -172,7 +174,7 @@
 
 (define (on-display)
   (let [(object1 (translate '(-0.2 0 0) (rotate (rotate-z gamma) (rotate (rotate-y beta) (rotate (rotate-x alpha) coordinates)))))
-        (object2 (translate '(+0.2 0 0) (rotate (rotate-x 0.02) (rotate (rotate-y 0.02) (rotate (rotate-z 0) coordinates)))))]
+        (object2 (translate '(+0.2 0 0) (rotate (rotate-x 0.04) (rotate (rotate-y 0.04) (rotate (rotate-z 0) coordinates)))))]
     (gl-clear (clear-buffer-mask color-buffer))
     (gl-begin (begin-mode lines)
       (gl-color 1 0 0)
