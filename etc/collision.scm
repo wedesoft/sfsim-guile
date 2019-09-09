@@ -174,7 +174,7 @@
 
 (define (on-display)
   (let [(object1 (translate '(-0.2 0 0) (rotate (rotate-z gamma) (rotate (rotate-y beta) (rotate (rotate-x alpha) coordinates)))))
-        (object2 (translate '(+0.2 0 0) (rotate (rotate-x 0.04) (rotate (rotate-y 0.04) (rotate (rotate-z 0) coordinates)))))]
+        (object2 (translate '(+0.2 0 0) (rotate (rotate-x alpha) (rotate (rotate-y beta) (rotate (rotate-z gamma) coordinates)))))]
     (gl-clear (clear-buffer-mask color-buffer))
     (gl-begin (begin-mode lines)
       (gl-color 1 0 0)
