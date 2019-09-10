@@ -144,10 +144,10 @@
   (match-let [((plane1 . plane2) planes)]
     (max (let [(e2 (elevation min plane2 object2 vertices2))
                (e1 (elevation max plane1 object1 vertices1))]
-           (if (and (>= e2 -1e-6) (<= e1 1e-6)) (plane-distance plane1 (plane-point plane2)) -1)))
+           (if (and (>= e2 -1e-6) (<= e1 1e-6)) (plane-distance plane1 (plane-point plane2)) -1))
          (let [(e2 (elevation max plane2 object2 vertices2))
                (e1 (elevation min plane1 object1 vertices1))]
-           (if (and (>= e1 -1e-6) (<= e2 1e-6)) (plane-distance plane2 (plane-point plane1)) -1))))
+           (if (and (>= e1 -1e-6) (<= e2 1e-6)) (plane-distance plane2 (plane-point plane1)) -1)))))
 
 (define (separating object1 edges1 object2 edges2)
   (argmax
