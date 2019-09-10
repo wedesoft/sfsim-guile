@@ -109,11 +109,21 @@
 
 (define (center coordinates) (map (cut / <> (length coordinates)) (apply map + coordinates)))
 
-(define (edges-plane object1 edge1 object2 edge2)
+(define (edges-plane object1 edge1 vertices1 object2 edge2 vertices2)
   (let* [(p1 (edge-tail object1 edge1))
          (p2 (edge-tail object2 edge2))
-         (n (cross-product (edge-vector object1 edge1) (edge-vector object2 edge2)))]
-    (cons (make-plane p1 n) (make-plane p2 n))))
+         (n (cross-product (edge-vector object1 edge1) (edge-vector object2 edge2)))
+         (plane1 (make-plane p1 n))
+         (plane2 (make-plane p2 n))]
+    (let [(e1 (elevation max plane1 object1 vertices1))
+          (e2 (elevation min plane2 object2 vertices2))]
+      (if (and (>= e2 -1e-6) (<= e1 1e-6))
+        (cons plane1 plane2)
+        (let [(e1 (elevation min plane1 object1 vertices1))
+              (e2 (elevation max plane2 object2 vertices2))]
+          (if (and (>= e1 -1e-6) (<= e2 1e-6))
+            (cons (negative-plane plane1) (negative-plane plane2))
+            #f))))))
 
 (define (edges-adjacent-to-vertex vertex) (filter (lambda (edge) (member vertex edge)) edges))
 
@@ -140,21 +150,17 @@
 (define (combine set1 set2)
   (list (append-map (lambda (x) (make-list (length set2) x)) set1) (apply append (make-list (length set1) set2))))
 
-(define (separation planes object1 vertices1 object2 vertices2)
-  (match-let [((plane1 . plane2) planes)]
-    (max (let [(e2 (elevation min plane2 object2 vertices2))
-               (e1 (elevation max plane1 object1 vertices1))]
-           (if (and (>= e2 -1e-6) (<= e1 1e-6)) (plane-distance plane1 (plane-point plane2)) -1))
-         (let [(e2 (elevation max plane2 object2 vertices2))
-               (e1 (elevation min plane1 object1 vertices1))]
-           (if (and (>= e1 -1e-6) (<= e2 1e-6)) (plane-distance plane2 (plane-point plane1)) -1)))))
+(define (separation planes)
+  (if (not planes) -1 (plane-distance (car planes) (plane-point (cdr planes)))))
 
-(define (separating object1 edges1 object2 edges2)
-  (argmax
-    (lambda (pair)
-      (match-let [((edge1 . edge2) pair)]
-        (separation (edges-plane object1 edge1 object2 edge2) object1 vertices object2 vertices)))
-    (apply map cons (combine edges1 edges2))))
+(define (best-edge-pair object1 edges1 vertices1 object2 edges2 vertices2)
+  (let* [(edge-pair (argmax
+                      (lambda (pair)
+                        (match-let [((edge1 . edge2) pair)]
+                          (separation (edges-plane object1 edge1 vertices1 object2 edge2 vertices2))))
+                      (apply map cons (combine edges1 edges2))))
+        (dist (separation (edges-plane object1 (car edge-pair) vertices1 object2 (cdr edge-pair) vertices2)))]
+    (cons edge-pair dist)))
 
 (define (best-face object1 faces1 object2 vertices2)
   (let* [(face (argmax (lambda (face) (elevation min (face-plane object1 face) object2 vertices2)) faces1))
@@ -202,14 +208,14 @@
               (apply gl-vertex (list-ref object2 (car edge)))
               (apply gl-vertex (list-ref object2 (cadr edge))))
             (edges-adjacent-to-face face2))))
-      (let [(result (separating object1 edges object2 edges))]
+      (match-let [((edges . dist) (best-edge-pair object1 edges vertices object2 edges vertices))]
         (gl-color 0 1 0)
-        (if (positive? (separation (edges-plane object1 (car result) object2 (cdr result)) object1 vertices object2 vertices))
+        (if (positive? dist)
           (begin
-            (apply gl-vertex (list-ref object1 (car (car result))))
-            (apply gl-vertex (list-ref object1 (cadr (car result))))
-            (apply gl-vertex (list-ref object2 (car (cdr result))))
-            (apply gl-vertex (list-ref object2 (cadr (cdr result))))))))
+            (apply gl-vertex (list-ref object1 (car (car edges))))
+            (apply gl-vertex (list-ref object1 (cadr (car edges))))
+            (apply gl-vertex (list-ref object2 (car (cdr edges))))
+            (apply gl-vertex (list-ref object2 (cadr (cdr edges))))))))
     (swap-buffers)))
 
 (define (on-idle)
