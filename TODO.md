@@ -1,6 +1,6 @@
 # TODO
 
-* check gap empty using two edge planes
+* compare faces, edges, and vertices coincident with the separating plane to determine contact points
 * Euler integration
 * multiple contacts
 * collision of blocks
