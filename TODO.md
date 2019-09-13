@@ -1,6 +1,6 @@
 # TODO
 
-* compare faces, edges, and vertices coincident with the separating plane to determine contact points
+* determine contact points
 * Euler integration
 * multiple contacts
 * collision of blocks

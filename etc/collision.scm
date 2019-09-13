@@ -164,8 +164,9 @@
 
 (define (best-face object1 faces1 object2 vertices2)
   (let* [(face (argmax (lambda (face) (elevation min (face-plane object1 face) object2 vertices2)) faces1))
-         (dist (elevation min (face-plane object1 face) object2 vertices2))]
-    (cons face dist)))
+         (vertex (argmin (lambda (vertex) (plane-distance (face-plane object1 face) (list-ref object2 vertex))) vertices2))
+         (dist (plane-distance (face-plane object1 face) (list-ref object2 vertex)))]
+    (cons (cons face vertex) dist)))
 
 (define main-window #f)
 
@@ -193,21 +194,21 @@
            edges))
         (list object1 object2))
       (gl-color 0 1 0)
-      (match-let [((face1 . dist1) (best-face object1 faces object2 vertices))
-                  ((face2 . dist2) (best-face object2 faces object1 vertices))
+      (match-let [((face-point1 . dist1) (best-face object1 faces object2 vertices))
+                  ((face-point2 . dist2) (best-face object2 faces object1 vertices))
                   ((edges . dist3) (best-edge-pair object1 edges vertices object2 edges vertices))]
         (if (and (positive? dist1) (>= dist1 dist2) (>= dist1 dist3))
           (for-each
             (lambda (edge)
               (apply gl-vertex (list-ref object1 (car edge)))
               (apply gl-vertex (list-ref object1 (cadr edge))))
-              (edges-adjacent-to-face face1)))
+              (edges-adjacent-to-face (car face-point1))))
         (if (and (positive? dist2) (> dist2 dist1) (>= dist2 dist3))
           (for-each
             (lambda (edge)
               (apply gl-vertex (list-ref object2 (car edge)))
               (apply gl-vertex (list-ref object2 (cadr edge))))
-            (edges-adjacent-to-face face2)))
+            (edges-adjacent-to-face (car face-point2))))
         (if (and (positive? dist3) (> dist3 dist1) (> dist3 dist2))
           (begin
             (apply gl-vertex (list-ref object1 (car (car edges))))
