@@ -117,7 +117,7 @@
          (plane2 (make-plane p2 n))]
     (let [(e1 (elevation max plane1 object1 vertices1))
           (e2 (elevation min plane2 object2 vertices2))]
-      (if (and (>= e2 -1e-6) (<= e1 1e-6))
+      (if (and (<= e1 1e-6) (>= e2 -1e-6))
         (cons plane1 plane2)
         (let [(e1 (elevation min plane1 object1 vertices1))
               (e2 (elevation max plane2 object2 vertices2))]
