@@ -148,7 +148,7 @@
   (apply reduce (map (lambda (vertex) (plane-distance plane (list-ref object2 vertex))) vertices2)))
 
 (define (combine set1 set2)
-  (list (append-map (lambda (x) (make-list (length set2) x)) set1) (apply append (make-list (length set1) set2))))
+  (map cons (append-map (lambda (x) (make-list (length set2) x)) set1) (apply append (make-list (length set1) set2))))
 
 (define (separation planes)
   (if (not planes) -1 (plane-distance (car planes) (plane-point (cdr planes)))))
@@ -158,7 +158,7 @@
                       (lambda (pair)
                         (match-let [((edge1 . edge2) pair)]
                           (separation (edges-plane object1 edge1 vertices1 object2 edge2 vertices2))))
-                      (apply map cons (combine edges1 edges2))))
+                      (combine edges1 edges2)))
         (dist (separation (edges-plane object1 (car edge-pair) vertices1 object2 (cdr edge-pair) vertices2)))]
     (cons edge-pair dist)))
 
@@ -193,10 +193,12 @@
              (apply gl-vertex (list-ref object (cadr edge))))
            edges))
         (list object1 object2))
-      (gl-color 0 1 0)
       (match-let [((face-point1 . dist1) (best-face object1 faces object2 vertices))
                   ((face-point2 . dist2) (best-face object2 faces object1 vertices))
                   ((edges . dist3) (best-edge-pair object1 edges vertices object2 edges vertices))]
+        (if (positive? (max dist1 dist2 dist3))
+          (gl-color 0 0 1)
+          (gl-color 0 1 0))
         (if (and (>= dist1 dist2) (>= dist1 dist3))
           (for-each
             (lambda (edge)
