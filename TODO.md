@@ -1,5 +1,7 @@
 # TODO
 
+* 3DS object hierarchy (use lib3ds?)
+* 3DS load vertex array objects
 * determine contact points
 * Euler integration
 * multiple contacts
@@ -7,9 +9,7 @@
 * contact constraints of blocks
 * joint constraints
 * Runge-Kutta integration
-* 3DS object hierarchy
-* 3DS load vertex array objects
-* convex hull extraction
+* convex hull extraction or definition
 * OpenGL visualisation
 * collision of gear
 * estimate friction impulse
