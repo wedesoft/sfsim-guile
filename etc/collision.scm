@@ -55,14 +55,6 @@
 
 (define (index-of a b) (list-index (cut = a <>) b))
 
-(define (flip-edge edge) (reverse edge))
-
-(define (order-edge-for-face face edge)
-  (let [(i (index-of (car edge) face)) (j (index-of (cadr edge) face))]
-    (if (or (eqv? (1+ i) j) (eqv? (- i 3) j)) edge (flip-edge edge))))
-
-(define (order-edge-for-vertex vertex edge) (if (eqv? (car edge) vertex) edge (flip-edge edge)))
-
 (define (edge-tail coordinates edge) (list-ref coordinates (car edge)))
 
 (define (edge-head coordinates edge) (list-ref coordinates (cadr edge)))
@@ -106,8 +98,6 @@
          (c1 (map + p1 (map (cut * <> f1) d1)))
          (c2 (map + p2 (map (cut * <> f1) d2)))]
     (map (lambda (a b) (/ (+ a b) 2)) c1 c2)))
-
-(define (center coordinates) (map (cut / <> (length coordinates)) (apply map + coordinates)))
 
 (define (edges-plane object1 edge1 vertices1 object2 edge2 vertices2)
   (let* [(p1 (edge-tail object1 edge1))
