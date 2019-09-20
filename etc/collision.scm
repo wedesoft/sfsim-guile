@@ -102,7 +102,7 @@
 (define (edges-plane object1 edge1 vertices1 object2 edge2 vertices2)
   (let* [(p1 (edge-tail object1 edge1))
          (p2 (edge-tail object2 edge2))
-         (n (cross-product (edge-vector object1 edge1) (edge-vector object2 edge2)))
+         (n (normalize (cross-product (edge-vector object1 edge1) (edge-vector object2 edge2))))
          (plane1 (make-plane p1 n))
          (plane2 (make-plane p2 n))]
     (let [(e1 (elevation max plane1 object1 vertices1))
