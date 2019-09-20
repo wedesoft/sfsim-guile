@@ -141,7 +141,7 @@
   (map cons (append-map (lambda (x) (make-list (length set2) x)) set1) (apply append (make-list (length set1) set2))))
 
 (define (separation planes)
-  (if (not planes) -1 (plane-distance (car planes) (plane-point (cdr planes)))))
+  (if (not planes) -100 (plane-distance (car planes) (plane-point (cdr planes)))))
 
 (define (best-edge-pair object1 edges1 vertices1 object2 edges2 vertices2)
   (let* [(edge-pair (argmax
@@ -159,6 +159,7 @@
     (cons (cons face vertex) dist)))
 
 (define main-window #f)
+(define dt 1)
 
 (define (on-reshape width height)
   (let* [(aspect (/ width height))
@@ -207,18 +208,23 @@
             (apply gl-vertex (list-ref object1 (cadr (car edges))))
             (apply gl-vertex (list-ref object2 (car (cdr edges))))
             (apply gl-vertex (list-ref object2 (cadr (cdr edges))))))
-        (format #t "~a~&" (max dist1 dist2 dist3))))
+        (if (positive? dt) (format #t "~a~&" (max dist1 dist2 dist3)))))
     (swap-buffers)))
 
 (define (on-idle)
-  (set! alpha (+ alpha 0.021))
-  (set! beta (+ beta 0.01))
-  (set! gamma (+ gamma 0.0052))
+  (set! alpha (+ alpha (* dt 0.021)))
+  (set! beta (+ beta (* dt 0.01)))
+  (set! gamma (+ gamma (* dt 0.0052)))
   (post-redisplay))
+
+(define (on-key key . args)
+  (if (eqv? key 32) (set! dt (- 1 dt)))
+  (if (eqv? key 27) (exit 0)))
 
 (initialize-glut (program-arguments) #:window-size '(640 . 480) #:display-mode (display-mode rgb double))
 (set! main-window (make-window "sfsim"))
 (set-display-callback on-display)
 (set-reshape-callback on-reshape)
+(set-keyboard-callback on-key)
 (set-idle-callback on-idle)
 (glut-main-loop)
