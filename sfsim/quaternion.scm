@@ -119,8 +119,8 @@
 
 (define (rotate-matrix self mat)
   "Rotate a matrix using quaternion rotation"
-  (let [(conjugate (quaternion-conjugate2 self))]
-    (transpose (map (lambda (v) (rotate-vector self (dot mat (rotate-vector conjugate v)))) '((1 0 0) (0 1 0) (0 0 1))))))
+  (let [(rot (rotation-matrix self))]
+    (dot (dot rot mat) (transpose rot))))
 
 (define (rotation-matrix self)
   "Convert rotation quaternion to a rotation matrix"
