@@ -124,7 +124,7 @@
 
 (define (rotation-matrix self)
   "Convert rotation quaternion to a rotation matrix"
-  (map (cut rotate-vector (quaternion-conjugate2 self) <>) '((1 0 0) (0 1 0) (0 0 1))))
+  (transpose (map (cut rotate-vector self <>) '((1 0 0) (0 1 0) (0 0 1)))))
 
 (define (sinc x)
   "Compute sin(x) divided by x"

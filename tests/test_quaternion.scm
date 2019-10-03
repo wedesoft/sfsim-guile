@@ -143,7 +143,7 @@
 
 (test-group "rotation matrix"
   (test-equal "Create identity matrix for zero rotation"
-    '((1.0 0 0) (0.0 1.0 0.0) (0.0 0.0 1.0)) (rotation-matrix (quaternion-rotation 0 '(1 0 0))))
+    '((1.0 0.0 0.0) (0 1.0 0.0) (0 0.0 1.0)) (rotation-matrix (quaternion-rotation 0 '(1 0 0))))
   (test-equal "Create rotation matrix for 90 degree rotation around z-axis"
     '((0 -1 0) (1 0 0) (0 0 1)) (round-matrix (rotation-matrix (quaternion-rotation (/ pi 2) '(0 0 1))))))
 
