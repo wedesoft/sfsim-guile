@@ -5,7 +5,6 @@ AM_INIT_AUTOMAKE([--warnings=no-portability foreign])
 AC_CONFIG_MACRO_DIR([m4])
 AC_REQUIRE_AUX_FILE([test-driver.scm])
 
-GUILE_PKG([2.2 2.0])
 GUILE_PROGS
 GUILE_CACHE_DIR
 
