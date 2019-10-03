@@ -63,7 +63,7 @@
     (test-equal "Scale angular momentum using inverse inertia matrix"
       '(2.0 2.0 1.5) (angular-velocity inertia (quaternion-rotation 0 '(1 0 0)) '(2 4 6)))
     (test-equal "Scale angular momentum using inverse of rotated inertia matrix"
-      '(2 1 3) (round-vector (angular-velocity inertia (quaternion-rotation (/ pi 2) '(1 0 0)) '(2 3 6))))))
+      '(2 1 3) (round-vector (angular-velocity inertia (quaternion-rotation (/ pi 2) '(1 0 0)) '(2 4 6))))))
 
 (test-group "position of a particle"
   (test-equal "Position of center particle equals body's center of gravity"
