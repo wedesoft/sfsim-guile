@@ -114,7 +114,7 @@
   (cdr (components self)))
 
 (define (rotate-vector self vec)
-  "Perform vector rotation with rotation represented using a quaternion"
+  "Perform vector rotation with rotation represented by a quaternion"
   (quaternion->vector (* self (vector->quaternion vec) (quaternion-conjugate self))))
 
 (define (rotate-matrix self mat)

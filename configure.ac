@@ -1,5 +1,5 @@
 AC_PREREQ([2.69])
-AC_INIT([sfsim], [0.1.1], [jan@wedesoft.de])
+AC_INIT([sfsim-guile], [0.1.1], [jan@wedesoft.de])
 AC_CONFIG_AUX_DIR([build-aux])
 AM_INIT_AUTOMAKE([--warnings=no-portability foreign])
 AC_CONFIG_MACRO_DIR([m4])
